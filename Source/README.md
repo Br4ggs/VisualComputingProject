@@ -8,7 +8,7 @@ Visual Studio has support for Cmake projects, and will automatically generate a 
 **Clion**  
 Stub. TODO
 
-**Linux**  
+**Linux [untested]**  
 1. Ensure Cmake is installed: `sudo apt install cmake`
 2. In the `Source` folder, create a new build directory using `mkdir build`.
 3. Navigate into the build directory using `cd build`, and deploy the Cmake project inside this directory using `cmake ../`. This should generate several Cmake-related files in the `build` directory.
