@@ -2,6 +2,9 @@
 #include "header/main.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 //This is just for illustration purposes
 //future implementation should have these shaders in a separate file
@@ -22,6 +25,10 @@ const char* fragmentShaderCode = "#version 330 core\n"
 int main()
 {
     std::cout << "Hello " << testmacro << std::endl;
+
+    //glm test code; wowee a matrix inverse!
+    glm::mat4 matrix = glm::mat4(1.0f);
+    glm::mat4 inverse = glm::inverse(matrix);
 
     if (!glfwInit())
     {
