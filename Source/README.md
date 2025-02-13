@@ -6,7 +6,7 @@ Visual Studio has support for Cmake projects, and will automatically generate a 
 3. Run `main.cpp`. If all goes well, you should see the output of the program.  
 
 **Clion**  
-1. Make sure that one of the prerequisite generators is installed on your machine. For instance,
+1. Make sure that you have all the prerequisite programs:
 - Make or Ninja should be present and available through the command line (on your path somewhere).
 - CMake should be installed.
 - You should have a compiler installed for c++, such as g++ or clang
