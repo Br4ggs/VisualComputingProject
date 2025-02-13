@@ -4,6 +4,8 @@ project(VisualComputingProject)
 
 add_executable(VisualComputingProject main.cpp glad.c)
 
+find_package(glfw3 REQUIRED)
+
 set(LIBRARY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Libraries")
 
 target_include_directories(VisualComputingProject PRIVATE ${LIBRARY_PATH}/include)
@@ -11,7 +13,7 @@ target_include_directories(VisualComputingProject PRIVATE ${LIBRARY_PATH}/includ
 if (APPLE)
   message(STATUS "Configuring for macOS")
   target_link_libraries(VisualComputingProject 
-    ${LIBRARY_PATH}/lib/libglfw.3.4.dylib
+    glfw
     "-framework OpenGL"
     "-framework Cocoa"
     "-framework IOKit"
