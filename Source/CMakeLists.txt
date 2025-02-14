@@ -15,6 +15,11 @@ add_executable(VisualComputingProject
 
 set(LIBRARY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Libraries")
 
+set_property(
+    TARGET VisualComputingProject
+    PROPERTY CXX_STANDARD 11
+)
+
 target_include_directories(VisualComputingProject PRIVATE ${LIBRARY_PATH}/include)
 
 if (APPLE)
