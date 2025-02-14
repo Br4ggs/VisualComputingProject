@@ -4,23 +4,21 @@ project(VisualComputingProject)
 
 add_executable(VisualComputingProject main.cpp glad.c)
 
-find_package(glfw3 REQUIRED)
-
 set(LIBRARY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Libraries")
 
 target_include_directories(VisualComputingProject PRIVATE ${LIBRARY_PATH}/include)
 
 if (APPLE)
-  message(STATUS "Configuring for macOS")
-  target_link_libraries(VisualComputingProject 
-    glfw
-    "-framework OpenGL"
-    "-framework Cocoa"
-    "-framework IOKit"
-    "-framework CoreVideo"
-  )
+    message(STATUS "Configuring for macOS")
+    find_package(glfw3 REQUIRED)
+    target_link_libraries(VisualComputingProject 
+        glfw
+        "-framework OpenGL"
+        "-framework Cocoa"
+        "-framework IOKit"
+        "-framework CoreVideo"
+    )
 elseif (WIN32)
-  message(STATUS "Configuring for Windows")
-  target_link_libraries(VisualComputingProject PRIVATE ${LIBRARY_PATH}/lib/glfw3.lib)
+    message(STATUS "Configuring for Windows")
+    target_link_libraries(VisualComputingProject PRIVATE ${LIBRARY_PATH}/lib/glfw3.lib)
 endif()
-
