@@ -5,6 +5,13 @@
 #include <string>
 #include <iostream>
 
+ShaderProgram::~ShaderProgram()
+{
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+	glDeleteProgram(shaderProgram);
+}
+
 int ShaderProgram::attachVertexShader(const char* sourceFile)
 {
 	std::ifstream in(sourceFile);
