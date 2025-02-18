@@ -16,11 +16,24 @@ TexturedScreenQuad::TexturedScreenQuad(const ShaderProgram* program)
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	glGenTextures(1, &texture);
+}
+
+int TexturedScreenQuad::writeToTexture(const unsigned int width, const unsigned int height, const unsigned char* data)
+{
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	return 0;
 }
 
 void TexturedScreenQuad::render() const
 {
 	program->use();
+
+	glBindTexture(GL_TEXTURE_2D, texture);
 
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

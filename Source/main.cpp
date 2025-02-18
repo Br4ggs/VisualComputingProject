@@ -71,18 +71,6 @@ int main()
 
     glViewport(0, 0, 1000, 800);
 
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load("..\\..\\..\\container.jpg", &width, &height, &nrChannels, 0);
-
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    stbi_image_free(data);
-
-
     ShaderProgram shaderProg;
     shaderProg.attachVertexShader("..\\..\\..\\vertexScreenQuad.glsl"); //since the executable is located in Source/out/build/x64-Debug
     shaderProg.attachFragmentShader("..\\..\\..\\fragmentScreenQuad.glsl");
@@ -115,8 +103,21 @@ int main()
     glClear(GL_COLOR_BUFFER_BIT);
     glfwSwapBuffers(window);
 
+    unsigned char* testTex = new unsigned char[1000 * 800 * 3];
+
     while (!glfwWindowShouldClose(window))
     {
+        for (int i = 0; i < 800; i++) //height
+        {
+            for (int j = 0; j < 1000 - 1; j++) //width
+            {
+                testTex[((i * 1000) + j) * 3] = 225;    //R
+                testTex[((i * 1000) + j) * 3 + 1] = 0;  //G
+                testTex[((i * 1000) + j) * 3 + 2] = 0;  //B
+            }
+        }
+        screenquad.writeToTexture(1000, 800, &testTex[0]);
+
         //imgui stuff
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -126,9 +127,6 @@ int main()
         //draws triangle
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        //shaderProg.use();
-
-        glBindTexture(GL_TEXTURE_2D, texture);
 
         screenquad.render();
 
@@ -143,8 +141,7 @@ int main()
         glfwPollEvents();
     }
 
-    //glDeleteVertexArrays(1, &vertexArray);
-    //glDeleteBuffers(1, &vertexBuffer);
+    delete[] testTex;
 
     screenquad.destroy();
     shaderProg.destroy();
@@ -155,5 +152,6 @@ int main()
 
     glfwDestroyWindow(window);
     glfwTerminate();
+
     return 0;
 }

@@ -5,12 +5,17 @@
 
 #include <glad/glad.h>
 
-//Simple class that represents a mesh object rendered using the provided shader program
+//Represents a textured quad stretched over the entire viewport
+//intended for visualizing visual data on screen using opengl
 class TexturedScreenQuad
 {
 public:
 	TexturedScreenQuad(const ShaderProgram* program);
 	//~TexturedScreenQuad();
+
+	//Writes provided data to opengl texture
+	//data must be provided in RGB format
+	int writeToTexture(const unsigned int width, const unsigned int height, const unsigned char* data);
 	void render() const;
 	void destroy();
 
@@ -32,6 +37,7 @@ private:
 
 	GLuint VAO;
 	GLuint VBO;
+	GLuint texture;
 };
 
 #endif // !MESHOBJ_H
