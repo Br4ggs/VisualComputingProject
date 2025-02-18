@@ -3,7 +3,7 @@
 out vec4 FragColor;
 
 float sdf_sphere(vec3 position, float radius) {
-   return length(position) - r;
+   return length(position) - radius;
 }
 
 void main()

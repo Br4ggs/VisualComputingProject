@@ -83,15 +83,15 @@ int main()
     if (version == 0)
     {
         std::cout << "Failed to initialize OpenGL context" << std::endl;
-        return -1;
+        return 1;
     }
 
     GLfloat vertices[] =
         {
-            -1., -1.,  0., 0., /* bottom left */
-            -0.8,  0.8,  0., 0., /* top left */
-            -0.8, 0.8,  0., 0., /* bottom right */
-            1.,  1.,  0., 0.  /* top right */
+            -0.8, -0.8, 0.0, 0.0, 0.0,
+            -0.8,  0.8, 0.0, 1.0, 1.0,
+             0.8,  0.8, 0.0, 0.0, 1.0,
+             0.8, -0.8, 0.0, 1.0, 0.0,
         };
     unsigned int triangle_elements[] = 
         {
@@ -105,15 +105,27 @@ int main()
 
     GLuint shaderProgram = glCreateProgram(); /* should hold all shaders */
 
+    int success;
+
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertex_shader->content, NULL);
     glCompileShader(vertexShader);
     glAttachShader(shaderProgram, vertexShader);
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        std::cerr << "error compiling vertex shader \n";
+        return 1;
+    }
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragment_shader->content, NULL);
     glCompileShader(fragmentShader);
     glAttachShader(shaderProgram, fragmentShader);
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        std::cerr << "error compiling fragment shader \n";
+        return 1;
+    }
 
     glLinkProgram(shaderProgram); /* can delete compiled shaders after linking */
 
@@ -123,34 +135,34 @@ int main()
 
     // === Setting up communication between CPU and GPU using buffers ===
 
-    GLuint vertex_arrays; /* creates a placeholder object */
+    GLuint vertex_array_id; /* creates a placeholder object */
     glGenVertexArrays(1, /* number of arrays */
-                      &vertex_arrays); /* placeholder for indices */
+                      &vertex_array_id); /* placeholder for indices */
 
-    GLuint vertex_buffer; /* is going to hold all vertices that exist */
-    GLuint element_buffer; /* enables reuse of vertices by specifying which elements belong together */
+    GLuint vertex_buffer_id; /* is going to hold all vertices that exist */
+    GLuint element_buffer_id; /* enables reuse of vertices by specifying which elements belong together */
 
     /* create the buffers */
-    glGenBuffers(1, &vertex_buffer);
-    glGenBuffers(1, &element_buffer);
+    glGenBuffers(1, &vertex_buffer_id);
+    glGenBuffers(1, &element_buffer_id);
 
-    glBindVertexArray(vertex_arrays); /* set the current vertex array object */
+    glBindVertexArray(vertex_array_id); /* set the current vertex array object */
 
     glBindBuffer(GL_ARRAY_BUFFER, /* target to which to bind */
-                 vertex_buffer); /* name of buffer object */
+                 vertex_buffer_id); /* name of buffer object */
     glBufferData(GL_ARRAY_BUFFER, /* target buffer to set data in */
                  sizeof(vertices), /* size in bytes of new data */
                  vertices, /* new data */
                  GL_STATIC_DRAW); /* usage pattern hint for memory layout */
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangle_elements), triangle_elements, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, /* index of vertex attribute */
                           3, /* number of components per attribute, for triangle this is 3 */
                           GL_FLOAT, /* type of values in array */
                           GL_FALSE, /* should not be normalized anymore */
-                          3 * sizeof(float), /* stride of the attributes */
+                          5 * sizeof(float), /* stride of the attributes */
                           (void*)0); /* pointer to first vertex attribute */
     glEnableVertexAttribArray(0); /* enable the array with index 0 (see above)*/
 
@@ -199,7 +211,7 @@ int main()
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f); /* rgba for when colors are cleared */
         glClear(GL_COLOR_BUFFER_BIT); /* clear the color buffer */
         glUseProgram(shaderProgram);
-        glBindVertexArray(vertex_arrays);
+        glBindVertexArray(vertex_array_id);
         glDrawElements(GL_TRIANGLES, /* primitive to render */
                        6, /* number of elements to render */
                        GL_UNSIGNED_INT, /* type of value in the 'indices' */
@@ -220,8 +232,8 @@ int main()
     free(fragment_shader->content);
     free(fragment_shader);
 
-    glDeleteVertexArrays(1, &vertex_arrays);
-    glDeleteBuffers(1, &vertex_buffer);
+    glDeleteVertexArrays(1, &vertex_array_id);
+    glDeleteBuffers(1, &vertex_buffer_id);
     glDeleteProgram(shaderProgram);
 
     glfwDestroyWindow(window);
