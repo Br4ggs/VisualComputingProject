@@ -19,7 +19,7 @@ public:
 	int attachVertexShader(const char* sourceFile);
 	int attachFragmentShader(const char* sourceFile);
 	int compile();
-	void use();
+	void use() const;
 	void destroy();
 
 private:

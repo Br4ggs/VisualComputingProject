@@ -1,5 +1,5 @@
-#include <iostream>
 #include "header/main.h"
+#include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -11,7 +11,10 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include "stb_image.h"
+
 #include "header/shaderProgram.h"
+#include "header/texturedScreenQuad.h"
 
 int main()
 {
@@ -66,32 +69,46 @@ int main()
         return -1;
     }
 
-    glViewport(0, 0, 800, 800);
+    glViewport(0, 0, 1000, 800);
+
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load("..\\..\\..\\container.jpg", &width, &height, &nrChannels, 0);
+
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(data);
+
 
     ShaderProgram shaderProg;
-    shaderProg.attachVertexShader("..\\..\\..\\vertex.glsl"); //since the executable is located in Source/out/build/x64-Debug
-    shaderProg.attachFragmentShader("..\\..\\..\\fragment.glsl");
+    shaderProg.attachVertexShader("..\\..\\..\\vertexScreenQuad.glsl"); //since the executable is located in Source/out/build/x64-Debug
+    shaderProg.attachFragmentShader("..\\..\\..\\fragmentScreenQuad.glsl");
 
     shaderProg.compile();
 
+    TexturedScreenQuad screenquad(&shaderProg);
+
     //vertex array and vertex buffer object to transfer vertex data from cpu to gpu
     //ordering is important here!
-    GLuint vertexArray;
-    GLuint vertexBuffer;
-    glGenVertexArrays(1, &vertexArray);
-    glGenBuffers(1, &vertexBuffer);
+    //GLuint vertexArray;
+    //GLuint vertexBuffer;
+    //glGenVertexArrays(1, &vertexArray);
+    //glGenBuffers(1, &vertexBuffer);
 
-    glBindVertexArray(vertexArray);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    //glBindVertexArray(vertexArray);
+    //glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    //glEnableVertexAttribArray(0);
 
-    //unbind buffers
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    ////unbind buffers
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindVertexArray(0);
 
     //set clearscreen color to a nice navy blue
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
@@ -109,9 +126,14 @@ int main()
         //draws triangle
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        shaderProg.use();
-        glBindVertexArray(vertexArray);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //shaderProg.use();
+
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        screenquad.render();
+
+        //glBindVertexArray(vertexArray);
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -121,8 +143,10 @@ int main()
         glfwPollEvents();
     }
 
-    glDeleteVertexArrays(1, &vertexArray);
-    glDeleteBuffers(1, &vertexBuffer);
+    //glDeleteVertexArrays(1, &vertexArray);
+    //glDeleteBuffers(1, &vertexBuffer);
+
+    screenquad.destroy();
     shaderProg.destroy();
 
     ImGui_ImplOpenGL3_Shutdown();

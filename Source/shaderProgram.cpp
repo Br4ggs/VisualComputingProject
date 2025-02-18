@@ -40,7 +40,7 @@ int ShaderProgram::attachVertexShader(const char* sourceFile)
 		std::cout << "Vertex shader compiled succesfully" << std::endl;
 		return 0;
 	}
-};
+}
 
 int ShaderProgram::attachFragmentShader(const char* sourceFile)
 {
@@ -70,7 +70,7 @@ int ShaderProgram::attachFragmentShader(const char* sourceFile)
 		std::cout << "Fragment shader compiled succesfully" << std::endl;
 		return 0;
 	}
-};
+}
 
 int ShaderProgram::compile()
 {
@@ -105,7 +105,7 @@ int ShaderProgram::compile()
 	}
 }
 
-void ShaderProgram::use()
+void ShaderProgram::use() const
 {
 	glUseProgram(shaderProgram);
 }
