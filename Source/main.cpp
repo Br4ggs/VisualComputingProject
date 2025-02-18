@@ -88,10 +88,10 @@ int main()
 
     GLfloat vertices[] =
         {
-            -0.8, -0.8, 0.0, 0.0, 0.0,
-            -0.8,  0.8, 0.0, 1.0, 1.0,
-             0.8,  0.8, 0.0, 0.0, 1.0,
-             0.8, -0.8, 0.0, 1.0, 0.0,
+            -0.8, -0.8, 0.0,
+            -0.8,  0.8, 0.0,
+             0.8,  0.8, 0.0,
+             0.8, -0.8, 0.0,
         };
     unsigned int triangle_elements[] = 
         {
@@ -162,12 +162,9 @@ int main()
                           3, /* number of components per attribute, for triangle this is 3 */
                           GL_FLOAT, /* type of values in array */
                           GL_FALSE, /* should not be normalized anymore */
-                          5 * sizeof(float), /* stride of the attributes */
+                          3 * sizeof(float), /* stride of all vertex data */
                           (void*)0); /* pointer to first vertex attribute */
     glEnableVertexAttribArray(0); /* enable the array with index 0 (see above)*/
-
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
 
     //unbind buffers
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -213,7 +210,7 @@ int main()
         glUseProgram(shaderProgram);
         glBindVertexArray(vertex_array_id);
         glDrawElements(GL_TRIANGLES, /* primitive to render */
-                       6, /* number of elements to render */
+                       sizeof(triangle_elements) / sizeof(unsigned int), /* number of elements to render */
                        GL_UNSIGNED_INT, /* type of value in the 'indices' */
                        0); /* byte offset into the bound buffer, or pointer to location if no buffer is bound */
 
