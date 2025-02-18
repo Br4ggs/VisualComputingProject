@@ -4,6 +4,7 @@ project(VisualComputingProject)
 
 add_executable(VisualComputingProject
     main.cpp
+    shaderProgram.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/glad.c
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_demo.cpp

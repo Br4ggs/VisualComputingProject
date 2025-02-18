@@ -11,21 +11,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-//This is just for illustration purposes
-//future implementation should have these shaders in a separate file
-const char* vertexShaderCode = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-
-const char* fragmentShaderCode = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(0.8f, 0.3f, 0.02f, 1.0f);\n"
-"}\0";
+#include "header/shaderProgram.h"
 
 int main()
 {
@@ -82,24 +68,11 @@ int main()
 
     glViewport(0, 0, 800, 800);
 
-    //creating the vertex shader
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderCode, NULL);
-    glCompileShader(vertexShader);
+    ShaderProgram shaderProg;
+    shaderProg.attachVertexShader("..\\..\\..\\vertex.glsl"); //since the executable is located in Source/out/build/x64-Debug
+    shaderProg.attachFragmentShader("..\\..\\..\\fragment.glsl");
 
-    //creating the fragment shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderCode, NULL);
-    glCompileShader(fragmentShader);
-
-    //creating the shader program (bundle of shaders)
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    shaderProg.compile();
 
     //vertex array and vertex buffer object to transfer vertex data from cpu to gpu
     //ordering is important here!
@@ -136,7 +109,7 @@ int main()
         //draws triangle
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        glUseProgram(shaderProgram);
+        shaderProg.use();
         glBindVertexArray(vertexArray);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -150,7 +123,7 @@ int main()
 
     glDeleteVertexArrays(1, &vertexArray);
     glDeleteBuffers(1, &vertexBuffer);
-    glDeleteProgram(shaderProgram);
+    shaderProg.destroy();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
