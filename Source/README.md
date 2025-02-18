@@ -8,8 +8,21 @@ Visual Studio has support for Cmake projects, and will automatically generate a 
 **Clion**  
 Stub. TODO
 
-**Linux**  
+**Linux [untested]**  
 1. Ensure Cmake is installed: `sudo apt install cmake`
 2. In the `Source` folder, create a new build directory using `mkdir build`.
 3. Navigate into the build directory using `cd build`, and deploy the Cmake project inside this directory using `cmake ../`. This should generate several Cmake-related files in the `build` directory.
 4. Run `cmake --build .` in the `build` directory to build the executable. If all goes well, this should output an executable build of the program.
+
+## Dependencies used
+[glad](https://glad.dav1d.de/)  
+A loader for OpenGL (used for API bindings).
+
+[glfw3](https://www.glfw.org/)  
+OpenGL library that provides a simplified API for creating windows, contexts, surfaces and handling IO.
+
+[glm](https://github.com/g-truc/glm)  
+OpenGL library that provides mathematical operations and structures such as matrices.
+
+[ImGui](https://github.com/ocornut/imgui)  
+OpenGL library that provides a bloat-free API for creating graphical user interfaces.
