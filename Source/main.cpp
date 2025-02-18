@@ -71,15 +71,6 @@ int main()
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); //enable vsync
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init();
-
     int version = gladLoadGL();
     if (version == 0)
     {
@@ -159,10 +150,6 @@ int main()
     glDeleteVertexArrays(1, &vertexArray);
     glDeleteBuffers(1, &vertexBuffer);
     glDeleteProgram(shaderProgram);
-
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
 
     glfwDestroyWindow(window);
     glfwTerminate();
