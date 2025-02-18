@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include "header/main.h"
 #include <glad/glad.h>
@@ -11,30 +12,37 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-//This is just for illustration purposes
-//future implementation should have these shaders in a separate file
-const char* vertexShaderCode = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
+typedef struct Shader {
+    int size;
+    char *content;
+} ShaderFile;
 
-const char* fragmentShaderCode = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(0.8f, 0.3f, 0.02f, 1.0f);\n"
-"}\0";
+int load_from_file(const char * const filename, ShaderFile* sf) {
+    std::ifstream ifs = std::ifstream{filename, std::ifstream::in};
+
+    if (!ifs) {
+        std::cerr <<
+            "issue loading shader from file: " <<
+            filename;
+
+        return 1;
+    }
+
+    ifs.seekg(0, ifs.end);
+    int size = ifs.tellg();
+    sf->size = size;
+    sf->content = (char *)malloc(sizeof(char) * size + 1);
+    ifs.seekg(0, ifs.beg);
+    ifs.read(sf->content, size);
+    ifs.close();
+    sf->content[size] = '\0';
+    std::cout << sf->content;
+
+    return 0;
+}
 
 int main()
 {
-    std::cout << "Hello " << testmacro << std::endl;
-
-    //glm test code; wowee a matrix inverse!
-    glm::mat4 matrix = glm::mat4(1.0f);
-    glm::mat4 inverse = glm::inverse(matrix);
-
     if (!glfwInit())
     {
         std::cout << "Failed to initialize GLFW" << std::endl;
@@ -45,12 +53,11 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    //vertices of a triangle
     GLfloat vertices[] =
     {
-        -0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,  //left corner
-        0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,   //right corner
-        0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f //top corner
+        -1., -1.,  0., /* bottom left */
+         0.,  0.,  0., /* top */
+         1., -1.,  0., /* bottom right */
     };
 
     GLFWwindow* window = glfwCreateWindow(1000, 800, "VisualComputingProject", NULL, NULL);
@@ -80,19 +87,29 @@ int main()
         return -1;
     }
 
+    ShaderFile* vertex_shader = (ShaderFile*)malloc(sizeof(ShaderFile));
+    ShaderFile* fragment_shader = (ShaderFile*)malloc(sizeof(ShaderFile));
+
+    if (load_from_file("./Source/shaders/simple.vert", vertex_shader)) {
+        std::cerr << "error loading vertex shader from file";
+        return 1;
+    }
+
+    if (load_from_file("./Source/shaders/simple.frag", fragment_shader)) {
+        std::cerr << "error loading fragment shader from file";
+        return 1;
+    }
+
     glViewport(0, 0, 800, 800);
 
-    //creating the vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderCode, NULL);
+    glShaderSource(vertexShader, 1, &vertex_shader->content, NULL);
     glCompileShader(vertexShader);
 
-    //creating the fragment shader
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderCode, NULL);
+    glShaderSource(fragmentShader, 1, &fragment_shader->content, NULL);
     glCompileShader(fragmentShader);
 
-    //creating the shader program (bundle of shaders)
     GLuint shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
@@ -127,21 +144,12 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
-        //imgui stuff
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
-
         //draws triangle
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram);
         glBindVertexArray(vertexArray);
         glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         //render
         glfwSwapBuffers(window);
