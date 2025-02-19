@@ -1,162 +1,83 @@
 #include <iostream>
 #include "header/main.h"
+#include "header/MarchingCubes.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <vector>
 
-//imgui related includes
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+// Implicit function: Sphere equation
+float implicitFunction(float x, float y, float z, float r) {
+    return x * x + y * y + z * z - r * r;
+}
 
-//This is just for illustration purposes
-//future implementation should have these shaders in a separate file
-const char* vertexShaderCode = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
+// Grid parameters
+const int gridSize = 200;
+const float gridSpacing = 0.01f;
+const float sphereRadius = 0.5f;
 
-const char* fragmentShaderCode = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(0.8f, 0.3f, 0.02f, 1.0f);\n"
-"}\0";
+int main() {
+    std::cout << "Starting Marching Cubes..." << std::endl;
 
-int main()
-{
-    std::cout << "Hello " << testmacro << std::endl;
-
-    //glm test code; wowee a matrix inverse!
-    glm::mat4 matrix = glm::mat4(1.0f);
-    glm::mat4 inverse = glm::inverse(matrix);
-
-    if (!glfwInit())
-    {
+    if (!glfwInit()) {
         std::cout << "Failed to initialize GLFW" << std::endl;
         return -1;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    //vertices of a triangle
-    GLfloat vertices[] =
-    {
-        -0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,  //left corner
-        0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,   //right corner
-        0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f //top corner
-    };
-
-    GLFWwindow* window = glfwCreateWindow(1000, 800, "VisualComputingProject", NULL, NULL);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
+    GLFWwindow* window = glfwCreateWindow(800, 800, "Marching Cubes", NULL, NULL);
+    if (!window) {
+        std::cout << "Failed to create window" << std::endl;
         glfwTerminate();
         return -1;
     }
-
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1); //enable vsync
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init();
-
-    int version = gladLoadGL();
-    if (version == 0)
-    {
-        std::cout << "Failed to initialize OpenGL context" << std::endl;
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
 
-    glViewport(0, 0, 800, 800);
+    std::vector<std::vector<std::vector<GridPoint>>> grid(gridSize,
+        std::vector<std::vector<GridPoint>>(gridSize, std::vector<GridPoint>(gridSize)));
 
-    //creating the vertex shader
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderCode, NULL);
-    glCompileShader(vertexShader);
+    // Fill grid with function values
+    for (int x = 0; x < gridSize; x++) {
+        for (int y = 0; y < gridSize; y++) {
+            for (int z = 0; z < gridSize; z++) {
+                float px = (x - gridSize / 2) * gridSpacing;
+                float py = (y - gridSize / 2) * gridSpacing;
+                float pz = (z - gridSize / 2) * gridSpacing;
+                grid[x][y][z] = { glm::vec3(px, py, pz), implicitFunction(px, py, pz, sphereRadius) };
+            }
+        }
+    }
 
-    //creating the fragment shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderCode, NULL);
-    glCompileShader(fragmentShader);
+    std::vector<glm::vec3> vertices;
+    marchingCubes(grid, vertices);
 
-    //creating the shader program (bundle of shaders)
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
+    GLuint vao, vbo;
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
 
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
 
-    //vertex array and vertex buffer object to transfer vertex data from cpu to gpu
-    //ordering is important here!
-    GLuint vertexArray;
-    GLuint vertexBuffer;
-    glGenVertexArrays(1, &vertexArray);
-    glGenBuffers(1, &vertexBuffer);
-
-    glBindVertexArray(vertexArray);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
     glEnableVertexAttribArray(0);
 
-    //unbind buffers
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    while (!glfwWindowShouldClose(window)) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glUseProgram(0);
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
-    //set clearscreen color to a nice navy blue
-    glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glfwSwapBuffers(window);
-
-    while (!glfwWindowShouldClose(window))
-    {
-        //imgui stuff
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
-
-        //draws triangle
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glUseProgram(shaderProgram);
-        glBindVertexArray(vertexArray);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        //render
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    glDeleteVertexArrays(1, &vertexArray);
-    glDeleteBuffers(1, &vertexBuffer);
-    glDeleteProgram(shaderProgram);
-
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
-    glfwDestroyWindow(window);
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
     glfwTerminate();
     return 0;
 }
