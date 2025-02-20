@@ -182,12 +182,17 @@ int main()
     int size = 10;
     int* sample = (int*)malloc(size * sizeof(int));
 
+    int resolution_location = glGetUniformLocation(shaderProgram, "windowResolution");
+
     while (!glfwWindowShouldClose(window))
     {
-        frameCount++;
-
         auto currentTime = std::chrono::high_resolution_clock::now();
         auto timeDelta = std::chrono::duration<double>(currentTime - lastTime).count();
+
+        int screen_width, screen_height;
+        glfwGetFramebufferSize(window, &screen_width, &screen_height);
+
+        frameCount++;
 
         if (timeDelta >= 1.0) // Every second
         {
@@ -209,6 +214,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT); /* clear the color buffer */
         glUseProgram(shaderProgram);
         glBindVertexArray(vertex_array_id);
+        glUniform2f(resolution_location, screen_width, screen_height);
         glDrawElements(GL_TRIANGLES, /* primitive to render */
                        sizeof(triangle_elements) / sizeof(unsigned int), /* number of elements to render */
                        GL_UNSIGNED_INT, /* type of value in the 'indices' */
