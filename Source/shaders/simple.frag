@@ -19,26 +19,28 @@ out vec4 FragColor;
 
 uniform vec2 windowResolution;
 
-float radius = 1.9; // radius of our sphere
+vec3 sphere_position = vec3(1., 0., .0);
+vec3 ray_origin = vec3(0, 0, -3);
 
-float sphere_SDF(vec3 point) {
+float max_color_value = length(sphere_position - ray_origin);
+
+float sphere_SDF(vec3 point, float radius) {
     return length(point) - radius;
 }
 
 float get_distance(vec3 point) {
-    return sphere_SDF(point);
+    return sphere_SDF(point - sphere_position, 1.);
 }
 
 const int MAX_STEPS = 60;
-const float THRESHOLD = 0.001;
-const float MAX_DISTANCE = 10.0;
+const float THRESHOLD = 0.01;
+float MAX_DISTANCE = max_color_value + 1.0;
 
 void main() {
 
     // normalize to clipping space
     vec2 uv = (gl_FragCoord.xy * 2. - windowResolution) / windowResolution.y;
 
-    vec3 ray_origin = vec3(0, 0, -3);
     vec3 ray_direction = normalize(vec3(uv, 1));
     vec3 pixel_colour = vec3(0);
 
@@ -54,7 +56,12 @@ void main() {
         }
     }
 
-    pixel_colour = vec3(smoothstep(0.0, MAX_DISTANCE, distance_traveled));
+    if (distance_traveled > (MAX_DISTANCE - THRESHOLD)) {
+        pixel_colour = vec3(0.0);
+    } else {
+        pixel_colour = vec3(smoothstep(2.0, max_color_value, distance_traveled));
+    }
+
 
     FragColor = vec4(pixel_colour, 1.0);
 }
