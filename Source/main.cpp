@@ -189,17 +189,6 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glfwSwapBuffers(window);
-
-    auto lastTime = std::chrono::high_resolution_clock::now();
-    int frameCount = 0;
-
-
     int resolution_location = glGetUniformLocation(shaderProgram, "windowResolution");
 
     while (!glfwWindowShouldClose(window))
@@ -210,7 +199,6 @@ int main()
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram);
-        glBindVertexArray(vertex_array_id);
         glUniform2f(resolution_location, screen_width, screen_height);
         glDrawElements(GL_TRIANGLES, sizeof(triangle_elements) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
