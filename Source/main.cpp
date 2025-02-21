@@ -17,10 +17,10 @@ typedef struct Shader {
 } ShaderFile;
 
 
-struct Vertex {
+typedef struct Vertex {
     float pos[3];
     float tex[2];
-};
+} VertexInfo;
 
 int load_from_file(const char * const filename, ShaderFile* sf) {
     std::ifstream ifs = std::ifstream{filename, std::ifstream::in};
@@ -56,7 +56,7 @@ int load_texture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     int texture_width, texture_height, nr_channels;
-    unsigned char* texture_data = stbi_load("private/checkered_room.png",
+    unsigned char* texture_data = stbi_load("private/rough_checkerboard.jpg",
                                             &texture_width,
                                             &texture_height,
                                             &nr_channels,
@@ -124,13 +124,16 @@ int main()
         return 1;
     }
 
-    GLfloat vertices[] =
+    constexpr size_t n_vertices = 4;
+
+    VertexInfo vertices[n_vertices] =
         {
-            -1.0, -1.0, 0.0,
-            -1.0,  1.0, 0.0,
-             1.0,  1.0, 0.0,
-             1.0, -1.0, 0.0,
+            {{ -1.0, -1.0,  0.0 }, {  0.0,  0.0}},
+            {{ -1.0,  1.0,  0.0 }, {  0.0,  0.0}},
+            {{  1.0,  1.0,  0.0 }, {  0.0,  0.0}},
+            {{  1.0, -1.0,  0.0 }, {  0.0,  0.0}},
         };
+
     unsigned int triangle_elements[] = 
         {
             0, 1, 2, /* first triangle vertices */
@@ -186,8 +189,12 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangle_elements), triangle_elements, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexInfo), (void *)offsetof(VertexInfo, pos));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexInfo), (void *)offsetof(VertexInfo, tex));
+
     glEnableVertexAttribArray(0);
+
+    load_texture();
 
     int resolution_location = glGetUniformLocation(shaderProgram, "windowResolution");
 
