@@ -19,7 +19,7 @@ out vec4 FragColor;
 
 uniform vec2 windowResolution;
 
-vec3 sphere_position = vec3(1., 0., .0);
+vec3 sphere_position = vec3(0., 0., .0);
 vec3 ray_origin = vec3(0, 0, -3);
 
 float max_color_value = length(sphere_position - ray_origin);
