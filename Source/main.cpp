@@ -8,8 +8,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <chrono>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+// #define STB_IMAGE_IMPLEMENTATION
+// #include <stb_image.h>
 
 typedef struct Shader {
     int size;
@@ -45,33 +45,45 @@ int load_from_file(const char * const filename, ShaderFile* sf) {
     return 0;
 }
 
-int load_texture()
-{
-    unsigned int texture_id;
-    glGenTextures(1, &texture_id);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
+// Function to generate a checkered texture
+std::vector<unsigned char> generateCheckeredTexture(int width, int height, int checkSize) {
+    std::vector<unsigned char> textureData(width * height * 3);
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            int checkX = x / checkSize;
+            int checkY = y / checkSize;
+            bool isWhite = (checkX + checkY) % 2 == 0;
+
+            int index = (y * width + x) * 3;
+            textureData[index] = isWhite ? 255 : 0;
+            textureData[index + 1] = isWhite ? 255 : 0;
+            textureData[index + 2] = isWhite ? 255 : 0;
+        }
+    }
+
+    return textureData;
+}
+
+GLuint loadCheckeredTexture(int texture_height, int texture_width, int checker_size) {
+    std::vector<unsigned char> imageData = generateCheckeredTexture(texture_width, texture_height, checker_size);
+
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    // Upload texture data to GPU
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_width, texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData.data());
+
+    // Set texture parameters (important for proper rendering)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    int texture_width, texture_height, nr_channels;
-    unsigned char* texture_data = stbi_load("private/rough_checkerboard.jpg",
-                                            &texture_width,
-                                            &texture_height,
-                                            &nr_channels,
-                                            0);
-    if (texture_data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_width, texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture_data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        std::cout << "Failed to load texture";
-        return 1;
-    }
+    glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture
 
-    stbi_image_free(texture_data);
-
-    return 0;
+    return textureID;
 }
 
 int main()
@@ -128,10 +140,10 @@ int main()
 
     VertexInfo vertices[n_vertices] =
         {
-            {{ -1.0, -1.0,  0.0 }, {  0.0,  0.0}},
-            {{ -1.0,  1.0,  0.0 }, {  0.0,  0.0}},
-            {{  1.0,  1.0,  0.0 }, {  0.0,  0.0}},
-            {{  1.0, -1.0,  0.0 }, {  0.0,  0.0}},
+            {{ -1.0, -1.0,  -0.5 }, {  0.0,  0.0}},
+            {{ -1.0,  1.0,   0.5 }, {  1.0,  0.0}},
+            {{  1.0,  1.0,  -0.5 }, {  1.0,  1.0}},
+            {{  1.0, -1.0,   0.5 }, {  0.0,  1.0}},
         };
 
     unsigned int triangle_elements[] = 
@@ -191,10 +203,12 @@ int main()
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexInfo), (void *)offsetof(VertexInfo, pos));
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexInfo), (void *)offsetof(VertexInfo, tex));
-
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
 
-    load_texture();
+    GLuint texture_id = loadCheckeredTexture(800, 800, 30);
+
+    glBindTexture(GL_TEXTURE_2D, texture_id);
 
     int resolution_location = glGetUniformLocation(shaderProgram, "windowResolution");
 

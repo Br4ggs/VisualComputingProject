@@ -17,7 +17,10 @@ World origin is at 0,0,0
 
 out vec4 FragColor;
 
+in vec2 TexCoord;
+
 uniform vec2 windowResolution;
+uniform sampler2D aTexture;
 
 vec3 sphere_position = vec3(0., 0., .0);
 vec3 ray_origin = vec3(0, 0, -3);
@@ -57,11 +60,9 @@ void main() {
     }
 
     if (distance_traveled > (MAX_DISTANCE - THRESHOLD)) {
-        pixel_colour = vec3(0.0);
+        FragColor = texture(aTexture, TexCoord);
     } else {
         pixel_colour = vec3(smoothstep(2.0, max_color_value, distance_traveled));
+        FragColor = vec4(pixel_colour, 1.0);
     }
-
-
-    FragColor = vec4(pixel_colour, 1.0);
 }
