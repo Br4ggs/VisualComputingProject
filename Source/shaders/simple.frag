@@ -17,7 +17,7 @@ World origin is at 0,0,0
 
 out vec4 FragColor;
 
-in vec2 TexCoord;
+in vec2 oTexCoord;
 
 uniform vec2 windowResolution;
 uniform sampler2D aTexture;
@@ -60,7 +60,7 @@ void main() {
     }
 
     if (distance_traveled > (MAX_DISTANCE - THRESHOLD)) {
-        FragColor = texture(aTexture, TexCoord);
+        FragColor = texture(aTexture, oTexCoord);
     } else {
         pixel_colour = vec3(smoothstep(2.0, max_color_value, distance_traveled));
         FragColor = vec4(pixel_colour, 1.0);
