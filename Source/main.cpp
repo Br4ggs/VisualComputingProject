@@ -8,6 +8,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <chrono>
 
+#include <stb_image.h>
+
 typedef struct Shader {
     int size;
     char *content;
