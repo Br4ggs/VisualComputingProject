@@ -13,6 +13,12 @@ typedef struct Shader {
     char *content;
 } ShaderFile;
 
+
+struct Vertex {
+    float pos[3];
+    float tex[2];
+};
+
 int load_from_file(const char * const filename, ShaderFile* sf) {
     std::ifstream ifs = std::ifstream{filename, std::ifstream::in};
 
@@ -78,7 +84,7 @@ int main()
         return 1;
     }
 
-    glfwSwapInterval(1); /* 1 = V-sync, 0 = ASAP */
+    glfwSwapInterval(1);
 
     if (version == 0)
     {
@@ -101,9 +107,7 @@ int main()
 
     glViewport(0, 0, 800, 800);
 
-    // === Creating shaders and attaching to program ===
-
-    GLuint shaderProgram = glCreateProgram(); /* should hold all shaders */
+    GLuint shaderProgram = glCreateProgram();
 
     int success;
 
@@ -127,50 +131,35 @@ int main()
         return 1;
     }
 
-    glLinkProgram(shaderProgram); /* can delete compiled shaders after linking */
+    glLinkProgram(shaderProgram);
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
 
-    // === Setting up communication between CPU and GPU using buffers ===
+    GLuint vertex_array_id;
+    glGenVertexArrays(1, &vertex_array_id);
 
-    GLuint vertex_array_id; /* creates a placeholder object */
-    glGenVertexArrays(1, /* number of arrays */
-                      &vertex_array_id); /* placeholder for indices */
+    GLuint vertex_buffer_id;
+    GLuint element_buffer_id;
 
-    GLuint vertex_buffer_id; /* is going to hold all vertices that exist */
-    GLuint element_buffer_id; /* enables reuse of vertices by specifying which elements belong together */
-
-    /* create the buffers */
     glGenBuffers(1, &vertex_buffer_id);
     glGenBuffers(1, &element_buffer_id);
 
-    glBindVertexArray(vertex_array_id); /* set the current vertex array object */
+    glBindVertexArray(vertex_array_id);
 
-    glBindBuffer(GL_ARRAY_BUFFER, /* target to which to bind */
-                 vertex_buffer_id); /* name of buffer object */
-    glBufferData(GL_ARRAY_BUFFER, /* target buffer to set data in */
-                 sizeof(vertices), /* size in bytes of new data */
-                 vertices, /* new data */
-                 GL_STATIC_DRAW); /* usage pattern hint for memory layout */
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangle_elements), triangle_elements, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, /* index of vertex attribute */
-                          3, /* number of components per attribute, for triangle this is 3 */
-                          GL_FLOAT, /* type of values in array */
-                          GL_FALSE, /* should not be normalized anymore */
-                          3 * sizeof(float), /* stride of all vertex data */
-                          (void*)0); /* pointer to first vertex attribute */
-    glEnableVertexAttribArray(0); /* enable the array with index 0 (see above)*/
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
-    //unbind buffers
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    //set clearscreen color to a nice navy blue
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glfwSwapBuffers(window);
@@ -178,58 +167,25 @@ int main()
     auto lastTime = std::chrono::high_resolution_clock::now();
     int frameCount = 0;
 
-    int head = 0;
-    int size = 10;
-    int* sample = (int*)malloc(size * sizeof(int));
 
     int resolution_location = glGetUniformLocation(shaderProgram, "windowResolution");
 
     while (!glfwWindowShouldClose(window))
     {
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        auto timeDelta = std::chrono::duration<double>(currentTime - lastTime).count();
-
         int screen_width, screen_height;
         glfwGetFramebufferSize(window, &screen_width, &screen_height);
 
-        frameCount++;
-
-        if (timeDelta >= 1.0) // Every second
-        {
-            sample[head++] = frameCount;
-
-            if (head == size) {
-                head = 0;
-                for (int i = 0; i < size; ++i) {
-                    std::cout << sample[i] << " ";
-                }
-                std::cout << "\n";
-            }
-
-            frameCount = 0;
-            lastTime = currentTime;
-        }
-
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f); /* rgba for when colors are cleared */
-        glClear(GL_COLOR_BUFFER_BIT); /* clear the color buffer */
+        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram);
         glBindVertexArray(vertex_array_id);
         glUniform2f(resolution_location, screen_width, screen_height);
-        glDrawElements(GL_TRIANGLES, /* primitive to render */
-                       sizeof(triangle_elements) / sizeof(unsigned int), /* number of elements to render */
-                       GL_UNSIGNED_INT, /* type of value in the 'indices' */
-                       0); /* byte offset into the bound buffer, or pointer to location if no buffer is bound */
+        glDrawElements(GL_TRIANGLES, sizeof(triangle_elements) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    for (int i = 0; i < head; ++i) {
-        std::cout << sample[i] << " ";
-    }
-    std::cout << "\n";
-
-    free(sample);
     free(vertex_shader->content);
     free(vertex_shader);
     free(fragment_shader->content);
