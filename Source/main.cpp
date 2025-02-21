@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <chrono>
 
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 typedef struct Shader {
@@ -40,6 +41,35 @@ int load_from_file(const char * const filename, ShaderFile* sf) {
     ifs.read(sf->content, size);
     ifs.close();
     sf->content[size] = '\0';
+
+    return 0;
+}
+
+int load_texture()
+{
+    unsigned int texture_id;
+    glGenTextures(1, &texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    int texture_width, texture_height, nr_channels;
+    unsigned char* texture_data = stbi_load("private/checkered_room.png",
+                                            &texture_width,
+                                            &texture_height,
+                                            &nr_channels,
+                                            0);
+    if (texture_data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_width, texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture_data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        std::cout << "Failed to load texture";
+        return 1;
+    }
+
+    stbi_image_free(texture_data);
 
     return 0;
 }
