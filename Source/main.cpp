@@ -21,9 +21,19 @@ int maxSteps = 256;
 float maxDist = 500;
 float epsilon = 0.001;
 
+//TODO
+//add intersection function
+//add difference function
+//populate render class
+
 glm::vec2 sdfUnion(glm::vec2 obj1, glm::vec2 obj2)
 {
     return (obj1.x < obj2.x) ? obj1 : obj2;
+}
+
+glm::vec2 sdfIntersect(glm::vec2 obj1, glm::vec2 obj2)
+{
+    return (obj1.x > obj2.x) ? obj1 : obj2;
 }
 
 //3d modulo function
@@ -67,7 +77,7 @@ float sdfPlane(glm::vec3 p, glm::vec3 n, float distanceFromOrigin)
 
 glm::vec2 map(glm::vec3 p)
 {
-    //mod3(&p, glm::vec3(5, 5, 5));
+    //mod3(&p, glm::vec3(7, 7, 7));
     //a plane
     float planeDist = sdfPlane(p, glm::vec3(0, 1, 0), 3.0);
     float planeID = 2.0;
@@ -91,8 +101,8 @@ glm::vec2 map(glm::vec3 p)
     glm::vec2 cylinder(cylinderDist, cylinderID);
 
     glm::vec2 res = box;
-    res = sdfUnion(res, sphere);
-    res = sdfUnion(res, cylinder);
+    res = sdfIntersect(res, sphere);
+    //res = sdfUnion(res, cylinder);
     res = sdfUnion(res, plane);
     return res;
 }
@@ -273,7 +283,7 @@ int main()
                 glm::vec2 fragCoord(j, i);
                 glm::vec2 uv = (2.0f * fragCoord - resolution) / resolution.y;
 
-                glm::vec3 rayOrigin(-6.0, 6.0, -3.0);
+                glm::vec3 rayOrigin(6.0, 6.0, -3.0);
                 glm::vec3 lookat(0, 0, 0);
                 glm::vec3 rayDirection = getCamera(rayOrigin, lookat) * glm::normalize(glm::vec3(uv.x, uv.y, FOV));
 
