@@ -36,6 +36,22 @@ glm::vec2 sdfIntersect(glm::vec2 obj1, glm::vec2 obj2)
     return (obj1.x > obj2.x) ? obj1 : obj2;
 }
 
+glm::vec2 sdfDifference(glm::vec2 obj1, glm::vec2 obj2)
+{
+    glm::vec2 res;
+    if (obj1.x > -obj2.x)
+    {
+        res = obj1;
+    }
+    else
+    {
+        res = obj2;
+        res.x *= -1;
+    }
+    
+    return res;
+}
+
 //3d modulo function
 void mod3(glm::vec3* p, glm::vec3 size)
 {
@@ -101,7 +117,7 @@ glm::vec2 map(glm::vec3 p)
     glm::vec2 cylinder(cylinderDist, cylinderID);
 
     glm::vec2 res = box;
-    res = sdfIntersect(res, sphere);
+    res = sdfDifference(res, sphere);
     //res = sdfUnion(res, cylinder);
     res = sdfUnion(res, plane);
     return res;
@@ -283,7 +299,7 @@ int main()
                 glm::vec2 fragCoord(j, i);
                 glm::vec2 uv = (2.0f * fragCoord - resolution) / resolution.y;
 
-                glm::vec3 rayOrigin(6.0, 6.0, -3.0);
+                glm::vec3 rayOrigin(3.0, 3.0, -3.0);
                 glm::vec3 lookat(0, 0, 0);
                 glm::vec3 rayDirection = getCamera(rayOrigin, lookat) * glm::normalize(glm::vec3(uv.x, uv.y, FOV));
 
