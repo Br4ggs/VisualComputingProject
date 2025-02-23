@@ -38,6 +38,7 @@
 //
 
 #include "header/MarchingCubes.h"
+#include "header/Functions.h"
 
 #include <glm/vec3.hpp>
 const int EdgeVertexIndices[12][2] = {
@@ -180,45 +181,110 @@ const int triTable[256][16] = {
 };
 
 // Linear interpolation function
-glm::vec3 interpolate(const GridPoint& p1, const GridPoint& p2) {
-    if (abs(p1.value - p2.value) < 0.00001) return p1.position;
-    float t = (0.0f - p1.value) / (p2.value - p1.value);
+static glm::vec3 interpolate(const GridPoint& p1, const GridPoint& p2) {
+    float v1 = p1.value;
+    float v2 = p2.value;
+
+    float t = (0.0f - v1) / (v2 - v1);
     return p1.position + t * (p2.position - p1.position);
 }
 
-// Apply Marching Cubes algorithm
-void marchingCubes(const std::vector<std::vector<std::vector<GridPoint>>>& grid, std::vector<glm::vec3>& vertices) {
-    int gridSize = grid.size();
+static glm::vec3 computeNormal(const glm::vec3& p, float r) {
+    // small step size for finite difference
+    const float delta = 0.001f;
 
+    float fxp = implicitFunction(p.x + delta, p.y, p.z, r);
+    float fxm = implicitFunction(p.x - delta, p.y, p.z, r);
+    float fyp = implicitFunction(p.x, p.y + delta, p.z, r);
+    float fym = implicitFunction(p.x, p.y - delta, p.z, r);
+    float fzp = implicitFunction(p.x, p.y, p.z + delta, r);
+    float fzm = implicitFunction(p.x, p.y, p.z - delta, r);
+
+    float dx = (fxp - fxm) * 0.5f / delta;
+    float dy = (fyp - fym) * 0.5f / delta;
+    float dz = (fzp - fzm) * 0.5f / delta;
+
+    glm::vec3 n(dx, dy, dz);
+    if (glm::length(n) < 1e-7f) {
+        return glm::vec3(0, 1, 0); // fallback
+    }
+    return glm::normalize(n);
+}
+
+// Apply Marching Cubes algorithm
+void marchingCubes(const std::vector<std::vector<std::vector<GridPoint>>>& grid,
+                   std::vector<Vertex>& vertices)
+{
+    int gridSize = (int)grid.size();
+    if (gridSize < 2) return; // no valid data
+
+    // We'll guess you used sphereRadius=0.5 in main, but to be general
+    // you might pass radius or a function pointer in real usage:
+    float sphereRadius = 0.5f;
+
+    vertices.clear();
+    vertices.reserve(100000); // Just a guess, to reduce re-allocs
+
+    // For each cell in the 3D grid
     for (int x = 0; x < gridSize - 1; x++) {
         for (int y = 0; y < gridSize - 1; y++) {
             for (int z = 0; z < gridSize - 1; z++) {
+                // The 8 corners of this cube
                 GridPoint cubeCorners[8] = {
-                    grid[x][y][z], grid[x+1][y][z], grid[x+1][y+1][z], grid[x][y+1][z],
-                    grid[x][y][z+1], grid[x+1][y][z+1], grid[x+1][y+1][z+1], grid[x][y+1][z+1]
+                    grid[x][y][z],
+                    grid[x+1][y][z],
+                    grid[x][y+1][z],
+                    grid[x+1][y+1][z],
+                    grid[x][y][z+1],
+                    grid[x+1][y][z+1],
+                    grid[x][y+1][z+1],
+                    grid[x+1][y+1][z+1],
                 };
 
+                // Determine which corners are inside/outside
+                // (we consider "value >= 0" as outside or inside
+                //  depending on your function's sign)
                 int cubeIndex = 0;
                 for (int i = 0; i < 8; i++) {
-                    if (cubeCorners[i].value >= 0.0f) cubeIndex |= (1 << i);
+                    if (cubeCorners[i].value < 0.0f) {
+                        cubeIndex |= (1 << i);
+                    }
                 }
 
-                if (edgeTable[cubeIndex] == 0) continue;
+                // If this cube is entirely outside or entirely inside,
+                // then no surface crosses it
+                if (edgeTable[cubeIndex] == 0) {
+                    continue;
+                }
 
-                glm::vec3 edgeVertices[12];
+                // Interpolate edge vertices
+                // We'll store them as Vertex (pos+normal).
+                Vertex edgeVertices[12];
 
                 for (int i = 0; i < 12; i++) {
                     if (edgeTable[cubeIndex] & (1 << i)) {
                         int v1 = EdgeVertexIndices[i][0];
                         int v2 = EdgeVertexIndices[i][1];
-                        edgeVertices[i] = interpolate(cubeCorners[v1], cubeCorners[v2]);
+                        glm::vec3 pos = interpolate(cubeCorners[v1], cubeCorners[v2]);
+                        glm::vec3 nor = computeNormal(pos, sphereRadius);
+
+                        edgeVertices[i].position = pos;
+                        edgeVertices[i].normal   = nor;
                     }
                 }
 
-                for (int i = 0; triTable[cubeIndex][i] != -1; i += 3) {
-                    vertices.push_back(edgeVertices[triTable[cubeIndex][i]]);
-                    vertices.push_back(edgeVertices[triTable[cubeIndex][i+1]]);
-                    vertices.push_back(edgeVertices[triTable[cubeIndex][i+2]]);
+                // Triangulate
+                int idx = 0;
+                while (triTable[cubeIndex][idx] != -1) {
+                    int a = triTable[cubeIndex][idx];
+                    int b = triTable[cubeIndex][idx + 1];
+                    int c = triTable[cubeIndex][idx + 2];
+
+                    vertices.push_back(edgeVertices[a]);
+                    vertices.push_back(edgeVertices[b]);
+                    vertices.push_back(edgeVertices[c]);
+
+                    idx += 3;
                 }
             }
         }
