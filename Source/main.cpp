@@ -108,8 +108,6 @@ int main()
         glfwPollEvents();
     }
 
-    //delete[] testTex;
-
     screenquad.destroy();
     shaderProg.destroy();
 
