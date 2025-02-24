@@ -78,8 +78,9 @@ int main()
     glfwSwapBuffers(window);
 
     RayMarcher marcher(1000, 800);
+    Scene scene;
 
-    marcher.render();
+    marcher.render(scene);
     unsigned char* dataptr = marcher.getRenderData();
     screenquad.writeToTexture(1000, 800, dataptr);
 

@@ -12,8 +12,9 @@ RayMarcher::~RayMarcher()
 	data = nullptr;
 }
 
-void RayMarcher::render()
+void RayMarcher::render(Scene scene)
 {
+    currentScene = scene;
     glm::vec2 resolution(width, height);
     for (int i = 0; i < height; i++)
     {
@@ -24,8 +25,8 @@ void RayMarcher::render()
             glm::vec2 uv = (2.0f * fragCoord - resolution) / resolution.y;
 
             //direction vectors
-            glm::vec3 rayOrigin(-0.75, 0.0, -0.75);
-            glm::vec3 lookat(0.75, 1.0, 0.75);
+            glm::vec3 rayOrigin(0.0, 0.0, -3.0);
+            glm::vec3 lookat(0, 0, 0);
             glm::vec3 rayDirection = getCamera(rayOrigin, lookat) * glm::normalize(glm::vec3(uv.x, uv.y, FOV));
 
             //do rendering
@@ -35,7 +36,7 @@ void RayMarcher::render()
             if (object.x < maxDist)
             {
                 //render object using corresponding material
-                glm::vec3 p = rayOrigin + object.x * rayDirection;
+                glm::vec3 p = rayOrigin + rayDirection * object.x;
                 glm::vec3 material = getMaterial(p, object.y);
                 color += getLight(p, rayDirection, material);
                 //add fog to mitigate ugly aliasing effects
@@ -95,7 +96,7 @@ glm::vec3 RayMarcher::getMaterial(glm::vec3 point, float id) const
 
 glm::vec3 RayMarcher::getLight(glm::vec3 point, glm::vec3 rayDirection, glm::vec3 color) const
 {
-    glm::vec3 lightPos(0.0, 0.0, 0.0);
+    glm::vec3 lightPos(30.0, 40.0, 30.0);
     glm::vec3 L = glm::normalize(lightPos - point);
     glm::vec3 N = getNormal(point);
     glm::vec3 V = -rayDirection;
@@ -119,10 +120,10 @@ glm::vec3 RayMarcher::getNormal(glm::vec3 point) const
 {
     glm::vec2 e(epsilon, 0.0);
 
-    float comp1 = map(point - glm::vec3(e.x, e.y, e.y)).x;
-    float comp2 = map(point - glm::vec3(e.y, e.x, e.y)).x;
-    float comp3 = map(point - glm::vec3(e.y, e.y, e.x)).x;
-    glm::vec3 n = glm::vec3(map(point).x) - glm::vec3(comp1, comp2, comp3);
+    float comp1 = currentScene.map(point - glm::vec3(e.x, e.y, e.y)).x;
+    float comp2 = currentScene.map(point - glm::vec3(e.y, e.x, e.y)).x;
+    float comp3 = currentScene.map(point - glm::vec3(e.y, e.y, e.x)).x;
+    glm::vec3 n = glm::vec3(currentScene.map(point).x) - glm::vec3(comp1, comp2, comp3);
     return glm::normalize(n);
 }
 
@@ -133,106 +134,12 @@ glm::vec2 RayMarcher::rayMarch(glm::vec3 rayOrigin, glm::vec3 rayDirection) cons
 
     for (int i = 0; i < maxSteps; i++)
     {
-        glm::vec3 p = rayOrigin + object.x * rayDirection;
-        hit = map(p);
+        glm::vec3 p = rayOrigin +  rayDirection * object.x;
+        hit = currentScene.map(p);
         object.x += hit.x;
         object.y = hit.y;
 
         if (abs(hit.x) < epsilon || object.x > maxDist) break;
     }
     return object;
-}
-
-//TODO: move this stuff to a "scene" class
-glm::vec2 RayMarcher::map(glm::vec3 point) const
-{
-    //mod3(&point, glm::vec3(5, 5, 5));
-    point = repeat(point, glm::vec3(2, 2, 2));
-
-    //a plane
-    //float planeDist = sdfPlane(point, glm::vec3(0, 1, 0), 3.0);
-    //float planeID = 2.0;
-    //glm::vec2 plane = glm::vec2(planeDist, planeID);
-
-    //a single sphere
-    float sphereDist = sdfSphere(point, 1.3);
-    float sphereID = 1.0;
-    glm::vec2 sphere = glm::vec2(sphereDist, sphereID);
-
-    //a box
-    float boxDist = sdfBox(point, glm::vec3(1, 1, 1));
-    float boxID = 1.0;
-    glm::vec2 box(boxDist, boxID);
-
-    //a cylinder, placed higher than the rest of the objects
-    //glm::vec3 pc = point;
-    //pc.y -= 4.0;
-    //float cylinderDist = sdfCylinder(glm::vec3(pc.y, pc.x, pc.z), 1, 2); //rotate the cylinder by swapping the components around
-    //float cylinderID = 1.0;
-    //glm::vec2 cylinder(cylinderDist, cylinderID);
-
-    glm::vec2 res = box;
-    res = sdfDifference(res, sphere);
-    //res = sdfUnion(res, cylinder);
-    //res = sdfUnion(res, plane);
-    return res;
-}
-
-float RayMarcher::sdfCylinder(glm::vec3 point, float radius, float height) const
-{
-    float d = glm::length(glm::vec2(point.x, point.z)) - radius;
-    d = glm::max(d, abs(point.y) - height);
-    return d;
-}
-
-float RayMarcher::sdfBox(glm::vec3 point, glm::vec3 dim) const
-{
-    glm::vec3 d = glm::abs(point) - dim;
-    return glm::length(glm::max(d, glm::vec3(0))) + vmax(glm::min(d, glm::vec3(0)));
-}
-
-float RayMarcher::sdfSphere(glm::vec3 point, float radius) const
-{
-    return glm::length(point) - radius;
-}
-
-float RayMarcher::sdfPlane(glm::vec3 point, glm::vec3 normal, float distanceFromOrigin) const
-{
-    return glm::dot(point, normal) + distanceFromOrigin;
-}
-
-glm::vec2 RayMarcher::sdfUnion(glm::vec2 obj1, glm::vec2 obj2) const
-{
-    return (obj1.x < obj2.x) ? obj1 : obj2;
-}
-
-glm::vec2 RayMarcher::sdfIntersect(glm::vec2 obj1, glm::vec2 obj2) const
-{
-    return (obj1.x > obj2.x) ? obj1 : obj2;
-}
-
-//max(obj1, -obj2)
-glm::vec2 RayMarcher::sdfDifference(glm::vec2 obj1, glm::vec2 obj2) const
-{
-    if (obj1.x > -obj2.x)
-    {
-        return obj1;
-    }
-    else
-    {
-        obj2.x *= -1;
-        return obj2;
-    }
-}
-
-//selects the largest component of the vector
-float RayMarcher::vmax(glm::vec3 v) const
-{
-    return glm::max(glm::max(v.x, v.y), v.z);
-}
-
-glm::vec3 RayMarcher::repeat(glm::vec3 point, glm::vec3 scale) const
-{
-    glm::vec3 q = point - scale * glm::round(point / scale);
-    return q;
 }

@@ -7,6 +7,9 @@ add_executable(VisualComputingProject
     shaderProgram.cpp
     texturedScreenQuad.cpp
     rayMarcher.cpp
+    scene.cpp
+    sdfSphere.cpp
+    sdfBox.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/glad.c
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_demo.cpp
