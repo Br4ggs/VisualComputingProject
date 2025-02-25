@@ -15,12 +15,11 @@ public:
 	glm::vec2 sdf(glm::vec3 point) const;
 
 private:
-	float vmax(glm::vec3 v) const;
 	void recalculateTransform();
 
 	glm::mat4 position;
 	glm::mat4 rotation;
-	glm::mat4 scale;
+	glm::vec3 scale;
 
 	glm::mat4 transform;
 

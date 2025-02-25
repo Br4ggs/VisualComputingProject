@@ -6,7 +6,7 @@
 
 Scene::Scene()
 {
-    //sphere.setScale(glm::vec3(0.55f, 1.0f, 0.65f));
+    sphere.setScale(glm::vec3(1.5f, 0.75f, 1.0f));
 
     //glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), -3.14f / 3.0f, glm::vec3(1.0f, 1.0, 1.0f));
     //sphere.setRotation(rotation);
@@ -16,7 +16,7 @@ Scene::Scene()
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), -3.14f / 4.0f, glm::vec3(1.0f, 1.0, 1.0f));
     box.setRotation(rotation);
 
-    //box.setScale(glm::vec3(2.0f, 1.3f, 1.001f));
+    box.setScale(glm::vec3(0.75f, 0.15f, 0.5f));
 }
 
 glm::vec2 Scene::map(glm::vec3 point) const
@@ -41,11 +41,13 @@ glm::vec2 Scene::map(glm::vec3 point) const
     //float cylinderID = 1.0;
     //glm::vec2 cylinder(cylinderDist, cylinderID);
 
+    glm::vec2 res = box.sdf(point);
+    res = sdfUnion(res, sphere.sdf(point));
     //res = sdfDifference(res, sphere);
     //res = sdfUnion(res, cylinder);
     //res = sdfUnion(res, plane);
 
-    return box.sdf(point);
+    return res;
 }
 
 float Scene::sdfCylinder(glm::vec3 point, float radius, float height) const
