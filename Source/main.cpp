@@ -17,6 +17,46 @@
 #include "header/texturedScreenQuad.h"
 #include "header/rayMarcher.h"
 
+void imGuiTest()
+{
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(300, 680));
+
+    ImGui::Begin("Settings");
+    
+    //should not be present when rendering using opengl, for that
+    //we can simply use mouse control
+    if (ImGui::CollapsingHeader("Camera"))
+    {
+        //camera position
+        static float camPos[3] = { 0.0f, 0.0f, -3.0f };
+        ImGui::InputFloat3("Position", camPos);
+
+        //camera lookat direction
+        static float lookAt[3] = { 0.0f, 0.0f, -3.0f };
+        ImGui::InputFloat3("Look at", lookAt);
+    }
+
+    if (ImGui::CollapsingHeader("Lighting"))
+    {
+        //position
+        static float lightPos[3] = { 30.0f, 40.0f, 30.0f };
+        ImGui::InputFloat3("Position", lightPos);
+
+        //color
+        static float lightColor[3] = { 0.5f, 0.5f, 0.5f };
+        ImGui::ColorEdit3("Color", lightColor);
+    }
+
+    if (ImGui::Button("Render"))
+    {
+        std::cout << "wuz clicked" << std::endl;
+    }
+
+
+    ImGui::End();
+}
+
 int main()
 {
     std::cout << "Hello " << testmacro << std::endl;
@@ -80,17 +120,19 @@ int main()
     RayMarcher marcher(1000, 800);
     Scene scene;
 
-    marcher.render(scene);
+    //marcher.render(scene);
     unsigned char* dataptr = marcher.getRenderData();
-    screenquad.writeToTexture(1000, 800, dataptr);
+    //screenquad.writeToTexture(1000, 800, dataptr);
 
     while (!glfwWindowShouldClose(window))
     {
         //imgui stuff
-        //ImGui_ImplOpenGL3_NewFrame();
-        //ImGui_ImplGlfw_NewFrame();
-        //ImGui::NewFrame();
-        //ImGui::ShowDemoWindow();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow();
+
+        imGuiTest();
 
         //draws triangle
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
@@ -101,8 +143,8 @@ int main()
         //glBindVertexArray(vertexArray);
         //glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        //ImGui::Render();
-        //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         //render
         glfwSwapBuffers(window);
