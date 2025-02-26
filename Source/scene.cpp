@@ -4,6 +4,10 @@
 #include "header/sdfBox.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+//TODO:
+//create IDrawable class for union/intersection and set difference
+//start looking at imgui integration into scene class
+
 Scene::Scene()
 {
     sphere.setScale(glm::vec3(1.5f, 0.75f, 1.0f));
