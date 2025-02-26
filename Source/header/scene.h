@@ -1,7 +1,9 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include <vector>
 #include <glm/glm.hpp>
+#include "iDrawable.h"
 #include "sdfBox.h";
 #include "sdfSphere.h"
 
@@ -27,6 +29,13 @@ private:
 	float specColorf[3] = { 0.5f, 0.5f, 0.5f };
 
 	glm::vec3 specularColor = glm::vec3(0.5f);
+
+	//how to store the objects in a scene
+	//option 1: store on heap and store pointers in vector
+	//-kinda dangerous
+
+	//list of Idrawable
+	std::vector<IDrawable*> objects;
 
 	SDFBox box = SDFBox(glm::vec3(1.0f, 1.0f, 1.0f));
 	SDFSphere sphere = SDFSphere(1.0f);

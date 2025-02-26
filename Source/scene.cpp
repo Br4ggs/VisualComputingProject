@@ -6,6 +6,8 @@
 #include "imgui.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <limits>
+
 //TODO:
 //start looking at imgui integration into scene class
 
@@ -51,6 +53,41 @@ void Scene::drawUI()
         //color
         ImGui::ColorEdit3("Color", specColorf);
     }
+
+    if (ImGui::CollapsingHeader("Geometry"))
+    {
+        const char* objectTypes[] = { "sphere", "cube" };
+        static int selectedItem = 0;
+        const char* preview = objectTypes[selectedItem];
+        
+        if (ImGui::BeginCombo("wombo combo", preview))
+        {
+            for (int n = 0; n < 2; n++)
+            {
+                const bool selected = (selectedItem == n);
+                if (ImGui::Selectable(objectTypes[n], selected))
+                    selectedItem = n;
+
+                if (selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+
+            ImGui::EndCombo();
+        }
+
+        if (ImGui::Button("Add new object"))
+        {
+            switch (selectedItem)
+            {
+            case 0: //sphere
+                break;
+            case 1: //cube
+                break;
+            default:
+                break;
+            }
+        }
+    }
 }
 
 glm::vec2 Scene::map(glm::vec3 point) const
@@ -75,8 +112,13 @@ glm::vec2 Scene::map(glm::vec3 point) const
     //float cylinderID = 1.0;
     //glm::vec2 cylinder(cylinderDist, cylinderID);
 
-    glm::vec2 res = box.sdf(point);
-    res = sdfUnion(res, sphere.sdf(point));
+    glm::vec2 res(std::numeric_limits<float>::infinity(), -1);
+    for (int i = 1; i < objects.size(); i++)
+    {
+        //res = sdfUnion(res, objects[i]->sdf(point));
+    }
+
+    //res = sdfUnion(res, sphere.sdf(point));
     //res = sdfDifference(res, sphere);
     //res = sdfUnion(res, cylinder);
     //res = sdfUnion(res, plane);
