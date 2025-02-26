@@ -10,9 +10,24 @@ class Scene
 public:
 	Scene();
 
+	void drawUI();
 	glm::vec2 map(glm::vec3 point) const;
 
+	glm::vec3 getCamPos() const;
+	glm::vec3 getLookAt() const;
+
+	glm::vec3 getLightPos() const;
+	glm::vec3 getSpecColor() const;
+
 private:
+	float camPosf[3] = { 0.0f, 0.0f, -3.0f };
+	float lookAtf[3] = { 0.0f, 0.0f, 0.0f };
+
+	float lightPosf[3] = { 30.0f, 40.0f, 30.0f };
+	float specColorf[3] = { 0.5f, 0.5f, 0.5f };
+
+	glm::vec3 specularColor = glm::vec3(0.5f);
+
 	SDFBox box = SDFBox(glm::vec3(1.0f, 1.0f, 1.0f));
 	SDFSphere sphere = SDFSphere(1.0f);
 

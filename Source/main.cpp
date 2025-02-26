@@ -17,42 +17,70 @@
 #include "header/texturedScreenQuad.h"
 #include "header/rayMarcher.h"
 
+TexturedScreenQuad* screen;
+RayMarcher* marcher;
+Scene* scene;
+
 void imGuiTest()
 {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(300, 680));
 
     ImGui::Begin("Settings");
+
+    //call to Scene ui
+    scene->drawUI();
     
     //should not be present when rendering using opengl, for that
     //we can simply use mouse control
-    if (ImGui::CollapsingHeader("Camera"))
-    {
-        //camera position
-        static float camPos[3] = { 0.0f, 0.0f, -3.0f };
-        ImGui::InputFloat3("Position", camPos);
+    //if (ImGui::CollapsingHeader("Camera"))
+    //{
+    //    //camera position
+    //    static float camPos[3] = { 0.0f, 0.0f, -3.0f };
+    //    ImGui::InputFloat3("Position", camPos);
 
-        //camera lookat direction
-        static float lookAt[3] = { 0.0f, 0.0f, -3.0f };
-        ImGui::InputFloat3("Look at", lookAt);
-    }
+    //    //camera lookat direction
+    //    static float lookAt[3] = { 0.0f, 0.0f, -3.0f };
+    //    ImGui::InputFloat3("Look at", lookAt);
 
-    if (ImGui::CollapsingHeader("Lighting"))
-    {
-        //position
-        static float lightPos[3] = { 30.0f, 40.0f, 30.0f };
-        ImGui::InputFloat3("Position", lightPos);
+    //    if (ImGui::TreeNode("foo"))
+    //    {
+    //        ImGui::Text("baz");
 
-        //color
-        static float lightColor[3] = { 0.5f, 0.5f, 0.5f };
-        ImGui::ColorEdit3("Color", lightColor);
-    }
+    //        if (ImGui::TreeNode("bar"))
+    //        {
+    //            ImGui::Text("baaaz");
+
+    //            if (ImGui::TreeNode("bing"))
+    //            {
+    //                ImGui::TreePop();
+    //            }
+
+    //            ImGui::TreePop();
+    //        }
+
+    //        ImGui::TreePop();
+    //    }
+    //}
+
+    //if (ImGui::CollapsingHeader("Lighting"))
+    //{
+    //    //position
+    //    static float lightPos[3] = { 30.0f, 40.0f, 30.0f };
+    //    ImGui::InputFloat3("Position", lightPos);
+
+    //    //color
+    //    static float lightColor[3] = { 0.5f, 0.5f, 0.5f };
+    //    ImGui::ColorEdit3("Color", lightColor);
+    //}
 
     if (ImGui::Button("Render"))
     {
         std::cout << "wuz clicked" << std::endl;
+        marcher->render(*scene);
+        unsigned char* dataptr = marcher->getRenderData();
+        screen->writeToTexture(1000, 800, dataptr);
     }
-
 
     ImGui::End();
 }
@@ -110,19 +138,15 @@ int main()
 
     shaderProg.compile();
 
-    TexturedScreenQuad screenquad(&shaderProg);
+    screen = new TexturedScreenQuad(&shaderProg);
 
     //set clearscreen color to a nice navy blue
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glfwSwapBuffers(window);
 
-    RayMarcher marcher(1000, 800);
-    Scene scene;
-
-    //marcher.render(scene);
-    unsigned char* dataptr = marcher.getRenderData();
-    //screenquad.writeToTexture(1000, 800, dataptr);
+    marcher = new RayMarcher(1000, 800);
+    scene = new Scene();
 
     while (!glfwWindowShouldClose(window))
     {
@@ -134,14 +158,10 @@ int main()
 
         imGuiTest();
 
-        //draws triangle
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        screenquad.render();
-
-        //glBindVertexArray(vertexArray);
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        screen->render();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -151,7 +171,7 @@ int main()
         glfwPollEvents();
     }
 
-    screenquad.destroy();
+    screen->destroy();
     shaderProg.destroy();
 
     ImGui_ImplOpenGL3_Shutdown();
@@ -160,6 +180,10 @@ int main()
 
     glfwDestroyWindow(window);
     glfwTerminate();
+
+    delete screen;
+    delete marcher;
+    delete scene;
 
     return 0;
 }

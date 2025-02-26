@@ -2,11 +2,16 @@
 
 #include "header/sdfSphere.h"
 #include "header/sdfBox.h"
+
+#include "imgui.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 //TODO:
-//create IDrawable class for union/intersection and set difference
 //start looking at imgui integration into scene class
+
+//scene ui
+//-settings for camera & lighting
+//create a tree node for each object in the scene (make it contain a sphere and a box
 
 Scene::Scene()
 {
@@ -21,6 +26,31 @@ Scene::Scene()
     box.setRotation(rotation);
 
     box.setScale(glm::vec3(0.75f, 0.15f, 0.5f));
+}
+
+void Scene::drawUI()
+{
+    if (ImGui::CollapsingHeader("Camera"))
+    {
+        //camera position
+        ImGui::PushID(1);
+        ImGui::InputFloat3("Position", camPosf);
+        ImGui::PopID();
+
+        //camera lookat direction
+        ImGui::InputFloat3("Look at", lookAtf);
+    }
+
+    if (ImGui::CollapsingHeader("Lighting"))
+    {
+        //position
+        ImGui::PushID(2);
+        ImGui::InputFloat3("Position", lightPosf);
+        ImGui::PopID();
+
+        //color
+        ImGui::ColorEdit3("Color", specColorf);
+    }
 }
 
 glm::vec2 Scene::map(glm::vec3 point) const
@@ -52,6 +82,26 @@ glm::vec2 Scene::map(glm::vec3 point) const
     //res = sdfUnion(res, plane);
 
     return res;
+}
+
+glm::vec3 Scene::getCamPos() const
+{
+    return glm::vec3(camPosf[0], camPosf[1], camPosf[2]);
+}
+
+glm::vec3 Scene::getLookAt() const
+{
+    return glm::vec3(lookAtf[0], lookAtf[1], lookAtf[2]);
+}
+
+glm::vec3 Scene::getLightPos() const
+{
+    return glm::vec3(lightPosf[0], lightPosf[1], lightPosf[2]);
+}
+
+glm::vec3 Scene::getSpecColor() const
+{
+    return glm::vec3(specColorf[0], specColorf[1], specColorf[2]);
 }
 
 float Scene::sdfCylinder(glm::vec3 point, float radius, float height) const

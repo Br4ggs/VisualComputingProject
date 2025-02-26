@@ -25,8 +25,8 @@ void RayMarcher::render(Scene scene)
             glm::vec2 uv = (2.0f * fragCoord - resolution) / resolution.y;
 
             //direction vectors
-            glm::vec3 rayOrigin(0.0, 0.0, -3.0);
-            glm::vec3 lookat(0, 0, 0);
+            glm::vec3 rayOrigin = currentScene.getCamPos();
+            glm::vec3 lookat = currentScene.getLookAt();
             glm::vec3 rayDirection = getCamera(rayOrigin, lookat) * glm::normalize(glm::vec3(uv.x, uv.y, FOV));
 
             //do rendering
@@ -96,14 +96,15 @@ glm::vec3 RayMarcher::getMaterial(glm::vec3 point, float id) const
 
 glm::vec3 RayMarcher::getLight(glm::vec3 point, glm::vec3 rayDirection, glm::vec3 color) const
 {
-    glm::vec3 lightPos(30.0, 40.0, 30.0);
+    glm::vec3 lightPos = currentScene.getLightPos();
+    glm::vec3 specColor = currentScene.getSpecColor();
+
     glm::vec3 L = glm::normalize(lightPos - point);
     glm::vec3 N = getNormal(point);
     glm::vec3 V = -rayDirection;
     glm::vec3 R = glm::reflect(-L, N);
 
     //standard phong light model
-    glm::vec3 specColor = glm::vec3(0.5);
     glm::vec3 specular = specColor * pow(glm::clamp(glm::dot(R, V), 0.0f, 1.0f), 10.0f);
     glm::vec3 diffuse = color * glm::clamp(glm::dot(L, N), 0.0f, 1.0f);
     glm::vec3 ambient = color * 0.05f;
