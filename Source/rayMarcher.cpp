@@ -12,7 +12,7 @@ RayMarcher::~RayMarcher()
 	data = nullptr;
 }
 
-void RayMarcher::render(Scene scene)
+void RayMarcher::render(Scene* scene)
 {
     currentScene = scene;
     glm::vec2 resolution(width, height);
@@ -25,8 +25,8 @@ void RayMarcher::render(Scene scene)
             glm::vec2 uv = (2.0f * fragCoord - resolution) / resolution.y;
 
             //direction vectors
-            glm::vec3 rayOrigin = currentScene.getCamPos();
-            glm::vec3 lookat = currentScene.getLookAt();
+            glm::vec3 rayOrigin = currentScene->getCamPos();
+            glm::vec3 lookat = currentScene->getLookAt();
             glm::vec3 rayDirection = getCamera(rayOrigin, lookat) * glm::normalize(glm::vec3(uv.x, uv.y, FOV));
 
             //do rendering
@@ -96,8 +96,8 @@ glm::vec3 RayMarcher::getMaterial(glm::vec3 point, float id) const
 
 glm::vec3 RayMarcher::getLight(glm::vec3 point, glm::vec3 rayDirection, glm::vec3 color) const
 {
-    glm::vec3 lightPos = currentScene.getLightPos();
-    glm::vec3 specColor = currentScene.getSpecColor();
+    glm::vec3 lightPos = currentScene->getLightPos();
+    glm::vec3 specColor = currentScene->getSpecColor();
 
     glm::vec3 L = glm::normalize(lightPos - point);
     glm::vec3 N = getNormal(point);
@@ -121,10 +121,10 @@ glm::vec3 RayMarcher::getNormal(glm::vec3 point) const
 {
     glm::vec2 e(epsilon, 0.0);
 
-    float comp1 = currentScene.map(point - glm::vec3(e.x, e.y, e.y)).x;
-    float comp2 = currentScene.map(point - glm::vec3(e.y, e.x, e.y)).x;
-    float comp3 = currentScene.map(point - glm::vec3(e.y, e.y, e.x)).x;
-    glm::vec3 n = glm::vec3(currentScene.map(point).x) - glm::vec3(comp1, comp2, comp3);
+    float comp1 = currentScene->map(point - glm::vec3(e.x, e.y, e.y)).x;
+    float comp2 = currentScene->map(point - glm::vec3(e.y, e.x, e.y)).x;
+    float comp3 = currentScene->map(point - glm::vec3(e.y, e.y, e.x)).x;
+    glm::vec3 n = glm::vec3(currentScene->map(point).x) - glm::vec3(comp1, comp2, comp3);
     return glm::normalize(n);
 }
 
@@ -136,7 +136,7 @@ glm::vec2 RayMarcher::rayMarch(glm::vec3 rayOrigin, glm::vec3 rayDirection) cons
     for (int i = 0; i < maxSteps; i++)
     {
         glm::vec3 p = rayOrigin +  rayDirection * object.x;
-        hit = currentScene.map(p);
+        hit = currentScene->map(p);
         object.x += hit.x;
         object.y = hit.y;
 

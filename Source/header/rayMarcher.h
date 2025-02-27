@@ -10,11 +10,11 @@ public:
 	RayMarcher(unsigned int width, unsigned int height);
 	~RayMarcher();
 
-	void render(Scene scene);
+	void render(Scene* scene);
 	unsigned char* getRenderData() const;
 
 private:
-	Scene currentScene;
+	Scene* currentScene;
 	unsigned int width;
 	unsigned int height;
 

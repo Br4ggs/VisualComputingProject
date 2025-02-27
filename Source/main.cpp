@@ -77,7 +77,7 @@ void imGuiTest()
     if (ImGui::Button("Render"))
     {
         std::cout << "wuz clicked" << std::endl;
-        marcher->render(*scene);
+        marcher->render(scene);
         unsigned char* dataptr = marcher->getRenderData();
         screen->writeToTexture(1000, 800, dataptr);
     }

@@ -7,13 +7,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <limits>
+#include <iostream>
+#include <algorithm>
 
 //TODO:
-//start looking at imgui integration into scene class
+//displaying object data in ui
+//ui for adding and removing primitives to scene
+//adding a thing as child of an existing operator?
 
 //scene ui
-//-settings for camera & lighting
-//create a tree node for each object in the scene (make it contain a sphere and a box
+//create a tree node for each object in the scene (make it contain a sphere and a box)
 
 Scene::Scene()
 {
@@ -28,6 +31,14 @@ Scene::Scene()
     box.setRotation(rotation);
 
     box.setScale(glm::vec3(0.75f, 0.15f, 0.5f));
+}
+
+Scene::~Scene()
+{
+    for (int i = 0; i < objects.size(); i++)
+    {
+        delete objects[i];
+    }
 }
 
 void Scene::drawUI()
@@ -59,8 +70,26 @@ void Scene::drawUI()
         const char* objectTypes[] = { "sphere", "cube" };
         static int selectedItem = 0;
         const char* preview = objectTypes[selectedItem];
+
+        //list of current objects in the scene
+        for (int i = 0; i < objects.size(); i++)
+        {
+            IDrawable* obj = objects[i];
+
+            ImGui::PushID(i);
+            obj->drawUI();
+
+            ImGui::SameLine();
+            if (ImGui::SmallButton("delete"))
+            {
+                std::cout << "deleting object" << std::endl;
+                objects.erase(std::remove(objects.begin(), objects.end(), obj), objects.end());
+                delete obj;
+            }
+            ImGui::PopID();
+        }
         
-        if (ImGui::BeginCombo("wombo combo", preview))
+        if (ImGui::BeginCombo("object", preview))
         {
             for (int n = 0; n < 2; n++)
             {
@@ -80,9 +109,18 @@ void Scene::drawUI()
             switch (selectedItem)
             {
             case 0: //sphere
+            {
+                std::cout << "adding sphere to scene" << std::endl;
+                IDrawable* obj = new SDFSphere(1.0f);
+                objects.push_back(obj);
                 break;
+            }
             case 1: //cube
-                break;
+            {
+                std::cout << "adding cube to scene" << std::endl;
+                IDrawable* obj = new SDFBox(glm::vec3(1.0f, 1.0f, 1.0f));
+                objects.push_back(obj);
+            }
             default:
                 break;
             }
@@ -112,10 +150,10 @@ glm::vec2 Scene::map(glm::vec3 point) const
     //float cylinderID = 1.0;
     //glm::vec2 cylinder(cylinderDist, cylinderID);
 
-    glm::vec2 res(std::numeric_limits<float>::infinity(), -1);
-    for (int i = 1; i < objects.size(); i++)
+    glm::vec2 res(std::numeric_limits<float>::max(), -1);
+    for (int i = 0; i < objects.size(); i++)
     {
-        //res = sdfUnion(res, objects[i]->sdf(point));
+        res = sdfUnion(res, objects[i]->sdf(point));
     }
 
     //res = sdfUnion(res, sphere.sdf(point));

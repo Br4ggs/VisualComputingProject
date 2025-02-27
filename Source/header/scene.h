@@ -11,6 +11,7 @@ class Scene
 {
 public:
 	Scene();
+	~Scene();
 
 	void drawUI();
 	glm::vec2 map(glm::vec3 point) const;

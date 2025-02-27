@@ -9,6 +9,7 @@ class SDFSphere : public WorldObject
 public:
 	SDFSphere(float radius);
 
+	virtual void drawUI();
 	virtual glm::vec2 sdf(glm::vec3 point) const;
 
 private:

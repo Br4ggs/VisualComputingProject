@@ -9,6 +9,7 @@ class SDFBox : public WorldObject
 public:
 	SDFBox(glm::vec3 dimenions);
 
+	virtual void drawUI();
 	virtual glm::vec2 sdf(glm::vec3 point) const;
 
 private:

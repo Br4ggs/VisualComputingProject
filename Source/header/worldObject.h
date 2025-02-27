@@ -18,6 +18,8 @@ protected:
 
 	void recalculateTransform();
 
+	//rotation?
+
 	glm::mat4 position;
 	glm::mat4 rotation;
 	glm::vec3 scale;
