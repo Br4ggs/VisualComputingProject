@@ -3,7 +3,7 @@
 
 #include "iDrawable.h"
 
-//represents an objects that has a transform in space
+//represents an objects that has a transform and color in space
 class WorldObject : public IDrawable
 {
 public:
@@ -18,7 +18,7 @@ protected:
 
 	void recalculateTransform();
 
-	//rotation?
+	glm::vec3 color;
 
 	glm::mat4 position;
 	glm::mat4 rotation;

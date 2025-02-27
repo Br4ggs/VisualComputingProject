@@ -11,8 +11,6 @@
 #include <algorithm>
 
 //TODO:
-//displaying object data in ui
-//ui for adding and removing primitives to scene
 //adding a thing as child of an existing operator?
 
 //scene ui
@@ -128,7 +126,7 @@ void Scene::drawUI()
     }
 }
 
-glm::vec2 Scene::map(glm::vec3 point) const
+std::pair<float, glm::vec3> Scene::map(glm::vec3 point) const
 {
     //mod3(&point, glm::vec3(5, 5, 5));
     //point = repeat(point, glm::vec3(2, 2, 2));
@@ -150,7 +148,7 @@ glm::vec2 Scene::map(glm::vec3 point) const
     //float cylinderID = 1.0;
     //glm::vec2 cylinder(cylinderDist, cylinderID);
 
-    glm::vec2 res(std::numeric_limits<float>::max(), -1);
+    std::pair<float, glm::vec3> res(std::numeric_limits<float>::max(), -1);
     for (int i = 0; i < objects.size(); i++)
     {
         res = sdfUnion(res, objects[i]->sdf(point));
@@ -201,9 +199,9 @@ float Scene::sdfPlane(glm::vec3 point, glm::vec3 normal, float distanceFromOrigi
     return glm::dot(point, normal) + distanceFromOrigin;
 }
 
-glm::vec2 Scene::sdfUnion(glm::vec2 obj1, glm::vec2 obj2) const
+std::pair<float, glm::vec3> Scene::sdfUnion(std::pair<float, glm::vec3> obj1, std::pair<float, glm::vec3> obj2) const
 {
-    return (obj1.x < obj2.x) ? obj1 : obj2;
+    return (obj1.first < obj2.first) ? obj1 : obj2;
 }
 
 glm::vec2 Scene::sdfIntersect(glm::vec2 obj1, glm::vec2 obj2) const

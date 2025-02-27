@@ -35,7 +35,7 @@ void SDFBox::drawUI()
 		static float colf[3] = { 1.0f, 1.0f, 1.0f };
 		if (ImGui::ColorEdit3("Color", colf))
 		{
-			//TODO
+			color = glm::vec3(colf[0], colf[1], colf[2]);
 		}
 
 	    ImGui::TreePop();
@@ -43,7 +43,7 @@ void SDFBox::drawUI()
 }
 
 //TODO: change return type to a float, vector pair
-glm::vec2 SDFBox::sdf(glm::vec3 point) const
+std::pair<float, glm::vec3> SDFBox::sdf(glm::vec3 point) const
 {
 	glm::vec4 pointHomog(point.x, point.y, point.z, 1.0f);
 	point = transform * pointHomog;
@@ -52,5 +52,5 @@ glm::vec2 SDFBox::sdf(glm::vec3 point) const
 
 	glm::vec3 d = glm::abs(point) - dimensions;
 	float distance = glm::length(glm::max(d, glm::vec3(0))) + vmax(glm::min(d, glm::vec3(0.0f)));
-	return glm::vec2(distance * vmin(scale), 1.0);
+	return std::make_pair(distance * vmin(scale), color);
 }

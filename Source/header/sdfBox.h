@@ -10,7 +10,7 @@ public:
 	SDFBox(glm::vec3 dimenions);
 
 	virtual void drawUI();
-	virtual glm::vec2 sdf(glm::vec3 point) const;
+	virtual std::pair<float, glm::vec3> sdf(glm::vec3 point) const;
 
 private:
 	glm::vec3 dimensions;

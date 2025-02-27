@@ -14,7 +14,7 @@ public:
 	~Scene();
 
 	void drawUI();
-	glm::vec2 map(glm::vec3 point) const;
+	std::pair<float, glm::vec3> map(glm::vec3 point) const;
 
 	glm::vec3 getCamPos() const;
 	glm::vec3 getLookAt() const;
@@ -31,11 +31,7 @@ private:
 
 	glm::vec3 specularColor = glm::vec3(0.5f);
 
-	//how to store the objects in a scene
-	//option 1: store on heap and store pointers in vector
-	//-kinda dangerous
-
-	//list of Idrawable
+	//list of Idrawables allocated on the heap
 	std::vector<IDrawable*> objects;
 
 	SDFBox box = SDFBox(glm::vec3(1.0f, 1.0f, 1.0f));
@@ -48,7 +44,7 @@ private:
 
 	float sdfPlane(glm::vec3 point, glm::vec3 normal, float distanceFromOrigin) const;
 
-	glm::vec2 sdfUnion(glm::vec2 obj1, glm::vec2 obj2) const;
+	std::pair<float, glm::vec3> sdfUnion(std::pair<float, glm::vec3> obj1, std::pair<float, glm::vec3> obj2) const;
 
 	glm::vec2 sdfIntersect(glm::vec2 obj1, glm::vec2 obj2) const;
 

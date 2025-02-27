@@ -32,15 +32,19 @@ void RayMarcher::render(Scene* scene)
             //do rendering
             glm::vec3 background(0.5, 0.8, 0.9);
             glm::vec3 color(0, 0, 0);
-            glm::vec2 object = rayMarch(rayOrigin, rayDirection);
-            if (object.x < maxDist)
+
+            //first component is the distance, second component is the material (color)
+            std::pair<float, glm::vec3> object = rayMarch(rayOrigin, rayDirection);
+
+            if (object.first < maxDist)
             {
                 //render object using corresponding material
-                glm::vec3 p = rayOrigin + rayDirection * object.x;
-                glm::vec3 material = getMaterial(p, object.y);
+                glm::vec3 p = rayOrigin + rayDirection * object.first;
+                glm::vec3 material = object.second;
                 color += getLight(p, rayDirection, material);
+
                 //add fog to mitigate ugly aliasing effects
-                color = glm::mix(color, background, 1.0 - exp(-0.0008 * object.x * object.x));
+                color = glm::mix(color, background, 1.0 - exp(-0.0008 * object.first * object.first));
             }
             else
             {
@@ -110,7 +114,7 @@ glm::vec3 RayMarcher::getLight(glm::vec3 point, glm::vec3 rayDirection, glm::vec
     glm::vec3 ambient = color * 0.05f;
 
     //shadows
-    float d = rayMarch(point + N * 0.02f, glm::normalize(lightPos)).x;
+    float d = rayMarch(point + N * 0.02f, glm::normalize(lightPos)).first;
     if (d < glm::length(lightPos - point)) return ambient;
 
     return diffuse + ambient + specular;
@@ -121,26 +125,26 @@ glm::vec3 RayMarcher::getNormal(glm::vec3 point) const
 {
     glm::vec2 e(epsilon, 0.0);
 
-    float comp1 = currentScene->map(point - glm::vec3(e.x, e.y, e.y)).x;
-    float comp2 = currentScene->map(point - glm::vec3(e.y, e.x, e.y)).x;
-    float comp3 = currentScene->map(point - glm::vec3(e.y, e.y, e.x)).x;
-    glm::vec3 n = glm::vec3(currentScene->map(point).x) - glm::vec3(comp1, comp2, comp3);
+    float comp1 = currentScene->map(point - glm::vec3(e.x, e.y, e.y)).first;
+    float comp2 = currentScene->map(point - glm::vec3(e.y, e.x, e.y)).first;
+    float comp3 = currentScene->map(point - glm::vec3(e.y, e.y, e.x)).first;
+    glm::vec3 n = glm::vec3(currentScene->map(point).first) - glm::vec3(comp1, comp2, comp3);
     return glm::normalize(n);
 }
 
-glm::vec2 RayMarcher::rayMarch(glm::vec3 rayOrigin, glm::vec3 rayDirection) const
+std::pair<float, glm::vec3> RayMarcher::rayMarch(glm::vec3 rayOrigin, glm::vec3 rayDirection) const
 {
-    glm::vec2 hit;
-    glm::vec2 object(0, 0); //?
+    std::pair<float, glm::vec3> hit;
+    std::pair<float, glm::vec3> object = std::make_pair(0.0f, glm::vec3(0.0f)); //?
 
     for (int i = 0; i < maxSteps; i++)
     {
-        glm::vec3 p = rayOrigin +  rayDirection * object.x;
+        glm::vec3 p = rayOrigin +  rayDirection * object.first;
         hit = currentScene->map(p);
-        object.x += hit.x;
-        object.y = hit.y;
+        object.first += hit.first;
+        object.second = hit.second;
 
-        if (abs(hit.x) < epsilon || object.x > maxDist) break;
+        if (abs(hit.first) < epsilon || object.first > maxDist) break;
     }
     return object;
 }

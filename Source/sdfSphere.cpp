@@ -35,14 +35,14 @@ void SDFSphere::drawUI()
 		static float colf[3] = { 1.0f, 1.0f, 1.0f };
 		if (ImGui::ColorEdit3("Color", colf))
 		{
-			//TODO
+			color = glm::vec3(colf[0], colf[1], colf[2]);
 		}
 
 		ImGui::TreePop();
 	}
 }
 
-glm::vec2 SDFSphere::sdf(glm::vec3 point) const
+std::pair<float, glm::vec3> SDFSphere::sdf(glm::vec3 point) const
 {
 	glm::vec4 pointHomog(point.x, point.y, point.z, 1.0f);
 	point = transform * pointHomog;
@@ -50,5 +50,6 @@ glm::vec2 SDFSphere::sdf(glm::vec3 point) const
 	point = point / scale;
 
 	float dist = glm::length(point) - radius;
-	return glm::vec2(dist * vmin(scale), 1.0);
+	//return glm::vec2(dist * vmin(scale), 1.0);
+	return std::make_pair(dist * vmin(scale), color);
 }

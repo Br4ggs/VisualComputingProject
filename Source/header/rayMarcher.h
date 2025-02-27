@@ -33,7 +33,7 @@ private:
 
 	glm::vec3 getNormal(glm::vec3 point) const;
 
-	glm::vec2 rayMarch(glm::vec3 rayOrigin, glm::vec3 rayDirection) const;
+	std::pair<float, glm::vec3> rayMarch(glm::vec3 rayOrigin, glm::vec3 rayDirection) const;
 };
 
 #endif
