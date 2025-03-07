@@ -35,6 +35,11 @@ void OpDifference::drawUI()
 	}
 }
 
+char* OpDifference::getName() const
+{
+	return "difference";
+}
+
 std::vector<IDrawable*> OpDifference::getChildren() const
 {
 	std::vector<IDrawable*> operants;

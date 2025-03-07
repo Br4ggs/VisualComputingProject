@@ -7,9 +7,7 @@
 
 #include <iostream>
 
-//TODO: make sure names are displayed in modal
-//TODO: close button
-//TODO: give preview of to-be-added object
+//TODO: give preview of to-be-added object?
 
 void AddOperatorModal::drawUI(Scene& scene)
 {
@@ -53,10 +51,8 @@ void AddOperatorModal::drawUI(Scene& scene)
             if (obj == operant1 || obj == operant2 || state == 2) continue;
 
             ImGui::PushID(i);
-
-            ImGui::BulletText("test");
+            ImGui::BulletText(obj->getName());
             selectButton(obj);
-
             ImGui::PopID();
         }
 
@@ -68,6 +64,15 @@ void AddOperatorModal::drawUI(Scene& scene)
             scene.removeObject(operant2);
             scene.addObject(op);
 
+            state = 0;
+            operant1 = nullptr;
+            operant2 = nullptr;
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (ImGui::Button("Close"))
+        {
             state = 0;
             operant1 = nullptr;
             operant2 = nullptr;

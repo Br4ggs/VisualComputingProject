@@ -42,6 +42,11 @@ void SDFBox::drawUI()
 	}
 }
 
+char* SDFBox::getName() const
+{
+	return "box";
+}
+
 //TODO: change return type to a float, vector pair
 std::pair<float, glm::vec3> SDFBox::sdf(glm::vec3 point) const
 {

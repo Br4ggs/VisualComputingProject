@@ -28,6 +28,11 @@ void OpUnion::drawUI()
 	}
 }
 
+char* OpUnion::getName() const
+{
+	return "union";
+}
+
 std::vector<IDrawable*> OpUnion::getChildren() const
 {
 	std::vector<IDrawable*> operants;

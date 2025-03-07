@@ -12,7 +12,6 @@ public:
 	void drawUI(Scene& scene);
 
 private:
-	void drawTreeNode();
 	void selectButton(IDrawable* obj);
 	IDrawable* createOperator(int op, IDrawable* op1, IDrawable* op2) const;
 

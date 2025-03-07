@@ -28,6 +28,11 @@ void OpIntersect::drawUI()
 	}
 }
 
+char* OpIntersect::getName() const
+{
+	return "intersect";
+}
+
 std::vector<IDrawable*> OpIntersect::getChildren() const
 {
 	std::vector<IDrawable*> operants;
