@@ -2,6 +2,11 @@
 
 #include "header/sdfSphere.h"
 #include "header/sdfBox.h"
+#include "header/opUnion.h"
+#include "header/opIntersect.h"
+#include "header/opDifference.h"
+
+#include "header/addOperatorModal.h"
 
 #include "imgui.h"
 #include <glm/gtc/matrix_transform.hpp>
@@ -11,24 +16,31 @@
 #include <algorithm>
 
 //TODO:
+//add class for union and difference
+//add class for repeat operator?
+//add ui for rotations?
 //adding a thing as child of an existing operator?
+//moving objects
 
 //scene ui
 //create a tree node for each object in the scene (make it contain a sphere and a box)
 
 Scene::Scene()
 {
-    sphere.setScale(glm::vec3(1.5f, 0.75f, 1.0f));
+    SDFBox* box = new SDFBox(glm::vec3(1.0f, 1.0f, 1.0f));
+    SDFSphere* sphere = new SDFSphere(1.0f);
+    SDFSphere* sphere2 = new SDFSphere(1.0f);
+    SDFSphere* sphere3 = new SDFSphere(1.0f);
 
-    //glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), -3.14f / 3.0f, glm::vec3(1.0f, 1.0, 1.0f));
-    //sphere.setRotation(rotation);
+    box->setScale(glm::vec3(0.75f));
 
-    box.setPosition(glm::vec3(0.5f, 0.5f, 0.0f));
+    sphere2->setPosition(glm::vec3(1.0f, 0.0f, 0.0f));
+    sphere3->setPosition(glm::vec3(1.0f, 0.0f, 1.0f));
 
-    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), -3.14f / 4.0f, glm::vec3(1.0f, 1.0, 1.0f));
-    box.setRotation(rotation);
-
-    box.setScale(glm::vec3(0.75f, 0.15f, 0.5f));
+    OpDifference* opDifference = new OpDifference(sphere, box);
+    objects.push_back(opDifference);
+    objects.push_back(sphere2);
+    objects.push_back(sphere3);
 }
 
 Scene::~Scene()
@@ -123,6 +135,13 @@ void Scene::drawUI()
                 break;
             }
         }
+
+        static AddOperatorModal addOperatorModal;
+
+        if (ImGui::Button("Add operator"))
+            ImGui::OpenPopup("Operator");
+
+        addOperatorModal.drawUI(*this);
     }
 }
 
@@ -180,6 +199,21 @@ glm::vec3 Scene::getLightPos() const
 glm::vec3 Scene::getSpecColor() const
 {
     return glm::vec3(specColorf[0], specColorf[1], specColorf[2]);
+}
+
+std::vector<IDrawable*> Scene::getObjects()
+{
+    return objects;
+}
+
+void Scene::addObject(IDrawable* obj)
+{
+    objects.push_back(obj);
+}
+
+void Scene::removeObject(IDrawable* obj)
+{
+    objects.erase(std::remove_if(objects.begin(), objects.end(), [obj](IDrawable* i) {return i == obj; }));
 }
 
 float Scene::sdfCylinder(glm::vec3 point, float radius, float height) const

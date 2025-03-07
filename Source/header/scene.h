@@ -22,6 +22,10 @@ public:
 	glm::vec3 getLightPos() const;
 	glm::vec3 getSpecColor() const;
 
+	std::vector<IDrawable*> getObjects();
+	void addObject(IDrawable* obj);
+	void removeObject(IDrawable* obj);
+
 private:
 	float camPosf[3] = { 0.0f, 0.0f, -3.0f };
 	float lookAtf[3] = { 0.0f, 0.0f, 0.0f };
@@ -33,9 +37,6 @@ private:
 
 	//list of Idrawables allocated on the heap
 	std::vector<IDrawable*> objects;
-
-	SDFBox box = SDFBox(glm::vec3(1.0f, 1.0f, 1.0f));
-	SDFSphere sphere = SDFSphere(1.0f);
 
 
 	float sdfCylinder(glm::vec3 point, float radius, float height) const;

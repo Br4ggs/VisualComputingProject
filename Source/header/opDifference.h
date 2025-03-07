@@ -1,15 +1,13 @@
-#ifndef OPUNION_H
-#define OPUNION_H
+#ifndef OPDIFFERENCE_H
+#define OPDIFFERENCE_H
 
 #include "iDrawable.h"
 
-class OpUnion : public IDrawable
+class OpDifference : public IDrawable
 {
 public:
-	OpUnion(IDrawable* operant1, IDrawable* operant2);
-	~OpUnion();
-
-	//setters and getters?
+	OpDifference(IDrawable* operant1, IDrawable* operant2);
+	~OpDifference();
 
 	virtual void drawUI();
 	virtual std::vector<IDrawable*> getChildren() const;

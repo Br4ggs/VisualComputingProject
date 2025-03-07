@@ -1,20 +1,20 @@
-#include "header/opUnion.h"
+#include "header/opIntersect.h"
 
 #include "imgui.h"
 
-OpUnion::OpUnion(IDrawable* operant1, IDrawable* operant2)
+OpIntersect::OpIntersect(IDrawable* operant1, IDrawable* operant2)
 	:operant1(operant1), operant2(operant2)
 {}
 
-OpUnion::~OpUnion()
+OpIntersect::~OpIntersect()
 {
 	delete operant1;
 	delete operant2;
 }
 
-void OpUnion::drawUI()
+void OpIntersect::drawUI()
 {
-	if (ImGui::TreeNode("union"))
+	if (ImGui::TreeNode("intersect"))
 	{
 		ImGui::PushID(0);
 		operant1->drawUI();
@@ -28,7 +28,7 @@ void OpUnion::drawUI()
 	}
 }
 
-std::vector<IDrawable*> OpUnion::getChildren() const
+std::vector<IDrawable*> OpIntersect::getChildren() const
 {
 	std::vector<IDrawable*> operants;
 	operants.push_back(operant1);
@@ -36,12 +36,10 @@ std::vector<IDrawable*> OpUnion::getChildren() const
 	return operants;
 };
 
-std::pair<float, glm::vec3> OpUnion::sdf(glm::vec3 point) const
+std::pair<float, glm::vec3> OpIntersect::sdf(glm::vec3 point) const
 {
-	//input guards
-
 	std::pair<float, glm::vec3> obj1 = operant1->sdf(point);
 	std::pair<float, glm::vec3> obj2 = operant2->sdf(point);
 
-	return (obj1.first < obj2.first) ? obj1 : obj2;
+	return (obj1.first > obj2.first) ? obj1 : obj2;
 }

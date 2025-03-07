@@ -9,6 +9,11 @@ WorldObject::WorldObject()
 	recalculateTransform();
 }
 
+std::vector<IDrawable*> WorldObject::getChildren() const
+{
+	return std::vector<IDrawable*>();
+}
+
 void WorldObject::setPosition(glm::vec3 pos)
 {
 	position = glm::translate(glm::mat4(1.0f), pos);

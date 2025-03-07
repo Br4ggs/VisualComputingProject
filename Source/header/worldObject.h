@@ -9,6 +9,8 @@ class WorldObject : public IDrawable
 public:
 	virtual ~WorldObject() {};
 
+	virtual std::vector<IDrawable*> getChildren() const;
+
 	void setPosition(glm::vec3 pos);
 	void setRotation(glm::mat4 rot);
 	void setScale(glm::vec3 scl);

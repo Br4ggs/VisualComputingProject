@@ -1,15 +1,12 @@
-#ifndef OPUNION_H
-#define OPUNION_H
+#ifndef OPINTERSECT_H
 
 #include "iDrawable.h"
 
-class OpUnion : public IDrawable
+class OpIntersect : public IDrawable
 {
 public:
-	OpUnion(IDrawable* operant1, IDrawable* operant2);
-	~OpUnion();
-
-	//setters and getters?
+	OpIntersect(IDrawable* operant1, IDrawable* operant2);
+	~OpIntersect();
 
 	virtual void drawUI();
 	virtual std::vector<IDrawable*> getChildren() const;
@@ -20,4 +17,4 @@ private:
 	IDrawable* operant2;
 };
 
-#endif
+#endif // !OPINTERSECT_H
