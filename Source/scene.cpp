@@ -5,8 +5,8 @@
 #include "header/opUnion.h"
 #include "header/opIntersect.h"
 #include "header/opDifference.h"
-
 #include "header/addOperatorModal.h"
+#include "header/addPrimitiveModal.h"
 
 #include "imgui.h"
 #include <glm/gtc/matrix_transform.hpp>
@@ -16,14 +16,9 @@
 #include <algorithm>
 
 //TODO:
-//add class for union and difference
 //add class for repeat operator?
 //add ui for rotations?
-//adding a thing as child of an existing operator?
-//moving objects
-
-//scene ui
-//create a tree node for each object in the scene (make it contain a sphere and a box)
+//rework delete
 
 Scene::Scene()
 {
@@ -98,48 +93,18 @@ void Scene::drawUI()
             }
             ImGui::PopID();
         }
-        
-        if (ImGui::BeginCombo("object", preview))
-        {
-            for (int n = 0; n < 2; n++)
-            {
-                const bool selected = (selectedItem == n);
-                if (ImGui::Selectable(objectTypes[n], selected))
-                    selectedItem = n;
 
-                if (selected)
-                    ImGui::SetItemDefaultFocus();
-            }
+        static AddPrimitiveModal addPrimitiveModal;
 
-            ImGui::EndCombo();
-        }
+        if (ImGui::Button("Add primitive"))
+            ImGui::OpenPopup("Add primitive");
 
-        if (ImGui::Button("Add new object"))
-        {
-            switch (selectedItem)
-            {
-            case 0: //sphere
-            {
-                std::cout << "adding sphere to scene" << std::endl;
-                IDrawable* obj = new SDFSphere(1.0f);
-                objects.push_back(obj);
-                break;
-            }
-            case 1: //cube
-            {
-                std::cout << "adding cube to scene" << std::endl;
-                IDrawable* obj = new SDFBox(glm::vec3(1.0f, 1.0f, 1.0f));
-                objects.push_back(obj);
-            }
-            default:
-                break;
-            }
-        }
+        addPrimitiveModal.drawUI(*this);
 
         static AddOperatorModal addOperatorModal;
 
         if (ImGui::Button("Add operator"))
-            ImGui::OpenPopup("Operator");
+            ImGui::OpenPopup("Add operator");
 
         addOperatorModal.drawUI(*this);
     }
@@ -172,11 +137,6 @@ std::pair<float, glm::vec3> Scene::map(glm::vec3 point) const
     {
         res = sdfUnion(res, objects[i]->sdf(point));
     }
-
-    //res = sdfUnion(res, sphere.sdf(point));
-    //res = sdfDifference(res, sphere);
-    //res = sdfUnion(res, cylinder);
-    //res = sdfUnion(res, plane);
 
     return res;
 }
@@ -216,6 +176,7 @@ void Scene::removeObject(IDrawable* obj)
     objects.erase(std::remove_if(objects.begin(), objects.end(), [obj](IDrawable* i) {return i == obj; }));
 }
 
+//TODO: move to primitive class
 float Scene::sdfCylinder(glm::vec3 point, float radius, float height) const
 {
     float d = glm::length(glm::vec2(point.x, point.z)) - radius;
@@ -223,11 +184,7 @@ float Scene::sdfCylinder(glm::vec3 point, float radius, float height) const
     return d;
 }
 
-float Scene::sdfSphere(glm::vec3 point, float radius) const
-{
-    return glm::length(point) - radius;
-}
-
+//TODO: move to primitive class
 float Scene::sdfPlane(glm::vec3 point, glm::vec3 normal, float distanceFromOrigin) const
 {
     return glm::dot(point, normal) + distanceFromOrigin;
@@ -238,25 +195,7 @@ std::pair<float, glm::vec3> Scene::sdfUnion(std::pair<float, glm::vec3> obj1, st
     return (obj1.first < obj2.first) ? obj1 : obj2;
 }
 
-glm::vec2 Scene::sdfIntersect(glm::vec2 obj1, glm::vec2 obj2) const
-{
-    return (obj1.x > obj2.x) ? obj1 : obj2;
-}
-
-//max(obj1, -obj2)
-glm::vec2 Scene::sdfDifference(glm::vec2 obj1, glm::vec2 obj2) const
-{
-    if (obj1.x > -obj2.x)
-    {
-        return obj1;
-    }
-    else
-    {
-        obj2.x *= -1;
-        return obj2;
-    }
-}
-
+//TODO: move to operator class
 glm::vec3 Scene::repeat(glm::vec3 point, glm::vec3 scale) const
 {
     glm::vec3 q = point - scale * glm::round(point / scale);

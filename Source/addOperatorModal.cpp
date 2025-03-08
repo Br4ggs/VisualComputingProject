@@ -5,13 +5,13 @@
 
 #include "imgui.h"
 
-#include <iostream>
-
 //TODO: give preview of to-be-added object?
 
 void AddOperatorModal::drawUI(Scene& scene)
 {
-    if (ImGui::BeginPopupModal("Operator", NULL, ImGuiWindowFlags_None))
+    ImGui::SetNextWindowSize(ImVec2(350, 300));
+
+    if (ImGui::BeginPopupModal("Add operator", NULL, ImGuiWindowFlags_None))
     {
         const char* opTypes[] = { "union", "intersect", "difference" };
         static int opSelected = 0;

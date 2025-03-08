@@ -38,7 +38,6 @@ private:
 	//list of Idrawables allocated on the heap
 	std::vector<IDrawable*> objects;
 
-
 	float sdfCylinder(glm::vec3 point, float radius, float height) const;
 
 	float sdfSphere(glm::vec3 point, float radius) const;
@@ -54,4 +53,4 @@ private:
 	glm::vec3 repeat(glm::vec3 point, glm::vec3 scale) const;
 };
 
-#endif // !SCENE_H
+#endif

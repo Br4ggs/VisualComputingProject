@@ -15,6 +15,7 @@ add_executable(VisualComputingProject
     opDifference.cpp
     worldObject.cpp
     addOperatorModal.cpp
+    addPrimitiveModal.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/glad.c
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_demo.cpp
