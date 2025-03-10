@@ -16,9 +16,8 @@
 #include <algorithm>
 
 //TODO:
-//rework delete
-//add class for repeat operator?
 //add ui for rotations?
+//add class for repeat operator?
 
 Scene::Scene()
 {
@@ -102,7 +101,6 @@ void Scene::drawUI()
 
 std::pair<float, glm::vec3> Scene::map(glm::vec3 point) const
 {
-    //mod3(&point, glm::vec3(5, 5, 5));
     //point = repeat(point, glm::vec3(2, 2, 2));
 
     //a plane

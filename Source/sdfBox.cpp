@@ -32,6 +32,8 @@ void SDFBox::drawUI()
 	{
 		color = glm::vec3(colf[0], colf[1], colf[2]);
 	}
+
+	WorldObject::drawUI();
 }
 
 char* SDFBox::getName() const

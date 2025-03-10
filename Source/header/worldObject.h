@@ -9,6 +9,8 @@ class WorldObject : public IDrawable
 public:
 	virtual ~WorldObject() {};
 
+	virtual void drawUI();
+
 	virtual std::vector<IDrawable*> getChildren() const;
 	virtual std::vector<IDrawable*> detachChildren();
 
@@ -17,9 +19,7 @@ public:
 	void setScale(glm::vec3 scl);
 
 protected:
-	WorldObject();
-
-	void recalculateTransform();
+	float rotf[3] = { 0.0f, 0.0f, 0.0f };
 
 	glm::vec3 color;
 
@@ -28,6 +28,9 @@ protected:
 	glm::vec3 scale;
 
 	glm::mat4 transform;
+
+	WorldObject();
+	void recalculateTransform();
 };
 
-#endif // !WORLDOBJECT_H
+#endif
