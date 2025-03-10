@@ -16,6 +16,7 @@ private:
 	IDrawable* createOperator(int op, IDrawable* op1, IDrawable* op2) const;
 
 	int state = 0;
+	int selectedOperator = 0;
 	IDrawable* operant1 = nullptr;
 	IDrawable* operant2 = nullptr;
 };

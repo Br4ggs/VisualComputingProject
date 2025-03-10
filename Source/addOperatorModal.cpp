@@ -2,6 +2,7 @@
 #include "header/opUnion.h"
 #include "header/opIntersect.h"
 #include "header/opDifference.h"
+#include "header/opModulo.h"
 
 #include "imgui.h"
 
@@ -13,17 +14,16 @@ void AddOperatorModal::drawUI(Scene& scene)
 
     if (ImGui::BeginPopupModal("Add operator", NULL, ImGuiWindowFlags_None))
     {
-        const char* opTypes[] = { "union", "intersect", "difference" };
-        static int opSelected = 0;
-        const char* opPreview = opTypes[opSelected];
+        const char* opTypes[] = { "union", "intersect", "difference", "modulo" };
+        const char* opPreview = opTypes[selectedOperator];
 
         if (ImGui::BeginCombo("operator", opPreview))
         {
-            for (int n = 0; n < 3; n++)
+            for (int n = 0; n < 4; n++)
             {
-                const bool selected = (opSelected == n);
-                if (ImGui::Selectable(opTypes[n], opSelected))
-                    opSelected = n;
+                const bool selected = (selectedOperator == n);
+                if (ImGui::Selectable(opTypes[n], selectedOperator))
+                    selectedOperator = n;
 
                 if (selected)
                     ImGui::SetItemDefaultFocus();
@@ -58,10 +58,12 @@ void AddOperatorModal::drawUI(Scene& scene)
 
         if (state == 2 && ImGui::Button("Add operator"))
         {
-            IDrawable* op = createOperator(opSelected, operant1, operant2);
+            IDrawable* op = createOperator(selectedOperator, operant1, operant2);
 
             scene.removeObject(operant1);
-            scene.removeObject(operant2);
+            if (selectedOperator != 3) //modulo only has one operant
+                scene.removeObject(operant2); //keep in mind, otherwise will cause memleak
+
             scene.addObject(op);
 
             state = 0;
@@ -94,11 +96,15 @@ void AddOperatorModal::selectButton(IDrawable* obj)
         {
         case 0:
             operant1 = obj;
-            state = 1;
+            if (selectedOperator == 3) //modulo
+                state = 2;
+            else
+                state = 1;
             break;
         case 1:
             operant2 = obj;
             state = 2;
+            break;
         }
     }
 }
@@ -113,5 +119,7 @@ IDrawable* AddOperatorModal::createOperator(int op, IDrawable* op1, IDrawable* o
         return new OpIntersect(op1, op2);
     case 2: //difference
         return new OpDifference(op1, op2);
+    case 3: //modulo
+        return new OpModulo(op1);
     }
 }

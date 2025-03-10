@@ -15,6 +15,7 @@ add_executable(VisualComputingProject
     opUnion.cpp
     opIntersect.cpp
     opDifference.cpp
+    opModulo.cpp
     worldObject.cpp
     addOperatorModal.cpp
     addPrimitiveModal.cpp
