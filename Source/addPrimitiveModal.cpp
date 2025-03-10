@@ -1,5 +1,9 @@
 #include "header/addPrimitiveModal.h"
 
+#include "header/sdfSphere.h"
+#include "header/sdfBox.h";
+#include "header/sdfCylinder.h"
+
 #include "imgui.h"
 
 void AddPrimitiveModal::drawUI(Scene& scene) const
@@ -8,13 +12,13 @@ void AddPrimitiveModal::drawUI(Scene& scene) const
 
 	if (ImGui::BeginPopupModal("Add primitive", NULL, ImGuiWindowFlags_None))
 	{
-        const char* primTypes[] = { "sphere", "box" };
+        const char* primTypes[] = { "sphere", "box", "cylinder" };
         static int primSelected = 0;
         const char* primPreview = primTypes[primSelected];
 
 		if (ImGui::BeginCombo("primitive", primPreview))
 		{
-			for (int n = 0; n < 2; n++)
+			for (int n = 0; n < 3; n++)
 			{
 				const bool selected = (primSelected == n);
 				if (ImGui::Selectable(primTypes[n], selected))
@@ -53,5 +57,7 @@ IDrawable* AddPrimitiveModal::createPrimitive(int prim) const
 		return new SDFSphere(1.0f);
 	case 1: //box
 		return new SDFBox(glm::vec3(1.0f, 1.0f, 1.0f));
+	case 2: //cylinder
+		return new SDFCylinder(1.0f, 1.0f);
 	}
 }

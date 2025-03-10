@@ -4,8 +4,6 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "iDrawable.h"
-#include "sdfBox.h";
-#include "sdfSphere.h"
 
 class Scene
 {

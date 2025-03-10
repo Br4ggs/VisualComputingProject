@@ -10,6 +10,7 @@ add_executable(VisualComputingProject
     scene.cpp
     sdfSphere.cpp
     sdfBox.cpp
+    sdfCylinder.cpp
     opUnion.cpp
     opIntersect.cpp
     opDifference.cpp
