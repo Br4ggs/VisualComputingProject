@@ -16,7 +16,6 @@
 #include <algorithm>
 
 //TODO:
-//add ui for rotations?
 //add class for repeat operator?
 
 Scene::Scene()

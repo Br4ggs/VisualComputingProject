@@ -19,7 +19,9 @@ public:
 	void setScale(glm::vec3 scl);
 
 protected:
+	float posf[3] = { 0.0f, 0.0f, 0.0f };
 	float rotf[3] = { 0.0f, 0.0f, 0.0f };
+	float sclf[3] = { 1.0f, 1.0f, 1.0f };
 
 	glm::vec3 color;
 

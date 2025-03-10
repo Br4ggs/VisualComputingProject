@@ -1,33 +1,20 @@
 #include "header/sdfBox.h"
-#include <glm/gtc/matrix_transform.hpp>
 #include "header/vecUtils.h"
-
-#include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "imgui.h"
+
+#include <iostream>
 
 SDFBox::SDFBox(glm::vec3 dimensions)
 	:WorldObject(),
 	 dimensions(dimensions)
-{}
+{
+	color = glm::vec3(colf[0], colf[1], colf[2]);
+}
 
 void SDFBox::drawUI()
 {
-	//position
-	if (ImGui::InputFloat3("Position", posf))
-	{
-		setPosition(glm::vec3(posf[0], posf[1], posf[2]));
-	}
-
-	//TODO: rotation?
-		
-	//scale
-	if (ImGui::InputFloat3("Scale", sclf))
-	{
-		setScale(glm::vec3(sclf[0], sclf[1], sclf[2]));
-	}
-
-	//color
 	if (ImGui::ColorEdit3("Color", colf))
 	{
 		color = glm::vec3(colf[0], colf[1], colf[2]);

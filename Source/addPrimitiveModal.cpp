@@ -8,7 +8,7 @@ void AddPrimitiveModal::drawUI(Scene& scene) const
 
 	if (ImGui::BeginPopupModal("Add primitive", NULL, ImGuiWindowFlags_None))
 	{
-        const char* primTypes[] = { "sphere", "cube" };
+        const char* primTypes[] = { "sphere", "box" };
         static int primSelected = 0;
         const char* primPreview = primTypes[primSelected];
 
