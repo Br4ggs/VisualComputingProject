@@ -16,9 +16,9 @@
 #include <algorithm>
 
 //TODO:
+//rework delete
 //add class for repeat operator?
 //add ui for rotations?
-//rework delete
 
 Scene::Scene()
 {
@@ -72,25 +72,15 @@ void Scene::drawUI()
 
     if (ImGui::CollapsingHeader("Geometry"))
     {
-        const char* objectTypes[] = { "sphere", "cube" };
-        static int selectedItem = 0;
-        const char* preview = objectTypes[selectedItem];
-
         //list of current objects in the scene
         for (int i = 0; i < objects.size(); i++)
         {
             IDrawable* obj = objects[i];
 
             ImGui::PushID(i);
-            obj->drawUI();
 
-            ImGui::SameLine();
-            if (ImGui::SmallButton("delete"))
-            {
-                std::cout << "deleting object" << std::endl;
-                objects.erase(std::remove(objects.begin(), objects.end(), obj), objects.end());
-                delete obj;
-            }
+            objectNodeWithDelete(obj);
+
             ImGui::PopID();
         }
 
@@ -119,11 +109,6 @@ std::pair<float, glm::vec3> Scene::map(glm::vec3 point) const
     //float planeDist = sdfPlane(point, glm::vec3(0, 1, 0), 3.0);
     //float planeID = 2.0;
     //glm::vec2 plane = glm::vec2(planeDist, planeID);
-
-    //a single sphere
-    //float sphereDist = sdfSphere(point, 1.3);
-    //float sphereID = 1.0;
-    //glm::vec2 sphere = glm::vec2(sphereDist, sphereID);
 
     //a cylinder, placed higher than the rest of the objects
     //glm::vec3 pc = point;
@@ -174,6 +159,50 @@ void Scene::addObject(IDrawable* obj)
 void Scene::removeObject(IDrawable* obj)
 {
     objects.erase(std::remove_if(objects.begin(), objects.end(), [obj](IDrawable* i) {return i == obj; }));
+}
+
+void Scene::objectNodeWithDelete(IDrawable* obj)
+{
+    if (ImGui::TreeNode(obj->getName()))
+    {
+        ImGui::SameLine();
+        if (ImGui::SmallButton("delete"))
+        {
+            deleteAsParent(obj);
+        }
+
+        ImGui::PushID(1);
+        if (obj != nullptr)
+            obj->drawUI();
+        ImGui::PopID();
+
+        ImGui::TreePop();
+    }
+    else
+    {
+        ImGui::SameLine();
+        if (ImGui::SmallButton("delete"))
+        {
+            deleteAsParent(obj);
+        }
+    }
+}
+
+void Scene::deleteAsParent(IDrawable* obj)
+{
+    std::vector<IDrawable*> children = obj->detachChildren();
+    if (children.size() > 0)
+    {
+        for (int i = 0; i < children.size(); i++)
+        {
+            //add to objects
+            objects.push_back(children[i]);
+        }
+    }
+
+    objects.erase(std::remove(objects.begin(), objects.end(), obj), objects.end());
+    delete obj;
+    obj = nullptr;
 }
 
 //TODO: move to primitive class

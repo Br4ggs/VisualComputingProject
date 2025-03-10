@@ -52,6 +52,6 @@ IDrawable* AddPrimitiveModal::createPrimitive(int prim) const
 	case 0: //sphere
 		return new SDFSphere(1.0f);
 	case 1: //box
-		return new SDFBox(glm::vec3(0.0f));
+		return new SDFBox(glm::vec3(1.0f, 1.0f, 1.0f));
 	}
 }

@@ -12,6 +12,7 @@ public:
 	virtual void drawUI();
 	virtual char* getName() const;
 	virtual std::vector<IDrawable*> getChildren() const;
+	virtual std::vector<IDrawable*> detachChildren();
 	virtual std::pair<float, glm::vec3> sdf(glm::vec3 point) const;
 
 private:

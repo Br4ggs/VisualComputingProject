@@ -8,24 +8,29 @@ OpUnion::OpUnion(IDrawable* operant1, IDrawable* operant2)
 
 OpUnion::~OpUnion()
 {
-	delete operant1;
-	delete operant2;
+	if (operant1 != nullptr)
+		delete operant1;
+	if (operant2 != nullptr)
+		delete operant2;
 }
 
 void OpUnion::drawUI()
 {
-	if (ImGui::TreeNode("union"))
+	ImGui::PushID(0);
+	if (ImGui::TreeNode(operant1->getName()))
 	{
-		ImGui::PushID(0);
 		operant1->drawUI();
-		ImGui::PopID();
-
-		ImGui::PushID(1);
-		operant2->drawUI();
-		ImGui::PopID();
-
 		ImGui::TreePop();
 	}
+	ImGui::PopID();
+
+	ImGui::PushID(1);
+	if (ImGui::TreeNode(operant2->getName()))
+	{
+		operant2->drawUI();
+		ImGui::TreePop();
+	}
+	ImGui::PopID();
 }
 
 char* OpUnion::getName() const
@@ -40,6 +45,17 @@ std::vector<IDrawable*> OpUnion::getChildren() const
 	operants.push_back(operant2);
 	return operants;
 };
+
+std::vector<IDrawable*> OpUnion::detachChildren()
+{
+	std::vector<IDrawable*> operants;
+	operants.push_back(operant1);
+	operants.push_back(operant2);
+	operant1 = nullptr;
+	operant2 = nullptr;
+
+	return operants;
+}
 
 std::pair<float, glm::vec3> OpUnion::sdf(glm::vec3 point) const
 {

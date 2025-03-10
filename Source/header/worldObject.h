@@ -10,6 +10,7 @@ public:
 	virtual ~WorldObject() {};
 
 	virtual std::vector<IDrawable*> getChildren() const;
+	virtual std::vector<IDrawable*> detachChildren();
 
 	void setPosition(glm::vec3 pos);
 	void setRotation(glm::mat4 rot);
