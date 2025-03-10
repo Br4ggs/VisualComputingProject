@@ -19,22 +19,7 @@
 //add class for repeat operator?
 
 Scene::Scene()
-{
-    SDFBox* box = new SDFBox(glm::vec3(1.0f, 1.0f, 1.0f));
-    SDFSphere* sphere = new SDFSphere(1.0f);
-    SDFSphere* sphere2 = new SDFSphere(1.0f);
-    SDFSphere* sphere3 = new SDFSphere(1.0f);
-
-    box->setScale(glm::vec3(0.75f));
-
-    sphere2->setPosition(glm::vec3(1.0f, 0.0f, 0.0f));
-    sphere3->setPosition(glm::vec3(1.0f, 0.0f, 1.0f));
-
-    OpDifference* opDifference = new OpDifference(sphere, box);
-    objects.push_back(opDifference);
-    objects.push_back(sphere2);
-    objects.push_back(sphere3);
-}
+{}
 
 Scene::~Scene()
 {
@@ -102,19 +87,7 @@ std::pair<float, glm::vec3> Scene::map(glm::vec3 point) const
 {
     //point = repeat(point, glm::vec3(2, 2, 2));
 
-    //a plane
-    //float planeDist = sdfPlane(point, glm::vec3(0, 1, 0), 3.0);
-    //float planeID = 2.0;
-    //glm::vec2 plane = glm::vec2(planeDist, planeID);
-
-    //a cylinder, placed higher than the rest of the objects
-    //glm::vec3 pc = point;
-    //pc.y -= 4.0;
-    //float cylinderDist = sdfCylinder(glm::vec3(pc.y, pc.x, pc.z), 1, 2); //rotate the cylinder by swapping the components around
-    //float cylinderID = 1.0;
-    //glm::vec2 cylinder(cylinderDist, cylinderID);
-
-    std::pair<float, glm::vec3> res(std::numeric_limits<float>::max(), -1);
+    std::pair<float, glm::vec3> res(std::numeric_limits<float>::infinity(), glm::vec3(1.0f));
     for (int i = 0; i < objects.size(); i++)
     {
         res = sdfUnion(res, objects[i]->sdf(point));
@@ -166,6 +139,7 @@ void Scene::objectNodeWithDelete(IDrawable* obj)
         if (ImGui::SmallButton("delete"))
         {
             deleteAsParent(obj);
+            obj = nullptr;
         }
 
         ImGui::PushID(1);
@@ -200,20 +174,6 @@ void Scene::deleteAsParent(IDrawable* obj)
     objects.erase(std::remove(objects.begin(), objects.end(), obj), objects.end());
     delete obj;
     obj = nullptr;
-}
-
-//TODO: move to primitive class
-float Scene::sdfCylinder(glm::vec3 point, float radius, float height) const
-{
-    float d = glm::length(glm::vec2(point.x, point.z)) - radius;
-    d = glm::max(d, abs(point.y) - height);
-    return d;
-}
-
-//TODO: move to primitive class
-float Scene::sdfPlane(glm::vec3 point, glm::vec3 normal, float distanceFromOrigin) const
-{
-    return glm::dot(point, normal) + distanceFromOrigin;
 }
 
 std::pair<float, glm::vec3> Scene::sdfUnion(std::pair<float, glm::vec3> obj1, std::pair<float, glm::vec3> obj2) const

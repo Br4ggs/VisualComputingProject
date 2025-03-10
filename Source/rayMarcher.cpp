@@ -82,22 +82,6 @@ glm::mat3 RayMarcher::getCamera(glm::vec3 rayOrigin, glm::vec3 lookAt) const
     return glm::mat3(camRight, camUp, camForward);
 }
 
-glm::vec3 RayMarcher::getMaterial(glm::vec3 point, float id) const
-{
-    glm::vec3 m(0.0);
-    switch (int(id))
-    {
-    case 1:
-        m = glm::vec3(0.9, 0.9, 0.0);
-        break;
-    case 2:
-        //creates a checkerboard pattern
-        m = glm::vec3(0.2 + 0.4 * glm::mod(floor(point.x) + floor(point.z), 2.0f));
-        break;
-    }
-    return m;
-}
-
 glm::vec3 RayMarcher::getLight(glm::vec3 point, glm::vec3 rayDirection, glm::vec3 color) const
 {
     glm::vec3 lightPos = currentScene->getLightPos();
@@ -145,6 +129,11 @@ std::pair<float, glm::vec3> RayMarcher::rayMarch(glm::vec3 rayOrigin, glm::vec3 
         object.second = hit.second;
 
         if (abs(hit.first) < epsilon || object.first > maxDist) break;
+
+        if (i == maxSteps - 1) //ugly hack but appears to work for plane parallelness
+        {
+            object.first = maxDist + 1;
+        }
     }
     return object;
 }

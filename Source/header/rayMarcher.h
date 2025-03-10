@@ -26,8 +26,6 @@ private:
 	unsigned char* data = nullptr;
 
 	glm::mat3 getCamera(glm::vec3 rayOrigin, glm::vec3 lookAt) const;
-	
-	glm::vec3 getMaterial(glm::vec3 point, float id) const;
 
 	glm::vec3 getLight(glm::vec3 point, glm::vec3 rayDirection, glm::vec3 color) const;
 

@@ -30,49 +30,6 @@ void imGuiTest()
 
     //call to Scene ui
     scene->drawUI();
-    
-    //should not be present when rendering using opengl, for that
-    //we can simply use mouse control
-    //if (ImGui::CollapsingHeader("Camera"))
-    //{
-    //    //camera position
-    //    static float camPos[3] = { 0.0f, 0.0f, -3.0f };
-    //    ImGui::InputFloat3("Position", camPos);
-
-    //    //camera lookat direction
-    //    static float lookAt[3] = { 0.0f, 0.0f, -3.0f };
-    //    ImGui::InputFloat3("Look at", lookAt);
-
-    //    if (ImGui::TreeNode("foo"))
-    //    {
-    //        ImGui::Text("baz");
-
-    //        if (ImGui::TreeNode("bar"))
-    //        {
-    //            ImGui::Text("baaaz");
-
-    //            if (ImGui::TreeNode("bing"))
-    //            {
-    //                ImGui::TreePop();
-    //            }
-
-    //            ImGui::TreePop();
-    //        }
-
-    //        ImGui::TreePop();
-    //    }
-    //}
-
-    //if (ImGui::CollapsingHeader("Lighting"))
-    //{
-    //    //position
-    //    static float lightPos[3] = { 30.0f, 40.0f, 30.0f };
-    //    ImGui::InputFloat3("Position", lightPos);
-
-    //    //color
-    //    static float lightColor[3] = { 0.5f, 0.5f, 0.5f };
-    //    ImGui::ColorEdit3("Color", lightColor);
-    //}
 
     if (ImGui::Button("Render"))
     {

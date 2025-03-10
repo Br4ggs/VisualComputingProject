@@ -40,10 +40,6 @@ private:
 
 	void deleteAsParent(IDrawable* obj);
 
-	float sdfCylinder(glm::vec3 point, float radius, float height) const;
-
-	float sdfPlane(glm::vec3 point, glm::vec3 normal, float distanceFromOrigin) const;
-
 	std::pair<float, glm::vec3> sdfUnion(std::pair<float, glm::vec3> obj1, std::pair<float, glm::vec3> obj2) const;
 
 	glm::vec3 repeat(glm::vec3 point, glm::vec3 scale) const;
