@@ -7,6 +7,18 @@ add_executable(VisualComputingProject
     shaderProgram.cpp
     texturedScreenQuad.cpp
     rayMarcher.cpp
+    scene.cpp
+    sdfSphere.cpp
+    sdfBox.cpp
+    sdfCylinder.cpp
+    sdfPlane.cpp
+    opUnion.cpp
+    opIntersect.cpp
+    opDifference.cpp
+    opModulo.cpp
+    worldObject.cpp
+    addOperatorModal.cpp
+    addPrimitiveModal.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/glad.c
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_demo.cpp

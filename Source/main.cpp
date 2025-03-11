@@ -15,16 +15,38 @@
 
 #include "header/shaderProgram.h"
 #include "header/texturedScreenQuad.h"
-#include "header/rayMarcher.h"
+#include "header/rayMarcher.h"=
+
+TexturedScreenQuad* screen;
+RayMarcher* marcher;
+Scene* scene;
+
+void imGuiTest()
+{
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(300, 680));
+
+    ImGui::Begin("Settings");
+
+    //call to raymarcher ui
+    marcher->drawUI();
+
+    //call to Scene ui
+    scene->drawUI();
+
+    if (ImGui::Button("Render"))
+    {
+        std::cout << "wuz clicked" << std::endl;
+        marcher->render(scene);
+        unsigned char* dataptr = marcher->getRenderData();
+        screen->writeToTexture(1000, 800, dataptr);
+    }
+
+    ImGui::End();
+}
 
 int main()
 {
-    std::cout << "Hello " << testmacro << std::endl;
-
-    //glm test code; wowee a matrix inverse!
-    glm::mat4 matrix = glm::mat4(1.0f);
-    glm::mat4 inverse = glm::inverse(matrix);
-
     if (!glfwInit())
     {
         std::cout << "Failed to initialize GLFW" << std::endl;
@@ -70,45 +92,41 @@ int main()
 
     shaderProg.compile();
 
-    TexturedScreenQuad screenquad(&shaderProg);
+    screen = new TexturedScreenQuad(&shaderProg);
 
     //set clearscreen color to a nice navy blue
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glfwSwapBuffers(window);
 
-    RayMarcher marcher(1000, 800);
-
-    marcher.render();
-    unsigned char* dataptr = marcher.getRenderData();
-    screenquad.writeToTexture(1000, 800, dataptr);
+    marcher = new RayMarcher(1000, 800);
+    scene = new Scene();
 
     while (!glfwWindowShouldClose(window))
     {
         //imgui stuff
-        //ImGui_ImplOpenGL3_NewFrame();
-        //ImGui_ImplGlfw_NewFrame();
-        //ImGui::NewFrame();
-        //ImGui::ShowDemoWindow();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow();
 
-        //draws triangle
+        imGuiTest();
+
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        screenquad.render();
+        screen->render();
 
-        //glBindVertexArray(vertexArray);
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        //ImGui::Render();
-        //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         //render
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    screenquad.destroy();
+    screen->destroy();
+
     shaderProg.destroy();
 
     ImGui_ImplOpenGL3_Shutdown();
@@ -117,6 +135,10 @@ int main()
 
     glfwDestroyWindow(window);
     glfwTerminate();
+
+    delete screen;
+    delete marcher;
+    delete scene;
 
     return 0;
 }
