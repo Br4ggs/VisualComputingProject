@@ -4,6 +4,9 @@ project(VisualComputingProject)
 
 add_executable(VisualComputingProject
     main.cpp
+    shaderProgram.cpp
+    texturedScreenQuad.cpp
+    rayMarcher.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/glad.c
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_demo.cpp
@@ -11,7 +14,8 @@ add_executable(VisualComputingProject
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_impl_glfw.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_impl_opengl3.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_tables.cpp
-    ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_widgets.cpp)
+    ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_widgets.cpp
+    ${PROJECT_SOURCE_DIR}/Libraries/src/stb_image.cpp)
 
 set(LIBRARY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Libraries")
 
