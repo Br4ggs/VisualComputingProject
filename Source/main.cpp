@@ -47,12 +47,6 @@ void imGuiTest()
 
 int main()
 {
-    std::cout << "Hello " << testmacro << std::endl;
-
-    //glm test code; wowee a matrix inverse!
-    glm::mat4 matrix = glm::mat4(1.0f);
-    glm::mat4 inverse = glm::inverse(matrix);
-
     if (!glfwInit())
     {
         std::cout << "Failed to initialize GLFW" << std::endl;
@@ -111,10 +105,10 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         //imgui stuff
-        //ImGui_ImplOpenGL3_NewFrame();
-        //ImGui_ImplGlfw_NewFrame();
-        //ImGui::NewFrame();
-        //ImGui::ShowDemoWindow();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow();
 
         imGuiTest();
 
@@ -123,13 +117,8 @@ int main()
 
         screen->render();
 
-        screenquad.render();
-
-        //glBindVertexArray(vertexArray);
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        //ImGui::Render();
-        //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         //render
         glfwSwapBuffers(window);
