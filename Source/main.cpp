@@ -15,7 +15,7 @@
 
 #include "header/shaderProgram.h"
 #include "header/texturedScreenQuad.h"
-#include "header/rayMarcher.h"
+#include "header/rayMarcher.h"=
 
 TexturedScreenQuad* screen;
 RayMarcher* marcher;
@@ -111,10 +111,10 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         //imgui stuff
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
+        //ImGui_ImplOpenGL3_NewFrame();
+        //ImGui_ImplGlfw_NewFrame();
+        //ImGui::NewFrame();
+        //ImGui::ShowDemoWindow();
 
         imGuiTest();
 
@@ -123,8 +123,13 @@ int main()
 
         screen->render();
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        screenquad.render();
+
+        //glBindVertexArray(vertexArray);
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        //ImGui::Render();
+        //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         //render
         glfwSwapBuffers(window);
@@ -132,6 +137,7 @@ int main()
     }
 
     screen->destroy();
+
     shaderProg.destroy();
 
     ImGui_ImplOpenGL3_Shutdown();

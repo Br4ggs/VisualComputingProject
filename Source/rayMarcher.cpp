@@ -35,7 +35,7 @@ void RayMarcher::drawUI()
             backgroundColor = glm::vec3(colf[0], colf[1], colf[2]);
         }
 
-        ImGui::InputDouble("fog creep", &fogCreep)
+        ImGui::InputDouble("fog creep", &fogCreep);
     }
 }
 
@@ -108,6 +108,7 @@ glm::mat3 RayMarcher::getCamera(glm::vec3 rayOrigin, glm::vec3 lookAt) const
 
     return glm::mat3(camRight, camUp, camForward);
 }
+
 
 glm::vec3 RayMarcher::getLight(glm::vec3 point, glm::vec3 rayDirection, glm::vec3 color) const
 {

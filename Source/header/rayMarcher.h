@@ -17,6 +17,7 @@ public:
 private:
 
 	Scene* currentScene;
+
 	unsigned int width;
 	unsigned int height;
 
