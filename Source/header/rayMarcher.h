@@ -10,10 +10,12 @@ public:
 	RayMarcher(unsigned int width, unsigned int height);
 	~RayMarcher();
 
+	void drawUI();
 	void render(Scene* scene);
 	unsigned char* getRenderData() const;
 
 private:
+
 	Scene* currentScene;
 	unsigned int width;
 	unsigned int height;
@@ -21,7 +23,11 @@ private:
 	float FOV = 1.0;
 	int maxSteps = 256;
 	float maxDist = 500;
+	double fogCreep = -0.0008;
 	float epsilon = 0.001;
+	float colf[3] = { 0.5f, 0.8f, 0.9f };
+
+	glm::vec3 backgroundColor = glm::vec3(colf[0], colf[1], colf[2]);
 
 	unsigned char* data = nullptr;
 

@@ -28,6 +28,9 @@ void imGuiTest()
 
     ImGui::Begin("Settings");
 
+    //call to raymarcher ui
+    marcher->drawUI();
+
     //call to Scene ui
     scene->drawUI();
 

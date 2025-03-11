@@ -17,6 +17,7 @@ public:
 
 private:
 	float sclf[3] = { 0.0f, 0.0f, 0.0f };
+	bool axisb[3] = { true, true, true };
 
 	IDrawable* operant;
 };

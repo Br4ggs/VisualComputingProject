@@ -15,9 +15,6 @@
 #include <iostream>
 #include <algorithm>
 
-//TODO:
-//add class for repeat operator?
-
 Scene::Scene()
 {}
 
@@ -179,11 +176,4 @@ void Scene::deleteAsParent(IDrawable* obj)
 std::pair<float, glm::vec3> Scene::sdfUnion(std::pair<float, glm::vec3> obj1, std::pair<float, glm::vec3> obj2) const
 {
     return (obj1.first < obj2.first) ? obj1 : obj2;
-}
-
-//TODO: move to operator class
-glm::vec3 Scene::repeat(glm::vec3 point, glm::vec3 scale) const
-{
-    glm::vec3 q = point - scale * glm::round(point / scale);
-    return q;
 }

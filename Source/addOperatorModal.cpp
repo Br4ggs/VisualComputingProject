@@ -6,8 +6,6 @@
 
 #include "imgui.h"
 
-//TODO: give preview of to-be-added object?
-
 void AddOperatorModal::drawUI(Scene& scene)
 {
     ImGui::SetNextWindowSize(ImVec2(350, 300));

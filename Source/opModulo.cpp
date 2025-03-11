@@ -47,6 +47,13 @@ std::vector<IDrawable*> OpModulo::detachChildren()
 std::pair<float, glm::vec3> OpModulo::sdf(glm::vec3 point) const
 {
 	glm::vec3 scale(sclf[0], sclf[1], sclf[2]);
-	point = point - scale * glm::round(point / scale);
+
+	if (sclf[0] > 0)
+		point.x = point.x - scale.x * glm::round(point.x / scale.x);
+	if (sclf[1] > 0)
+		point.y = point.y - scale.y * glm::round(point.y / scale.y);
+	if (sclf[2] > 0)
+		point.z = point.z - scale.z * glm::round(point.z / scale.z);
+
 	return operant->sdf(point);
 }

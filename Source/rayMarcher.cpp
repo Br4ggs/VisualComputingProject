@@ -1,5 +1,7 @@
 #include "header/rayMarcher.h"
 
+#include "imgui.h"
+
 RayMarcher::RayMarcher(unsigned int width, unsigned int height)
 	:width(width), height(height)
 {
@@ -10,6 +12,31 @@ RayMarcher::~RayMarcher()
 {
 	delete[] data;
 	data = nullptr;
+}
+
+void RayMarcher::drawUI()
+{
+    if (ImGui::CollapsingHeader("Rendering"))
+    {
+        if (ImGui::InputInt("max steps", &maxSteps))
+        {
+            if (maxSteps < 1)
+                maxSteps = 1;
+        }
+
+        if (ImGui::InputFloat("max distance", &maxDist))
+        {
+            if (maxDist < 1)
+                maxDist = 1.0f;
+        }
+
+        if (ImGui::ColorEdit3("background color", colf))
+        {
+            backgroundColor = glm::vec3(colf[0], colf[1], colf[2]);
+        }
+
+        ImGui::InputDouble("fog creep", &fogCreep)
+    }
 }
 
 void RayMarcher::render(Scene* scene)
@@ -30,7 +57,7 @@ void RayMarcher::render(Scene* scene)
             glm::vec3 rayDirection = getCamera(rayOrigin, lookat) * glm::normalize(glm::vec3(uv.x, uv.y, FOV));
 
             //do rendering
-            glm::vec3 background(0.5, 0.8, 0.9);
+            glm::vec3 background = backgroundColor;
             glm::vec3 color(0, 0, 0);
 
             //first component is the distance, second component is the material (color)
@@ -44,7 +71,7 @@ void RayMarcher::render(Scene* scene)
                 color += getLight(p, rayDirection, material);
 
                 //add fog to mitigate ugly aliasing effects
-                color = glm::mix(color, background, 1.0 - exp(-0.0008 * object.first * object.first));
+                color = glm::mix(color, background, 1.0 - exp(fogCreep * object.first * object.first));
             }
             else
             {
