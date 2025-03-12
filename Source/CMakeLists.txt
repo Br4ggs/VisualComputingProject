@@ -14,7 +14,9 @@ add_executable(VisualComputingProject
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_widgets.cpp
         MarchingCubes.cpp
         header/MarchingCubes.h
-        header/Functions.h)
+        header/Functions.h
+        imgui_layer.cpp
+        header/imgui_layer.h)
 
 set(LIBRARY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Libraries")
 
