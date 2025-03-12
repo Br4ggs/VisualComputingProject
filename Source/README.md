@@ -6,7 +6,13 @@ Visual Studio has support for Cmake projects, and will automatically generate a 
 3. Run `main.cpp`. If all goes well, you should see the output of the program.  
 
 **Clion**  
-Stub. TODO
+1. Make sure that you have all the prerequisite programs:
+- Make or Ninja should be present and available through the command line (on your path somewhere).
+- CMake should be installed.
+- You should have a compiler installed for c++, such as g++ or clang
+2. Open the project with CLion.
+3. Right click on the Source/CMakeLists.txt file and click `Load CMake Project`
+4. Usually, a directory is created that is called something like `cmake-build-debug` or `cmake-build-release`. Make sure to ignore this directory in version control as it is generated based on your machine's settings and other people have no use for this.
 
 **Linux [untested]**  
 1. Ensure Cmake is installed: `sudo apt install cmake`
