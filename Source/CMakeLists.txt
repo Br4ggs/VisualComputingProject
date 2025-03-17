@@ -7,6 +7,7 @@ add_executable(VisualComputingProject
     shaderProgram.cpp
     texturedScreenQuad.cpp
     rayMarcher.cpp
+    marchingCubes.cpp
     scene.cpp
     sdfSphere.cpp
     sdfBox.cpp
