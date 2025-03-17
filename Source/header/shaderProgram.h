@@ -28,4 +28,4 @@ private:
 	GLuint shaderProgram = 0;
 };
 
-#endif // !SHADER_PROG_H
+#endif

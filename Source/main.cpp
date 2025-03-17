@@ -15,26 +15,65 @@
 
 #include "header/shaderProgram.h"
 #include "header/texturedScreenQuad.h"
-#include "header/rayMarcher.h"=
+#include "header/rayMarcher.h"
+#include "header/marchingCubes.h"
+
+int selectedRenderBackend = 0;
 
 TexturedScreenQuad* screen;
 RayMarcher* marcher;
+MarchingCubes* marchingCubes;
 Scene* scene;
 
 void imGuiTest()
 {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
-    ImGui::SetNextWindowSize(ImVec2(300, 680));
+    ImGui::SetNextWindowSize(ImVec2(400, 680));
 
     ImGui::Begin("Settings");
 
-    //call to raymarcher ui
-    marcher->drawUI();
+    if (ImGui::CollapsingHeader("RenderingEE"))
+    {
+        //rendering backend dropdown
+        const char* renderTypes[] = { "sphere tracing (cpu)", "marching cubes"};
+        const char* renderPreview = renderTypes[selectedRenderBackend];
+
+        if (ImGui::BeginCombo("rendering backend", renderPreview))
+        {
+            for (int n = 0; n < 2; n++)
+            {
+                const bool selected = (selectedRenderBackend == n);
+                if (ImGui::Selectable(renderTypes[n], selected))
+                {
+                    std::cout << "i was clicked" << std::endl;
+                    selectedRenderBackend = n;
+                }
+
+                if (selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+
+            ImGui::EndCombo();
+        }
+
+        //render settings
+        switch (selectedRenderBackend)
+        {
+        case 0: //sphere tracing
+            marcher->drawUI();
+            break;
+        case 1: //marching cubes
+            marchingCubes->drawUI();
+            break;
+        default:
+            break;
+        }
+    }
 
     //call to Scene ui
     scene->drawUI();
 
-    if (ImGui::Button("Render"))
+    if (selectedRenderBackend == 0 && ImGui::Button("Render"))
     {
         std::cout << "wuz clicked" << std::endl;
         marcher->render(scene);
@@ -86,13 +125,17 @@ int main()
 
     glViewport(0, 0, 1000, 800);
 
-    ShaderProgram shaderProg;
-    shaderProg.attachVertexShader("..\\..\\..\\vertexScreenQuad.glsl"); //since the executable is located in Source/out/build/x64-Debug
-    shaderProg.attachFragmentShader("..\\..\\..\\fragmentScreenQuad.glsl");
+    ShaderProgram shaderProgMarcher;
+    shaderProgMarcher.attachVertexShader("..\\..\\..\\vertexScreenQuad.glsl"); //since the executable is located in Source/out/build/x64-Debug
+    shaderProgMarcher.attachFragmentShader("..\\..\\..\\fragmentScreenQuad.glsl");
+    shaderProgMarcher.compile();
 
-    shaderProg.compile();
+    screen = new TexturedScreenQuad(&shaderProgMarcher);
 
-    screen = new TexturedScreenQuad(&shaderProg);
+    ShaderProgram shaderProgMarchingCubes;
+    shaderProgMarchingCubes.attachVertexShader("..\\..\\..\\vertexMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachFragmentShader("..\\..\\..\\fragmentMarchingCubes.glsl");
+    shaderProgMarchingCubes.compile();
 
     //set clearscreen color to a nice navy blue
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
@@ -100,6 +143,8 @@ int main()
     glfwSwapBuffers(window);
 
     marcher = new RayMarcher(1000, 800);
+    marchingCubes = new MarchingCubes();
+
     scene = new Scene();
 
     while (!glfwWindowShouldClose(window))
@@ -127,7 +172,7 @@ int main()
 
     screen->destroy();
 
-    shaderProg.destroy();
+    shaderProgMarcher.destroy();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

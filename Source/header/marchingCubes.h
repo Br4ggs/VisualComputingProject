@@ -46,7 +46,7 @@ private:
 
 	void marchingCubes();
 	glm::vec3 interpolate(GridPoint p1, GridPoint p2) const;
-	glm::vec3 getNormal(glm::vec3 point) const
+	glm::vec3 getNormal(glm::vec3 point) const;
 };
 
 #endif

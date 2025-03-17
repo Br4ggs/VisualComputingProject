@@ -1,5 +1,7 @@
 #include "header/marchingCubes.h"
 
+#include "imgui.h"
+
 constexpr int edgeTable[256] = {
 	0x0, 0x109, 0x203, 0x30a, 0x80c, 0x905, 0xa0f, 0xb06,
 	0x406, 0x50f, 0x605, 0x70c, 0xc0a, 0xd03, 0xe09, 0xf00,
@@ -139,6 +141,11 @@ constexpr int triTable[256][16] = {
 MarchingCubes::MarchingCubes()
 	:grid(gridSize, std::vector<std::vector<GridPoint>>(gridSize, std::vector<GridPoint>(gridSize)))
 {}
+
+void MarchingCubes::drawUI()
+{
+	ImGui::Text("hoi!");
+}
 
 void MarchingCubes::regenerateMarchingCubes(Scene* scene)
 {
