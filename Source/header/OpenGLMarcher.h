@@ -3,16 +3,19 @@
 
 #include <glm/glm.hpp>
 #include "scene.h"
+#include "shaderProgram.h"
 
 class OpenGLMarcher
 {
 public:
-	OpenGLMarcher(unsigned int width, unsigned int height);
+	OpenGLMarcher(unsigned int width,
+							 unsigned int height,
+							 Scene *scene,
+							 ShaderProgram *shaderProgram);
 	~OpenGLMarcher();
 
 	void drawUI();
-	void render(Scene* scene);
-	unsigned char* getRenderData() const;
+	void render();
 
 private:
 
@@ -20,6 +23,9 @@ private:
 
 	unsigned int width;
 	unsigned int height;
+	ShaderProgram *shaderProgram;
+	Scene *scene;
+	unsigned int uboID;
 
 	float FOV = 1.0;
 	int maxSteps = 256;
@@ -29,16 +35,6 @@ private:
 	float colf[3] = { 0.5f, 0.8f, 0.9f };
 
 	glm::vec3 backgroundColor = glm::vec3(colf[0], colf[1], colf[2]);
-
-	unsigned char* data = nullptr;
-
-	glm::mat3 getCamera(glm::vec3 rayOrigin, glm::vec3 lookAt) const;
-
-	glm::vec3 getLight(glm::vec3 point, glm::vec3 rayDirection, glm::vec3 color) const;
-
-	glm::vec3 getNormal(glm::vec3 point) const;
-
-	std::pair<float, glm::vec3> rayMarch(glm::vec3 rayOrigin, glm::vec3 rayDirection) const;
 };
 
 #endif

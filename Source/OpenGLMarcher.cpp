@@ -2,16 +2,67 @@
 
 #include "imgui.h"
 
-OpenGLMarcher::OpenGLMarcher(unsigned int width, unsigned int height)
-	:width(width), height(height)
+#define N_VERTICES 4
+#define N_ELEMENTS N_VERTICES * 3
+
+typedef struct Vertex
 {
-	data = new unsigned char[width * height * 3];
+    glm::vec3 pos;
+    glm::vec3 col;
+} Vertex;
+
+struct LinearCSGTreeNode {
+    int32_t op;
+    int32_t shape;
+    float _padding[2];
+    glm::vec4 position;
+    glm::vec4 dimensions;
+};
+
+static const Vertex vertices[N_VERTICES] =
+    {
+        { { -1.0f, -1.0f, 0.0f }, { 1.f, 0.f, 0.f } },
+        { {  1.0f, -1.0f, 0.0f }, { 0.f, 1.f, 0.f } },
+        { {  1.0f,  1.0f, 0.0f }, { 0.f, 0.f, 1.f } },
+        { { -1.0f,  1.0f, 0.0f }, { 1.f, 1.f, 1.f } },
+    };
+
+static const GLuint elements[N_VERTICES * 3] = { 0, 1, 2, 2, 3, 0 };
+
+enum CSGOperation {
+    OP_UNI = 0,
+    OP_INT = 1,
+    OP_SUB = 2,
+    NO_OP = 3,
+};
+
+enum CSGShape {
+    SHAPE_SPHERE = 0,
+    SHAPE_BOX = 1,
+    NO_SHAPE = 2,
+};
+
+const std::vector<LinearCSGTreeNode> nodes = {
+    { NO_OP, SHAPE_SPHERE, 0, 0, glm::vec4(0.0, 0.0, 0.0, 0.0), glm::vec4(2.0f) },
+    { NO_OP, SHAPE_SPHERE, 0, 0, glm::vec4(0.0, 2.0, 0.0, 0.0), glm::vec4(1.0f) },
+    { OP_INT, NO_SHAPE, 0, 0, glm::vec4(0), glm::vec4(0) },
+};
+
+OpenGLMarcher:: OpenGLMarcher(unsigned int width,
+                              unsigned int height,
+                              Scene *scene,
+                              ShaderProgram *shaderProgram)
+:width(width), height(height), shaderProgram(shaderProgram), scene(scene)
+{
+    int maxNodes = 128;
+    size_t dataSize = sizeof(LinearCSGTreeNode) * maxNodes;
+    glGenBuffers(1, &uboID);
+    glBindBuffer(GL_UNIFORM_BUFFER, uboID);
+    glBufferData(GL_UNIFORM_BUFFER, dataSize, nodes.data(), GL_DYNAMIC_DRAW);
 }
 
 OpenGLMarcher::~OpenGLMarcher()
 {
-	delete[] data;
-	data = nullptr;
 }
 
 void OpenGLMarcher::drawUI()
@@ -36,129 +87,41 @@ void OpenGLMarcher::drawUI()
     ImGui::InputDouble("fog creep", &fogCreep);
 }
 
-void OpenGLMarcher::render(Scene* scene)
+void OpenGLMarcher::render()
 {
-    currentScene = scene;
-    glm::vec2 resolution(width, height);
-    for (int i = 0; i < height; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            //normalize screen coordinates
-            glm::vec2 fragCoord(j, i);
-            glm::vec2 uv = (2.0f * fragCoord - resolution) / resolution.y;
+    GLuint vertex_array;
+    glGenVertexArrays(1, &vertex_array);
+    glBindVertexArray(vertex_array);
 
-            //direction vectors
-            glm::vec3 rayOrigin = currentScene->getCamPos();
-            glm::vec3 lookat = currentScene->getLookAt();
-            glm::vec3 rayDirection = getCamera(rayOrigin, lookat) * glm::normalize(glm::vec3(uv.x, uv.y, FOV));
+    shaderProgram->use();
 
-            //do rendering
-            glm::vec3 background = backgroundColor;
-            glm::vec3 color(0, 0, 0);
+    unsigned int shaderProgramInt = shaderProgram->getRawShaderProgram();
+    const GLint vpos_location = glGetAttribLocation(shaderProgramInt, "vPos");
+    const GLint vcol_location = glGetAttribLocation(shaderProgramInt, "vCol");
 
-            //first component is the distance, second component is the material (color)
-            std::pair<float, glm::vec3> object = rayMarch(rayOrigin, rayDirection);
+    glEnableVertexAttribArray(vpos_location);
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex), (void*) offsetof(Vertex, pos));
+    glEnableVertexAttribArray(vcol_location);
+    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex), (void*) offsetof(Vertex, col));
 
-            if (object.first < maxDist)
-            {
-                //render object using corresponding material
-                glm::vec3 p = rayOrigin + rayDirection * object.first;
-                glm::vec3 material = object.second;
-                color += getLight(p, rayDirection, material);
+    const GLint window_dim_location = glGetUniformLocation(shaderProgramInt, "window_dimensions");
+    glUniform2f(window_dim_location, width, height);
 
-                //add fog to mitigate ugly aliasing effects
-                color = glm::mix(color, background, 1.0 - exp(fogCreep * object.first * object.first));
-            }
-            else
-            {
-                //render background
-                color += background - glm::max(0.95f * rayDirection.y, 0.0f);
-            }
+    unsigned int buffer_id;
+    glGenBuffers(1, &buffer_id);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-            //perform gamma correction
-            color = glm::pow(color, glm::vec3(0.4545));
+    unsigned int vertices_id;
+    glGenBuffers(1, &vertices_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertices_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
-            //convert float to 8-bit color data for each separate channel
-            unsigned int R = floor(color.x >= 1.0 ? 255 : color.x * 256.0);
-            unsigned int G = floor(color.y >= 1.0 ? 255 : color.y * 256.0);
-            unsigned int B = floor(color.z >= 1.0 ? 255 : color.z * 256.0);
+    GLuint blockIndex = glGetUniformBlockIndex(shaderProgramInt, "CSGBuffer");
+    glUniformBlockBinding(shaderProgramInt, blockIndex, 0);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, uboID);
 
-            //set color
-            data[((i * 1000) + j) * 3]     = R;
-            data[((i * 1000) + j) * 3 + 1] = G;
-            data[((i * 1000) + j) * 3 + 2] = B;
-        }
-    }
-}
-
-unsigned char* OpenGLMarcher::getRenderData() const
-{
-    return &data[0];
-}
-
-glm::mat3 OpenGLMarcher::getCamera(glm::vec3 rayOrigin, glm::vec3 lookAt) const
-{
-    glm::vec3 camForward = glm::normalize(lookAt - rayOrigin);
-    glm::vec3 camRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), camForward));
-    glm::vec3 camUp = glm::cross(camForward, camRight);
-
-    return glm::mat3(camRight, camUp, camForward);
-}
-
-
-glm::vec3 OpenGLMarcher::getLight(glm::vec3 point, glm::vec3 rayDirection, glm::vec3 color) const
-{
-    glm::vec3 lightPos = currentScene->getLightPos();
-    glm::vec3 specColor = currentScene->getSpecColor();
-
-    glm::vec3 L = glm::normalize(lightPos - point);
-    glm::vec3 N = getNormal(point);
-    glm::vec3 V = -rayDirection;
-    glm::vec3 R = glm::reflect(-L, N);
-
-    //standard phong light model
-    glm::vec3 specular = specColor * pow(glm::clamp(glm::dot(R, V), 0.0f, 1.0f), 10.0f);
-    glm::vec3 diffuse = color * glm::clamp(glm::dot(L, N), 0.0f, 1.0f);
-    glm::vec3 ambient = color * 0.05f;
-
-    //shadows
-    float d = rayMarch(point + N * 0.02f, glm::normalize(lightPos)).first;
-    if (d < glm::length(lightPos - point)) return ambient;
-
-    return diffuse + ambient + specular;
-}
-
-//returns an approximate of the normal
-glm::vec3 OpenGLMarcher::getNormal(glm::vec3 point) const
-{
-    glm::vec2 e(epsilon, 0.0);
-
-    float comp1 = currentScene->map(point - glm::vec3(e.x, e.y, e.y)).first;
-    float comp2 = currentScene->map(point - glm::vec3(e.y, e.x, e.y)).first;
-    float comp3 = currentScene->map(point - glm::vec3(e.y, e.y, e.x)).first;
-    glm::vec3 n = glm::vec3(currentScene->map(point).first) - glm::vec3(comp1, comp2, comp3);
-    return glm::normalize(n);
-}
-
-std::pair<float, glm::vec3> OpenGLMarcher::rayMarch(glm::vec3 rayOrigin, glm::vec3 rayDirection) const
-{
-    std::pair<float, glm::vec3> hit;
-    std::pair<float, glm::vec3> object = std::make_pair(0.0f, glm::vec3(0.0f)); //?
-
-    for (int i = 0; i < maxSteps; i++)
-    {
-        glm::vec3 p = rayOrigin +  rayDirection * object.first;
-        hit = currentScene->map(p);
-        object.first += hit.first;
-        object.second = hit.second;
-
-        if (abs(hit.first) < epsilon || object.first > maxDist) break;
-
-        if (i == maxSteps - 1) //ugly hack but appears to work for plane parallelness
-        {
-            object.first = maxDist + 1;
-        }
-    }
-    return object;
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }

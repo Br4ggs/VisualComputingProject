@@ -106,6 +106,11 @@ int ShaderProgram::compile()
 	}
 }
 
+unsigned int ShaderProgram::getRawShaderProgram()
+{
+	return shaderProgram;
+}
+
 void ShaderProgram::use() const
 {
 	glUseProgram(shaderProgram);

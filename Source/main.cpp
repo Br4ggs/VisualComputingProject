@@ -25,6 +25,11 @@
 
 RenderType::Type selectedRenderBackend = RenderType::SPHERE_MARCHING_GPU;
 
+static void error_callback(int error, const char* description)
+{
+    fprintf(stderr, "Error: %s\n", description);
+}
+
 TexturedScreenQuad* screen;
 RayMarcher* marcher;
 MarchingCubes* marchingCubes;
@@ -97,9 +102,7 @@ void imGuiTest()
             break;
         case RenderType::SPHERE_MARCHING_GPU:
             if (ImGui::Button("Render")) {
-                oglMarcher->render(scene);
-                unsigned char* dataptr = oglMarcher->getRenderData();
-                screen->writeToTexture(1000, 800, dataptr);
+                oglMarcher->render();
             }
             break;
         default:
@@ -163,16 +166,23 @@ int main()
     shaderProgMarchingCubes.attachFragmentShader(TOSTRING(SHADER_PATH) "fragmentMarchingCubes.frag");
     shaderProgMarchingCubes.compile();
 
+    ShaderProgram OpenGLMarcherShader;
+    OpenGLMarcherShader.attachVertexShader(TOSTRING(SHADER_PATH) "oglMarcher.vert");
+    OpenGLMarcherShader.attachFragmentShader(TOSTRING(SHADER_PATH) "oglMarcher.frag");
+    OpenGLMarcherShader.compile();
+
     //set clearscreen color to a nice navy blue
-    glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+    //glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glfwSwapBuffers(window);
 
     scene = new Scene();
 
     marcher = new RayMarcher(1000, 800);
-    oglMarcher = new OpenGLMarcher(1000, 800);
     marchingCubes = new MarchingCubes(1000, 800, scene, &shaderProgMarchingCubes);
+    oglMarcher = new OpenGLMarcher(1000, 800, scene, &OpenGLMarcherShader);
+
+    glfwSetErrorCallback(error_callback);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -184,7 +194,6 @@ int main()
 
         imGuiTest();
 
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         switch (selectedRenderBackend)
@@ -196,7 +205,7 @@ int main()
             marchingCubes->render();
             break;
         case RenderType::SPHERE_MARCHING_GPU:
-            screen->render();
+            oglMarcher->render();
             break;
         default:
             throw std::logic_error("render backend of chosen type is not implemented");
@@ -214,6 +223,7 @@ int main()
     screen->destroy();
 
     shaderProgMarcher.destroy();
+    OpenGLMarcherShader.destroy();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
