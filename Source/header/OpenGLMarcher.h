@@ -26,6 +26,7 @@ private:
 	ShaderProgram *shaderProgram;
 	Scene *scene;
 	unsigned int uboID;
+	unsigned int VAOID;
 
 	float FOV = 1.0;
 	int maxSteps = 256;

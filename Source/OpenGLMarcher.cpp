@@ -43,9 +43,13 @@ enum CSGShape {
 };
 
 const std::vector<LinearCSGTreeNode> nodes = {
-    { NO_OP, SHAPE_SPHERE, 0, 0, glm::vec4(0.0, 0.0, 0.0, 0.0), glm::vec4(2.0f) },
-    { NO_OP, SHAPE_SPHERE, 0, 0, glm::vec4(0.0, 2.0, 0.0, 0.0), glm::vec4(1.0f) },
-    { OP_INT, NO_SHAPE, 0, 0, glm::vec4(0), glm::vec4(0) },
+    { NO_OP, SHAPE_BOX, 0, 0, glm::vec4(0.0), glm::vec4(1.0f) },
+    { NO_OP, SHAPE_SPHERE, 0, 0, glm::vec4(-1.0, 3.0, 0.0, 0.0), glm::vec4(1.0f) },
+    { OP_UNI, NO_SHAPE, 0, 0, glm::vec4(0), glm::vec4(0) },
+    { NO_OP, SHAPE_BOX, 0, 0, glm::vec4(1.0), glm::vec4(1.0f) },
+    { OP_UNI, NO_SHAPE, 0, 0, glm::vec4(0), glm::vec4(0) },
+    { NO_OP, SHAPE_SPHERE, 0, 0, glm::vec4(-2.0), glm::vec4(1.0f) },
+    { OP_UNI, NO_SHAPE, 0, 0, glm::vec4(0), glm::vec4(0) },
 };
 
 OpenGLMarcher:: OpenGLMarcher(unsigned int width,
@@ -54,11 +58,32 @@ OpenGLMarcher:: OpenGLMarcher(unsigned int width,
                               ShaderProgram *shaderProgram)
 :width(width), height(height), shaderProgram(shaderProgram), scene(scene)
 {
-    int maxNodes = 128;
-    size_t dataSize = sizeof(LinearCSGTreeNode) * maxNodes;
-    glGenBuffers(1, &uboID);
-    glBindBuffer(GL_UNIFORM_BUFFER, uboID);
-    glBufferData(GL_UNIFORM_BUFFER, dataSize, nodes.data(), GL_DYNAMIC_DRAW);
+    glGenVertexArrays(1, &VAOID);
+    glBindVertexArray(VAOID);
+
+    shaderProgram->use();
+
+    unsigned int buffer_id;
+    glGenBuffers(1, &buffer_id);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    unsigned int vertices_id;
+    glGenBuffers(1, &vertices_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertices_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+
+    unsigned int shaderProgramInt = shaderProgram->getRawShaderProgram();
+    const GLint vpos_location = glGetAttribLocation(shaderProgramInt, "vPos");
+    const GLint vcol_location = glGetAttribLocation(shaderProgramInt, "vCol");
+
+    glEnableVertexAttribArray(vpos_location);
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex), (void*) offsetof(Vertex, pos));
+    glEnableVertexAttribArray(vcol_location);
+    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex), (void*) offsetof(Vertex, col));
+    glBindVertexArray(0);
 }
 
 OpenGLMarcher::~OpenGLMarcher()
@@ -89,35 +114,21 @@ void OpenGLMarcher::drawUI()
 
 void OpenGLMarcher::render()
 {
-    GLuint vertex_array;
-    glGenVertexArrays(1, &vertex_array);
-    glBindVertexArray(vertex_array);
-
-    shaderProgram->use();
+    glBindVertexArray(VAOID);
 
     unsigned int shaderProgramInt = shaderProgram->getRawShaderProgram();
-    const GLint vpos_location = glGetAttribLocation(shaderProgramInt, "vPos");
-    const GLint vcol_location = glGetAttribLocation(shaderProgramInt, "vCol");
 
-    glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(Vertex), (void*) offsetof(Vertex, pos));
-    glEnableVertexAttribArray(vcol_location);
-    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(Vertex), (void*) offsetof(Vertex, col));
+    int maxNodes = 128;
+    size_t dataSize = sizeof(LinearCSGTreeNode) * maxNodes;
+    glGenBuffers(1, &uboID);
+    glBindBuffer(GL_UNIFORM_BUFFER, uboID);
+    glBufferData(GL_UNIFORM_BUFFER, dataSize, nodes.data(), GL_DYNAMIC_DRAW);
+
+    const GLint loop_length_location = glGetUniformLocation(shaderProgramInt, "loop_length");
+    glUniform1f(loop_length_location, nodes.size());
 
     const GLint window_dim_location = glGetUniformLocation(shaderProgramInt, "window_dimensions");
     glUniform2f(window_dim_location, width, height);
-
-    unsigned int buffer_id;
-    glGenBuffers(1, &buffer_id);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    unsigned int vertices_id;
-    glGenBuffers(1, &vertices_id);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertices_id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
     GLuint blockIndex = glGetUniformBlockIndex(shaderProgramInt, "CSGBuffer");
     glUniformBlockBinding(shaderProgramInt, blockIndex, 0);

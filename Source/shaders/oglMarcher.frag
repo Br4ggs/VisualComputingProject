@@ -16,7 +16,7 @@ layout(std140) uniform CSGBuffer {
 };
 
 
-uniform float t_elapsed;
+uniform float loop_length;
 uniform vec2 window_dimensions;
 
 out vec4 fragment_colour;
@@ -57,7 +57,7 @@ float sphere_sdf(vec3 point, float radius)
 float get_distance(vec3 point) {
 	float stack[20];
 	int sp = 0; // pointer to next empty slot
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < loop_length; ++i) {
 		int shape = nodes[i].shape;
 		int op = nodes[i].op;
 		if (shape != NO_SHAPE) {
