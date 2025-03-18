@@ -22,6 +22,7 @@ public:
 	int compile();
 	void use() const;
 	void passUniform4x4floatMatrix(char* name, glm::mat4 matrix) const;
+	void passUniform3floatVector(char* name, glm::vec3 vector) const;
 	void destroy();
 
 private:

@@ -116,6 +116,11 @@ void ShaderProgram::passUniform4x4floatMatrix(char* name, glm::mat4 matrix) cons
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
+void ShaderProgram::passUniform3floatVector(char* name, glm::vec3 vector) const
+{
+	glUniform3fv(glGetUniformLocation(shaderProgram, name), 1, glm::value_ptr(vector));
+}
+
 void ShaderProgram::destroy()
 {
 	glDeleteProgram(shaderProgram);

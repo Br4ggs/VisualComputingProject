@@ -33,6 +33,7 @@ private:
 	{
 		glm::vec3 position;
 		glm::vec3 normal;
+		//TODO: color
 	};
 
 	Scene* scene;

@@ -169,14 +169,14 @@ MarchingCubes::MarchingCubes(int displayWidth, int displayHeight, Scene* scene, 
 void MarchingCubes::drawUI()
 {
 	ImGui::Text("hoi!");
+	//TODO
 }
 
 void MarchingCubes::render() const
 {
-	//TODO
 	shaderProg->use();
 
-	//update uniforms?
+	//model view projection matrix stuff
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)); //TODO: camera transform
 	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)displayWidth / (float)displayHeight, 0.1f, 100.0f);
@@ -185,6 +185,16 @@ void MarchingCubes::render() const
 	shaderProg->passUniform4x4floatMatrix("model", model);
 	shaderProg->passUniform4x4floatMatrix("view", view);
 	shaderProg->passUniform4x4floatMatrix("projection", proj);
+
+	glm::vec3 lightPos = scene->getLightPos();
+	glm::vec3 viewPos = glm::vec3(0.0f, 0.0f, 3.0f); //TODO: camera transform
+	glm::vec3 lightColor = scene->getSpecColor();
+	glm::vec3 objectColor = glm::vec3(1.0f, 0.0f, 0.0f); //TODO: encode this with vertex data for interpolation in fragment shader
+
+	shaderProg->passUniform3floatVector("lightPos", lightPos);
+	shaderProg->passUniform3floatVector("viewPos", viewPos);
+	shaderProg->passUniform3floatVector("lightColor", lightColor);
+	shaderProg->passUniform3floatVector("objectColor", objectColor);
 
 	//draw buffers
 	glBindVertexArray(VAO);
@@ -213,7 +223,6 @@ void MarchingCubes::regenerateMarchingCubes()
 
 	marchingCubes();
 
-	//TODO: update buffers
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
