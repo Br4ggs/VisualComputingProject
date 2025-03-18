@@ -214,9 +214,9 @@ void MarchingCubes::regenerateMarchingCubes()
 		{
 			for (int z = 0; z < gridSize; z++)
 			{
-				int posX = (x - gridSize / 2) * gridSpacing;
-				int posY = (y - gridSize / 2) * gridSpacing;
-				int posZ = (z - gridSize / 2) * gridSpacing;
+				float posX = (x - gridSize / 2.0f) * gridSpacing;
+				float posY = (y - gridSize / 2.0f) * gridSpacing;
+				float posZ = (z - gridSize / 2.0f) * gridSpacing;
 
 				glm::vec3 worldPoint(posX, posY, posZ);
 				float dist = scene->map(worldPoint).first;
