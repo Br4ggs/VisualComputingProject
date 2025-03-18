@@ -24,7 +24,15 @@ inline const char* getName(Type type) {
 		return names[type];
 	}
 
-	throw std::invalid_argument("That render type does not exist");
+	throw std::invalid_argument(&"That render type does not exist: " [ type]);
+}
+
+inline const Type getType(int type) {
+	// should return the correct Type based on the index
+	if (type >= 0 && type < COUNT) {
+		return static_cast<Type>(type);
+	}
+	throw std::invalid_argument(&"That render type does not exist: " [ type]);
 }
 
 inline void allNames(const char *** dst) {

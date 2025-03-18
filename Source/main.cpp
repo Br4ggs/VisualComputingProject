@@ -23,7 +23,7 @@
 #define STRINGIFY(x) #x // makes a string of x
 #define TOSTRING(x) STRINGIFY(x) // expands x
 
-int selectedRenderBackend = 0;
+RenderType::Type selectedRenderBackend = RenderType::SPHERE_MARCHING_GPU;
 
 TexturedScreenQuad* screen;
 RayMarcher* marcher;
@@ -43,7 +43,7 @@ void imGuiTest()
         const char** renderTypeNames;
         RenderType::allNames(&renderTypeNames);
         const char** renderTypes = renderTypeNames;
-        const char* renderPreview = RenderType::getName((RenderType::Type)selectedRenderBackend);
+        const char* renderPreview = RenderType::getName(selectedRenderBackend);
 
         if (ImGui::BeginCombo("rendering backend", renderPreview))
         {
@@ -53,7 +53,7 @@ void imGuiTest()
                 if (ImGui::Selectable(renderTypes[n], selected))
                 {
                     std::cout << "i was clicked" << std::endl;
-                    selectedRenderBackend = n;
+                    selectedRenderBackend = RenderType::getType(n);
                 }
 
                 if (selected) ImGui::SetItemDefaultFocus();
@@ -62,19 +62,19 @@ void imGuiTest()
             ImGui::EndCombo();
         }
 
-        //render settings
         switch (selectedRenderBackend)
         {
-            case 0: //sphere tracing
+            case RenderType::SPHERE_MARCHING_CPU:
                 marcher->drawUI();
                 break;
-            case 1: //marching cubes
+            case RenderType::CUBE_MARCHING_CPU:
                 marchingCubes->drawUI();
                 break;
-            case 2:
+            case RenderType::SPHERE_MARCHING_GPU:
                 oglMarcher->drawUI();
                 break;
             default:
+                throw std::logic_error("selected render backend does not exist, can not draw ui");
                 break;
         }
     }
@@ -82,21 +82,29 @@ void imGuiTest()
     //call to Scene ui
     scene->drawUI();
 
-    if (selectedRenderBackend == 1)
+    switch (selectedRenderBackend)
     {
-        marchingCubes->regenerateMarchingCubes(); //TODO: trigger only when scene has actually changed
-    }else if (selectedRenderBackend == 0 && ImGui::Button("Render"))
-    {
-        marcher->render(scene);
-        unsigned char* dataptr = marcher->getRenderData();
-        screen->writeToTexture(1000, 800, dataptr);
-    }else if (selectedRenderBackend == 2 && ImGui::Button("Render")) 
-    {
-        // scene is bekend
-        // implement linearization here
-        oglMarcher->render(scene);
-        unsigned char* dataptr = oglMarcher->getRenderData();
-        screen->writeToTexture(1000, 800, dataptr);
+        case RenderType::SPHERE_MARCHING_CPU:
+            marcher->drawUI();
+            if (ImGui::Button("Render")) {
+                marcher->render(scene);
+                unsigned char* dataptr = marcher->getRenderData();
+                screen->writeToTexture(1000, 800, dataptr);
+            }
+            break;
+        case RenderType::CUBE_MARCHING_CPU:
+            marchingCubes->regenerateMarchingCubes();
+            break;
+        case RenderType::SPHERE_MARCHING_GPU:
+            if (ImGui::Button("Render")) {
+                oglMarcher->render(scene);
+                unsigned char* dataptr = oglMarcher->getRenderData();
+                screen->writeToTexture(1000, 800, dataptr);
+            }
+            break;
+        default:
+            throw std::logic_error("selected render backend does not exist, can not render scene");
+            break;
     }
 
     ImGui::End();
@@ -181,14 +189,17 @@ int main()
 
         switch (selectedRenderBackend)
         {
-        case 0: //cpu-based sphere tracing. just render the screen quad
+        case RenderType::SPHERE_MARCHING_CPU:
             screen->render();
             break;
-        case 1: //marching cubes.
+        case RenderType::CUBE_MARCHING_CPU:
             marchingCubes->render();
             break;
-        case 2: /* opengl based sphere tracing */
+        case RenderType::SPHERE_MARCHING_GPU:
             screen->render();
+            break;
+        default:
+            throw std::logic_error("render backend of chosen type is not implemented");
             break;
         }
 
