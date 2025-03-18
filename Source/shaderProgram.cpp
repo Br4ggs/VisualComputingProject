@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 ShaderProgram::~ShaderProgram()
 {
@@ -108,6 +109,11 @@ int ShaderProgram::compile()
 void ShaderProgram::use() const
 {
 	glUseProgram(shaderProgram);
+}
+
+void ShaderProgram::passUniform4x4floatMatrix(char* name, glm::mat4 matrix) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void ShaderProgram::destroy()

@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 //Wrapper class for opengl shader programs
 //Usage:
@@ -20,6 +21,7 @@ public:
 	int attachFragmentShader(const char* sourceFile);
 	int compile();
 	void use() const;
+	void passUniform4x4floatMatrix(char* name, glm::mat4 matrix) const;
 	void destroy();
 
 private:

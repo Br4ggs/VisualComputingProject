@@ -2,6 +2,9 @@
 
 #include "imgui.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
+
 constexpr int edgeTable[256] = {
 	0x0, 0x109, 0x203, 0x30a, 0x80c, 0x905, 0xa0f, 0xb06,
 	0x406, 0x50f, 0x605, 0x70c, 0xc0a, 0xd03, 0xe09, 0xf00,
@@ -138,19 +141,58 @@ constexpr int triTable[256][16] = {
 	{2, 10, 1, -1}, {2, 1, 11, 1, 9, 11, 9, 8, 11, -1}, {11, 2, 3, 9, 0, 1, -1}, {11, 0, 8, 2, 0, 11, -1},
 	{3, 11, 2, -1}, {1, 8, 3, 9, 8, 1, -1}, {1, 9, 0, -1}, {8, 3, 0, -1}, {-1}};
 
-MarchingCubes::MarchingCubes()
-	:grid(gridSize, std::vector<std::vector<GridPoint>>(gridSize, std::vector<GridPoint>(gridSize)))
-{}
+MarchingCubes::MarchingCubes(int displayWidth, int displayHeight, Scene* scene, ShaderProgram* shaderProg)
+	:displayWidth(displayWidth),
+	 displayHeight(displayHeight),
+	 grid(gridSize, std::vector<std::vector<GridPoint>>(gridSize, std::vector<GridPoint>(gridSize))),
+	 scene(scene),
+	 shaderProg(shaderProg)
+{
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	glEnableVertexAttribArray(0);
+	glDisable(GL_CULL_FACE);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, normal)); //TODO: can this be done without pointer func?
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
 
 void MarchingCubes::drawUI()
 {
 	ImGui::Text("hoi!");
 }
 
-void MarchingCubes::regenerateMarchingCubes(Scene* scene)
+void MarchingCubes::render() const
 {
-	currentScene = scene;
+	//TODO
+	shaderProg->use();
 
+	//update uniforms?
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)); //TODO: camera transform
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)displayWidth / (float)displayHeight, 0.1f, 100.0f);
+
+	//pass uniforms
+	shaderProg->passUniform4x4floatMatrix("model", model);
+	shaderProg->passUniform4x4floatMatrix("view", view);
+	shaderProg->passUniform4x4floatMatrix("projection", proj);
+
+	//draw buffers
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+}
+
+void MarchingCubes::regenerateMarchingCubes()
+{
 	for (int x = 0; x < gridSize; x++)
 	{
 		for (int y = 0; y < gridSize; y++)
@@ -162,7 +204,7 @@ void MarchingCubes::regenerateMarchingCubes(Scene* scene)
 				int posZ = (z - gridSize / 2) * gridSpacing;
 
 				glm::vec3 worldPoint(posX, posY, posZ);
-				float dist = currentScene->map(worldPoint).first;
+				float dist = scene->map(worldPoint).first;
 
 				grid[x][y][z] = { glm::vec3(posX, posY, posZ), dist };
 			}
@@ -171,7 +213,10 @@ void MarchingCubes::regenerateMarchingCubes(Scene* scene)
 
 	marchingCubes();
 
-	//update buffers
+	//TODO: update buffers
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void MarchingCubes::marchingCubes()
@@ -224,8 +269,7 @@ void MarchingCubes::marchingCubes()
 					}
 				}
 
-				//TODO: triangulate and store vertex data somewhere
-
+				//triangulate
 				int idx = 0;
 				while (triTable[cubeIndex][idx] != -1)
 				{
@@ -257,9 +301,9 @@ glm::vec3 MarchingCubes::getNormal(glm::vec3 point) const
 {
 	glm::vec2 e(0.001, 0.0);
 
-	float comp1 = currentScene->map(point - glm::vec3(e.x, e.y, e.y)).first;
-	float comp2 = currentScene->map(point - glm::vec3(e.y, e.x, e.y)).first;
-	float comp3 = currentScene->map(point - glm::vec3(e.y, e.y, e.x)).first;
-	glm::vec3 n = glm::vec3(currentScene->map(point).first) - glm::vec3(comp1, comp2, comp3);
+	float comp1 = scene->map(point - glm::vec3(e.x, e.y, e.y)).first;
+	float comp2 = scene->map(point - glm::vec3(e.y, e.x, e.y)).first;
+	float comp3 = scene->map(point - glm::vec3(e.y, e.y, e.x)).first;
+	glm::vec3 n = glm::vec3(scene->map(point).first) - glm::vec3(comp1, comp2, comp3);
 	return glm::normalize(n);
 }

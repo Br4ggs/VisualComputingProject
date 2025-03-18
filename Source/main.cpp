@@ -32,7 +32,7 @@ void imGuiTest()
 
     ImGui::Begin("Settings");
 
-    if (ImGui::CollapsingHeader("RenderingEE"))
+    if (ImGui::CollapsingHeader("Rendering"))
     {
         //rendering backend dropdown
         const char* renderTypes[] = { "sphere tracing (cpu)", "marching cubes"};
@@ -73,9 +73,13 @@ void imGuiTest()
     //call to Scene ui
     scene->drawUI();
 
+    if (selectedRenderBackend == 1)
+    {
+        marchingCubes->regenerateMarchingCubes(); //TODO: trigger only when scene has actually changed
+    }
+
     if (selectedRenderBackend == 0 && ImGui::Button("Render"))
     {
-        std::cout << "wuz clicked" << std::endl;
         marcher->render(scene);
         unsigned char* dataptr = marcher->getRenderData();
         screen->writeToTexture(1000, 800, dataptr);
@@ -142,10 +146,11 @@ int main()
     glClear(GL_COLOR_BUFFER_BIT);
     glfwSwapBuffers(window);
 
-    marcher = new RayMarcher(1000, 800);
-    marchingCubes = new MarchingCubes();
-
     scene = new Scene();
+
+    marcher = new RayMarcher(1000, 800);
+    marchingCubes = new MarchingCubes(1000, 800, scene, &shaderProgMarchingCubes);
+
 
     while (!glfwWindowShouldClose(window))
     {
@@ -160,7 +165,15 @@ int main()
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        screen->render();
+        switch (selectedRenderBackend)
+        {
+        case 0: //cpu-based sphere tracing. just render the screen quad
+            screen->render();
+            break;
+        case 1: //marching cubes.
+            marchingCubes->render();
+            break;
+        }
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

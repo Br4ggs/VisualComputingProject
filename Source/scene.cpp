@@ -82,8 +82,6 @@ void Scene::drawUI()
 
 std::pair<float, glm::vec3> Scene::map(glm::vec3 point) const
 {
-    //point = repeat(point, glm::vec3(2, 2, 2));
-
     std::pair<float, glm::vec3> res(std::numeric_limits<float>::infinity(), glm::vec3(1.0f));
     for (int i = 0; i < objects.size(); i++)
     {

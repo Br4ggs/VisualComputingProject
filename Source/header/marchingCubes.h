@@ -8,15 +8,17 @@
 #include <glm/glm.hpp>
 
 #include "scene.h"
+#include "shaderProgram.h"
 
 class MarchingCubes
 {
 public:
-	MarchingCubes();
+	MarchingCubes(int displayWidth, int displayHeight, Scene* scene, ShaderProgram* shaderProg);
 
 	void drawUI();
+	void render() const;
 
-	void regenerateMarchingCubes(Scene* scene);
+	void regenerateMarchingCubes();
 
 
 private:
@@ -33,7 +35,14 @@ private:
 		glm::vec3 normal;
 	};
 
-	Scene* currentScene;
+	Scene* scene;
+	ShaderProgram* shaderProg;
+
+	int displayWidth;
+	int displayHeight;
+
+	GLuint VAO;
+	GLuint VBO;
 
 	//grid
 	const int gridSize = 30;
