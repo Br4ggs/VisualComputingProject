@@ -17,6 +17,8 @@
 #include "header/texturedScreenQuad.h"
 #include "header/rayMarcher.h"
 #include "header/marchingCubes.h"
+#include "header/OpenGLMarcher.h"
+#include "header/renderTypes.h"
 
 #define STRINGIFY(x) #x // makes a string of x
 #define TOSTRING(x) STRINGIFY(x) // expands x
@@ -26,6 +28,7 @@ int selectedRenderBackend = 0;
 TexturedScreenQuad* screen;
 RayMarcher* marcher;
 MarchingCubes* marchingCubes;
+OpenGLMarcher* oglMarcher;
 Scene* scene;
 
 void imGuiTest()
@@ -37,13 +40,14 @@ void imGuiTest()
 
     if (ImGui::CollapsingHeader("Rendering"))
     {
-        //rendering backend dropdown
-        const char* renderTypes[] = { "sphere tracing (cpu)", "marching cubes"};
-        const char* renderPreview = renderTypes[selectedRenderBackend];
+        const char** renderTypeNames;
+        RenderType::allNames(&renderTypeNames);
+        const char** renderTypes = renderTypeNames;
+        const char* renderPreview = RenderType::getName((RenderType::Type)selectedRenderBackend);
 
         if (ImGui::BeginCombo("rendering backend", renderPreview))
         {
-            for (int n = 0; n < 2; n++)
+            for (int n = 0; n < (int)RenderType::COUNT; n++)
             {
                 const bool selected = (selectedRenderBackend == n);
                 if (ImGui::Selectable(renderTypes[n], selected))
@@ -52,8 +56,7 @@ void imGuiTest()
                     selectedRenderBackend = n;
                 }
 
-                if (selected)
-                    ImGui::SetItemDefaultFocus();
+                if (selected) ImGui::SetItemDefaultFocus();
             }
 
             ImGui::EndCombo();
@@ -62,14 +65,17 @@ void imGuiTest()
         //render settings
         switch (selectedRenderBackend)
         {
-        case 0: //sphere tracing
-            marcher->drawUI();
-            break;
-        case 1: //marching cubes
-            marchingCubes->drawUI();
-            break;
-        default:
-            break;
+            case 0: //sphere tracing
+                marcher->drawUI();
+                break;
+            case 1: //marching cubes
+                marchingCubes->drawUI();
+                break;
+            case 2:
+                oglMarcher->drawUI();
+                break;
+            default:
+                break;
         }
     }
 
@@ -79,12 +85,17 @@ void imGuiTest()
     if (selectedRenderBackend == 1)
     {
         marchingCubes->regenerateMarchingCubes(); //TODO: trigger only when scene has actually changed
-    }
-
-    if (selectedRenderBackend == 0 && ImGui::Button("Render"))
+    }else if (selectedRenderBackend == 0 && ImGui::Button("Render"))
     {
         marcher->render(scene);
         unsigned char* dataptr = marcher->getRenderData();
+        screen->writeToTexture(1000, 800, dataptr);
+    }else if (selectedRenderBackend == 2 && ImGui::Button("Render")) 
+    {
+        // scene is bekend
+        // implement linearization here
+        oglMarcher->render(scene);
+        unsigned char* dataptr = oglMarcher->getRenderData();
         screen->writeToTexture(1000, 800, dataptr);
     }
 
@@ -152,8 +163,8 @@ int main()
     scene = new Scene();
 
     marcher = new RayMarcher(1000, 800);
+    oglMarcher = new OpenGLMarcher(1000, 800);
     marchingCubes = new MarchingCubes(1000, 800, scene, &shaderProgMarchingCubes);
-
 
     while (!glfwWindowShouldClose(window))
     {
@@ -175,6 +186,9 @@ int main()
             break;
         case 1: //marching cubes.
             marchingCubes->render();
+            break;
+        case 2: /* opengl based sphere tracing */
+            screen->render();
             break;
         }
 

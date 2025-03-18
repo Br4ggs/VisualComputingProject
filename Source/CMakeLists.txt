@@ -8,6 +8,7 @@ add_executable(VisualComputingProject
     texturedScreenQuad.cpp
     rayMarcher.cpp
     marchingCubes.cpp
+    OpenGLMarcher.cpp
     scene.cpp
     sdfSphere.cpp
     sdfBox.cpp
