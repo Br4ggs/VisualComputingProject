@@ -46,8 +46,8 @@ private:
 	GLuint VBO;
 
 	//grid
-	const int gridSize = 30;
-	const float gridSpacing = 0.1f;
+	int gridSize = 30;
+	float gridSpacing = 0.1f;
 
 	std::vector<std::vector<std::vector<GridPoint>>> grid;
 
