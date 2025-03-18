@@ -422,3 +422,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+build/*
+*.ini
+private/
+check_shaders.sh

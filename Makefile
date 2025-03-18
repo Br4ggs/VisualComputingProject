@@ -10,6 +10,9 @@ EXECUTABLE=$(BUILD_DIR)/VisualComputingProject
 run: build
 	$(EXECUTABLE)
 
+run-release: release
+	$(EXECUTABLE)
+
 clean:
 	rm -rf $(BUILD_DIR)
 
@@ -20,6 +23,10 @@ build-dir:
 	mkdir -p $(BUILD_DIR)
 
 build:
+	cmake --build $(BUILD_DIR)
+
+release: clean build-dir
+	cd $(BUILD_DIR) && cmake $(CMAKE_RELEASE_EXPORT_FLAGS) ../$(SOURCE_DIR)
 	cmake --build $(BUILD_DIR)
 
 debug: clean build-dir
