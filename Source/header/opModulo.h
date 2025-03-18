@@ -9,6 +9,9 @@ public:
 	OpModulo(IDrawable* operant);
 	~OpModulo();
 
+	bool isOp() { return true; }
+	bool isShape() { return false; }
+
 	virtual void drawUI();
 	virtual char* getName() const;
 	virtual std::vector<IDrawable*> getChildren() const;

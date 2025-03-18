@@ -14,6 +14,10 @@ public:
 
 	virtual char* getName() const = 0;
 
+	/* HACK: op and shape need to be distinguished in the tree */
+	virtual bool isOp() = 0;
+	virtual bool isShape() = 0;
+
 	/// <summary>
 	/// todo
 	/// </summary>

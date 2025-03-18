@@ -8,6 +8,9 @@ public:
 	OpIntersect(IDrawable* operant1, IDrawable* operant2);
 	~OpIntersect();
 
+	bool isOp() { return true; }
+	bool isShape() { return false; }
+
 	virtual void drawUI();
 	virtual char* getName() const;
 	virtual std::vector<IDrawable*> getChildren() const;

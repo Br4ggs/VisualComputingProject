@@ -9,6 +9,9 @@ public:
 	OpDifference(IDrawable* operant1, IDrawable* operant2);
 	~OpDifference();
 
+	bool isOp() { return true; }
+	bool isShape() { return false; }
+
 	virtual void drawUI();
 	virtual char* getName() const;
 	virtual std::vector<IDrawable*> getChildren() const;
