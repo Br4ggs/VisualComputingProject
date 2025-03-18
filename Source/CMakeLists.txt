@@ -49,7 +49,10 @@ if (APPLE)
         "-framework IOKit"
         "-framework CoreVideo"
     )
+    set(SHADER_PATH "${CMAKE_SOURCE_DIR}/shaders/")
 elseif (WIN32)
     message(STATUS "Configuring for Windows")
     target_link_libraries(VisualComputingProject PRIVATE ${LIBRARY_PATH}/lib/glfw3.lib)
 endif()
+
+add_compile_definitions(SHADER_PATH=${SHADER_PATH})

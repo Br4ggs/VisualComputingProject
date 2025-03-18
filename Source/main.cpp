@@ -18,6 +18,9 @@
 #include "header/rayMarcher.h"
 #include "header/marchingCubes.h"
 
+#define STRINGIFY(x) #x // makes a string of x
+#define TOSTRING(x) STRINGIFY(x) // expands x
+
 int selectedRenderBackend = 0;
 
 TexturedScreenQuad* screen;
@@ -130,15 +133,15 @@ int main()
     glViewport(0, 0, 1000, 800);
 
     ShaderProgram shaderProgMarcher;
-    shaderProgMarcher.attachVertexShader("..\\..\\..\\vertexScreenQuad.glsl"); //since the executable is located in Source/out/build/x64-Debug
-    shaderProgMarcher.attachFragmentShader("..\\..\\..\\fragmentScreenQuad.glsl");
+    shaderProgMarcher.attachVertexShader(TOSTRING(SHADER_PATH) "vertexScreenQuad.vert");
+    shaderProgMarcher.attachFragmentShader(TOSTRING(SHADER_PATH) "fragmentScreenQuad.frag");
     shaderProgMarcher.compile();
 
     screen = new TexturedScreenQuad(&shaderProgMarcher);
 
     ShaderProgram shaderProgMarchingCubes;
-    shaderProgMarchingCubes.attachVertexShader("..\\..\\..\\vertexMarchingCubes.glsl");
-    shaderProgMarchingCubes.attachFragmentShader("..\\..\\..\\fragmentMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachVertexShader(TOSTRING(SHADER_PATH) "vertexMarchingCubes.vert");
+    shaderProgMarchingCubes.attachFragmentShader(TOSTRING(SHADER_PATH) "fragmentMarchingCubes.frag");
     shaderProgMarchingCubes.compile();
 
     //set clearscreen color to a nice navy blue
