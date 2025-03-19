@@ -7,7 +7,7 @@
 
 #include "imgui.h"
 
-void AddPrimitiveModal::drawUI(Scene& scene) const
+void AddPrimitiveModal::drawUI(Scene& scene, bool& dirty) const
 {
 	ImGui::SetNextWindowSize(ImVec2(250, 150));
 
@@ -34,6 +34,7 @@ void AddPrimitiveModal::drawUI(Scene& scene) const
 
 		if (ImGui::Button("Add"))
 		{
+			dirty = true;
 			IDrawable* prim = createPrimitive(primSelected);
 			scene.addObject(prim);
 			ImGui::CloseCurrentPopup();

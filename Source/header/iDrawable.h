@@ -10,7 +10,7 @@ class IDrawable
 {
 public:
 	virtual ~IDrawable() {}
-	virtual void drawUI() = 0;
+	virtual void drawUI(bool& dirty) = 0;
 
 	virtual char* getName() const = 0;
 

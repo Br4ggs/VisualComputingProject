@@ -15,7 +15,7 @@ class MarchingCubes
 public:
 	MarchingCubes(int displayWidth, int displayHeight, Scene* scene, ShaderProgram* shaderProg);
 
-	void drawUI();
+	void drawUI(bool& dirty);
 	void render() const;
 
 	void regenerateMarchingCubes();

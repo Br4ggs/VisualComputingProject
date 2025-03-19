@@ -30,6 +30,8 @@ void imGuiTest()
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(400, 680));
 
+    bool dirty = false;
+
     ImGui::Begin("Settings");
 
     if (ImGui::CollapsingHeader("Rendering"))
@@ -63,7 +65,7 @@ void imGuiTest()
             marcher->drawUI();
             break;
         case 1: //marching cubes
-            marchingCubes->drawUI();
+            marchingCubes->drawUI(dirty);
             break;
         default:
             break;
@@ -71,9 +73,9 @@ void imGuiTest()
     }
 
     //call to Scene ui
-    scene->drawUI();
+    scene->drawUI(dirty);
 
-    if (selectedRenderBackend == 1)
+    if (selectedRenderBackend == 1 && dirty)
     {
         marchingCubes->regenerateMarchingCubes(); //TODO: trigger only when scene has actually changed
     }

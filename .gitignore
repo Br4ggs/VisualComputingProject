@@ -1,5 +1,5 @@
 # Ignore output folder
-*/out
+out/
 
 # Ignore build directories
 */build

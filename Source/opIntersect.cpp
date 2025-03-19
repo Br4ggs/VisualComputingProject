@@ -12,12 +12,12 @@ OpIntersect::~OpIntersect()
 	delete operant2;
 }
 
-void OpIntersect::drawUI()
+void OpIntersect::drawUI(bool& dirty)
 {
 	ImGui::PushID(0);
 	if (ImGui::TreeNode(operant1->getName()))
 	{
-		operant1->drawUI();
+		operant1->drawUI(dirty);
 		ImGui::TreePop();
 	}
 	ImGui::PopID();
@@ -25,7 +25,7 @@ void OpIntersect::drawUI()
 	ImGui::PushID(1);
 	if (ImGui::TreeNode(operant2->getName()))
 	{
-		operant2->drawUI();
+		operant2->drawUI(dirty);
 		ImGui::TreePop();
 	}
 	ImGui::PopID();

@@ -6,7 +6,7 @@
 
 #include "imgui.h"
 
-void AddOperatorModal::drawUI(Scene& scene)
+void AddOperatorModal::drawUI(Scene& scene, bool& dirty)
 {
     ImGui::SetNextWindowSize(ImVec2(350, 300));
 
@@ -56,6 +56,7 @@ void AddOperatorModal::drawUI(Scene& scene)
 
         if (state == 2 && ImGui::Button("Add operator"))
         {
+            dirty = true;
             IDrawable* op = createOperator(selectedOperator, operant1, operant2);
 
             scene.removeObject(operant1);

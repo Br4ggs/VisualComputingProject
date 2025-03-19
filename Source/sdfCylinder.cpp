@@ -11,14 +11,15 @@ SDFCylinder::SDFCylinder(float radius, float height)
 	color = glm::vec3(colf[0], colf[1], colf[2]);
 }
 
-void SDFCylinder::drawUI()
+void SDFCylinder::drawUI(bool& dirty)
 {
 	if (ImGui::ColorEdit3("Color", colf))
 	{
+		dirty = true;
 		color = glm::vec3(colf[0], colf[1], colf[2]);
 	}
 
-	WorldObject::drawUI();
+	WorldObject::drawUI(dirty);
 }
 
 char* SDFCylinder::getName() const

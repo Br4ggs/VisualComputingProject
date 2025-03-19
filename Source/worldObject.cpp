@@ -20,15 +20,17 @@ WorldObject::WorldObject()
 	setScale(glm::vec3(sclf[0], sclf[1], sclf[2]));
 }
 
-void WorldObject::drawUI()
+void WorldObject::drawUI(bool& dirty)
 {
 	if (ImGui::InputFloat3("Position", posf))
 	{
+		dirty = true;
 		setPosition(glm::vec3(posf[0], posf[1], posf[2]));
 	}
 
 	if (ImGui::InputFloat3("Rotation", rotf))
 	{
+		dirty = true;
 		float radiansX = glm::radians(rotf[0]);
 		float radiansY = glm::radians(rotf[1]);
 		float radiansZ = glm::radians(rotf[2]);
@@ -42,6 +44,7 @@ void WorldObject::drawUI()
 
 	if (ImGui::InputFloat3("Scale", sclf))
 	{
+		dirty = true;
 		setScale(glm::vec3(sclf[0], sclf[1], sclf[2]));
 	}
 }

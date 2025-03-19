@@ -9,7 +9,7 @@ class AddPrimitiveModal
 public:
 	AddPrimitiveModal() = default;
 
-	void drawUI(Scene& scene) const;
+	void drawUI(Scene& scene, bool& dirty) const;
 
 private:
 	IDrawable* createPrimitive(int prim) const;

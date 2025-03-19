@@ -11,9 +11,9 @@ SDFPlane::SDFPlane(float height)
 	height(height)
 {}
 
-void SDFPlane::drawUI()
+void SDFPlane::drawUI(bool& dirty)
 {
-	WorldObject::drawUI();
+	WorldObject::drawUI(dirty);
 }
 
 char* SDFPlane::getName() const

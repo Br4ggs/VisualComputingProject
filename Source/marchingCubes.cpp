@@ -166,15 +166,15 @@ MarchingCubes::MarchingCubes(int displayWidth, int displayHeight, Scene* scene, 
 	glBindVertexArray(0);
 }
 
-//TODO
-void MarchingCubes::drawUI()
+void MarchingCubes::drawUI(bool& dirty)
 {
 	ImGui::Text("hoi!");
 	if (ImGui::InputInt("grid size", &gridSize))
 	{
+		dirty = true;
 		grid = std::vector<std::vector<std::vector<GridPoint>>>(gridSize, std::vector<std::vector<GridPoint>>(gridSize, std::vector<GridPoint>(gridSize)));
 	}
-	ImGui::InputFloat("grid spacing", &gridSpacing);
+	if (ImGui::InputFloat("grid spacing", &gridSpacing)) dirty = true;
 }
 
 void MarchingCubes::render() const

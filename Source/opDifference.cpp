@@ -12,10 +12,11 @@ OpDifference::~OpDifference()
 	delete operant2;
 }
 
-void OpDifference::drawUI()
+void OpDifference::drawUI(bool& dirty)
 {
 	if (ImGui::Button("swap operants"))
 	{
+		dirty = true;
 		IDrawable* temp = operant1;
 		operant1 = operant2;
 		operant2 = temp;
@@ -24,7 +25,7 @@ void OpDifference::drawUI()
 	ImGui::PushID(0);
 	if (ImGui::TreeNode(operant1->getName()))
 	{
-		operant1->drawUI();
+		operant1->drawUI(dirty);
 		ImGui::TreePop();
 	}
 	ImGui::PopID();
@@ -32,7 +33,7 @@ void OpDifference::drawUI()
 	ImGui::PushID(1);
 	if (ImGui::TreeNode(operant2->getName()))
 	{
-		operant2->drawUI();
+		operant2->drawUI(dirty);
 		ImGui::TreePop();
 	}
 	ImGui::PopID();
