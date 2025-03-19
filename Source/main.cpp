@@ -235,6 +235,8 @@ int main()
     delete screen;
     delete marcher;
     delete scene;
+    delete oglMarcher;
+    delete marchingCubes;
 
     return 0;
 }

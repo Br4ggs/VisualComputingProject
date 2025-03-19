@@ -116,8 +116,11 @@ void OpenGLMarcher::render()
 {
     glBindVertexArray(VAOID);
 
+    shaderProgram->use();
+
     unsigned int shaderProgramInt = shaderProgram->getRawShaderProgram();
 
+    // TODO: nodes is hardcoded now, this needs to come from the linearization
     int maxNodes = 128;
     size_t dataSize = sizeof(LinearCSGTreeNode) * maxNodes;
     glGenBuffers(1, &uboID);
