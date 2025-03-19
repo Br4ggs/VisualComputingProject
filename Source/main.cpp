@@ -36,6 +36,8 @@ MarchingCubes* marchingCubes;
 OpenGLMarcher* oglMarcher;
 Scene* scene;
 
+static bool dirty = true; /* HACK: dirty indicates linearization */
+
 void imGuiTest()
 {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -57,8 +59,9 @@ void imGuiTest()
                 const bool selected = (selectedRenderBackend == n);
                 if (ImGui::Selectable(renderTypes[n], selected))
                 {
-                    std::cout << "i was clicked" << std::endl;
+                    std::cout << "i was clicked: " << renderTypes[n] << std::endl;
                     selectedRenderBackend = RenderType::getType(n);
+                    dirty = true;
                 }
 
                 if (selected) ImGui::SetItemDefaultFocus();
@@ -102,6 +105,7 @@ void imGuiTest()
             break;
         case RenderType::SPHERE_MARCHING_GPU:
             if (ImGui::Button("Render")) {
+                dirty = true;
                 oglMarcher->render();
             }
             break;
@@ -193,6 +197,11 @@ int main()
         ImGui::ShowDemoWindow();
 
         imGuiTest();
+
+        if (dirty && selectedRenderBackend == RenderType::SPHERE_MARCHING_GPU) {
+            dirty = false;
+            oglMarcher->linearize();
+        }
 
         glClear(GL_COLOR_BUFFER_BIT);
 

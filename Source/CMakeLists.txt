@@ -21,6 +21,7 @@ add_executable(VisualComputingProject
     worldObject.cpp
     addOperatorModal.cpp
     addPrimitiveModal.cpp
+    linearizeScene.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/glad.c
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_demo.cpp
@@ -35,10 +36,13 @@ set(LIBRARY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Libraries")
 
 set_property(
     TARGET VisualComputingProject
-    PROPERTY CXX_STANDARD 11
+    PROPERTY CXX_STANDARD 17
 )
 
-target_include_directories(VisualComputingProject PRIVATE ${LIBRARY_PATH}/include)
+target_include_directories(VisualComputingProject PRIVATE
+    ${LIBRARY_PATH}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/header
+)
 
 if (APPLE)
     message(STATUS "Configuring for macOS")

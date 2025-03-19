@@ -1,10 +1,5 @@
 #include "header/scene.h"
 
-#include "header/sdfSphere.h"
-#include "header/sdfBox.h"
-#include "header/opUnion.h"
-#include "header/opIntersect.h"
-#include "header/opDifference.h"
 #include "header/addOperatorModal.h"
 #include "header/addPrimitiveModal.h"
 
@@ -171,7 +166,10 @@ void Scene::deleteAsParent(IDrawable* obj)
     obj = nullptr;
 }
 
-std::pair<float, glm::vec3> Scene::sdfUnion(std::pair<float, glm::vec3> obj1, std::pair<float, glm::vec3> obj2) const
+std::pair<float, glm::vec3> Scene::sdfUnion(std::pair<float,
+                                            glm::vec3> obj1,
+                                            std::pair<float,
+                                            glm::vec3> obj2) const
 {
     return (obj1.first < obj2.first) ? obj1 : obj2;
 }

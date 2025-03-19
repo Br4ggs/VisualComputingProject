@@ -14,12 +14,12 @@ public:
 	virtual std::vector<IDrawable*> getChildren() const;
 	virtual std::vector<IDrawable*> detachChildren();
 
-	bool isOp() { return false; }
-	bool isShape() { return true; }
-
 	void setPosition(glm::vec3 pos);
 	void setRotation(glm::mat4 rot);
 	void setScale(glm::vec3 scl);
+
+	glm::vec3 getPosition();
+	glm::vec3 getScale();
 
 protected:
 	float posf[3] = { 0.0f, 0.0f, 0.0f };

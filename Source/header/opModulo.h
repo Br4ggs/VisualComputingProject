@@ -9,8 +9,7 @@ public:
 	OpModulo(IDrawable* operant);
 	~OpModulo();
 
-	bool isOp() { return true; }
-	bool isShape() { return false; }
+	CSGType getType() const { return CSGOperation::OP_MOD; };
 
 	virtual void drawUI();
 	virtual char* getName() const;

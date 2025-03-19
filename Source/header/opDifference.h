@@ -9,8 +9,7 @@ public:
 	OpDifference(IDrawable* operant1, IDrawable* operant2);
 	~OpDifference();
 
-	bool isOp() { return true; }
-	bool isShape() { return false; }
+	CSGType getType() const { return CSGOperation::OP_DIFF; };
 
 	virtual void drawUI();
 	virtual char* getName() const;

@@ -16,10 +16,13 @@ public:
 
 	void drawUI();
 	void render();
+	void linearize();
 
 private:
 
 	Scene* currentScene;
+
+	std::vector<LinearCSGTreeNode> linearScene;
 
 	unsigned int width;
 	unsigned int height;

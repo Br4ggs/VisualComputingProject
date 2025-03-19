@@ -20,6 +20,16 @@ WorldObject::WorldObject()
 	setScale(glm::vec3(sclf[0], sclf[1], sclf[2]));
 }
 
+glm::vec3 WorldObject::getScale()
+{
+	return scale;
+}
+
+glm::vec3 WorldObject::getPosition()
+{
+	return glm::vec3(position[0][0], position[0][1], position[0][2]);
+}
+
 void WorldObject::drawUI()
 {
 	if (ImGui::InputFloat3("Position", posf))

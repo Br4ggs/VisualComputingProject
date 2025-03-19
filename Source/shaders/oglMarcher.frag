@@ -15,7 +15,6 @@ layout(std140) uniform CSGBuffer {
 	LinearCSGTreeNode nodes[128];
 };
 
-
 uniform float loop_length;
 uniform vec2 window_dimensions;
 
@@ -36,12 +35,15 @@ const float shininess = 64.0;
 
 const int OP_UNI = 0;
 const int OP_INT = 1;
-const int OP_SUB = 2;
-const int NO_OP = 3;
+const int OP_DIFF = 2;
+const int OP_MOD = 3;
+const int NO_OP = 4;
 
 const int SHAPE_SPHERE = 0;
 const int SHAPE_BOX = 1;
-const int NO_SHAPE = 2;
+const int SHAPE_CYL = 2;
+const int SHAPE_PLANE = 3;
+const int NO_SHAPE = 4;
 
 float box_sdf(vec3 point, vec3 dimensions)
 {

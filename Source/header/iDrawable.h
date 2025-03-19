@@ -4,7 +4,8 @@
 #include <glm/glm.hpp>
 #include <utility>
 #include <vector>
-#include <string>
+
+#include "types.h"
 
 class IDrawable
 {
@@ -14,9 +15,7 @@ public:
 
 	virtual char* getName() const = 0;
 
-	/* HACK: op and shape need to be distinguished in the tree */
-	virtual bool isOp() = 0;
-	virtual bool isShape() = 0;
+	virtual CSGType getType() const = 0;
 
 	/// <summary>
 	/// todo

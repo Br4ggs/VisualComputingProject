@@ -4,8 +4,6 @@
 
 #include "imgui.h"
 
-#include <iostream>
-
 SDFSphere::SDFSphere(float radius)
 	:WorldObject(),
 	 radius(radius)

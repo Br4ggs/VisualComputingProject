@@ -12,6 +12,8 @@ public:
 	virtual char* getName() const;
 	virtual std::pair<float, glm::vec3> sdf(glm::vec3 point) const;
 
+	CSGType getType() const { return CSGShape::SHAPE_CYL; };
+
 private:
 	float colf[3] = { 1.0f, 1.0f, 1.0f };
 

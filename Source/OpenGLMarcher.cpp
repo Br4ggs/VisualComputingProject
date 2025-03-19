@@ -1,6 +1,6 @@
-#include "header/OpenGLMarcher.h"
-
+#include "OpenGLMarcher.h"
 #include "imgui.h"
+#include "linearizeScene.h"
 
 #define N_VERTICES 4
 #define N_ELEMENTS N_VERTICES * 3
@@ -10,14 +10,6 @@ typedef struct Vertex
     glm::vec3 pos;
     glm::vec3 col;
 } Vertex;
-
-struct LinearCSGTreeNode {
-    int32_t op;
-    int32_t shape;
-    float _padding[2];
-    glm::vec4 position;
-    glm::vec4 dimensions;
-};
 
 static const Vertex vertices[N_VERTICES] =
     {
@@ -29,26 +21,13 @@ static const Vertex vertices[N_VERTICES] =
 
 static const GLuint elements[N_VERTICES * 3] = { 0, 1, 2, 2, 3, 0 };
 
-enum CSGOperation {
-    OP_UNI = 0,
-    OP_INT = 1,
-    OP_SUB = 2,
-    NO_OP = 3,
-};
-
-enum CSGShape {
-    SHAPE_SPHERE = 0,
-    SHAPE_BOX = 1,
-    NO_SHAPE = 2,
-};
-
 const std::vector<LinearCSGTreeNode> nodes = {
-    { NO_OP, SHAPE_BOX, 0, 0, glm::vec4(0.0), glm::vec4(1.0f) },
-    { NO_OP, SHAPE_SPHERE, 0, 0, glm::vec4(-1.0, 3.0, 0.0, 0.0), glm::vec4(1.0f) },
+    { NO_OP, SHAPE_BOX, 0, 0, glm::vec4(1.0, 1.0, 0.0, 0.0), glm::vec4(1.0f) },
+    { NO_OP, SHAPE_SPHERE, 0, 0, glm::vec4(-1.0, 0.0, 0.0, 0.0), glm::vec4(1.0f) },
     { OP_UNI, NO_SHAPE, 0, 0, glm::vec4(0), glm::vec4(0) },
-    { NO_OP, SHAPE_BOX, 0, 0, glm::vec4(1.0), glm::vec4(1.0f) },
+    { NO_OP, SHAPE_BOX, 0, 0, glm::vec4(-1.0), glm::vec4(1.0f) },
     { OP_UNI, NO_SHAPE, 0, 0, glm::vec4(0), glm::vec4(0) },
-    { NO_OP, SHAPE_SPHERE, 0, 0, glm::vec4(-2.0), glm::vec4(1.0f) },
+    { NO_OP, SHAPE_SPHERE, 0, 0, glm::vec4(-1.0), glm::vec4(1.0f) },
     { OP_UNI, NO_SHAPE, 0, 0, glm::vec4(0), glm::vec4(0) },
 };
 
@@ -112,8 +91,16 @@ void OpenGLMarcher::drawUI()
     ImGui::InputDouble("fog creep", &fogCreep);
 }
 
+void OpenGLMarcher::linearize()
+{
+    linearScene.clear();
+    linearizeScene(scene, linearScene);
+}
+
 void OpenGLMarcher::render()
 {
+    if (linearScene.size() == 0) return;
+
     glBindVertexArray(VAOID);
 
     shaderProgram->use();

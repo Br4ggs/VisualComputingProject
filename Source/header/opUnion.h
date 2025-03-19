@@ -9,8 +9,7 @@ public:
 	OpUnion(IDrawable* operant1, IDrawable* operant2);
 	~OpUnion();
 
-	bool isOp() { return true; }
-	bool isShape() { return false; }
+	CSGType getType() const { return CSGOperation::OP_UNI; };
 
 	virtual void drawUI();
 	virtual char* getName() const;

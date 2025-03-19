@@ -4,14 +4,13 @@
 
 #include "imgui.h"
 
-#include <iostream>
-
 SDFBox::SDFBox(glm::vec3 dimensions)
 	:WorldObject(),
 	 dimensions(dimensions)
 {
 	color = glm::vec3(colf[0], colf[1], colf[2]);
 }
+
 
 void SDFBox::drawUI()
 {

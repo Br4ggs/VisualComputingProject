@@ -8,8 +8,7 @@ public:
 	OpIntersect(IDrawable* operant1, IDrawable* operant2);
 	~OpIntersect();
 
-	bool isOp() { return true; }
-	bool isShape() { return false; }
+	CSGType getType() const { return CSGOperation::OP_INT; };
 
 	virtual void drawUI();
 	virtual char* getName() const;
