@@ -27,7 +27,7 @@ glm::vec3 WorldObject::getScale()
 
 glm::vec3 WorldObject::getPosition()
 {
-	return glm::vec3(position[0][0], position[0][1], position[0][2]);
+	return glm::vec3(position[3][0], position[3][1], position[3][2]);
 }
 
 void WorldObject::drawUI()

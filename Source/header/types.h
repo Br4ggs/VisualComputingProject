@@ -1,6 +1,7 @@
 #ifndef _TYPES_H
 #define _TYPES_H
 
+#include <iostream>
 #include <cstdint>
 #include <glm/glm.hpp>
 #include <variant>

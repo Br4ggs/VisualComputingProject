@@ -1,6 +1,7 @@
 #include "OpenGLMarcher.h"
 #include "imgui.h"
 #include "linearizeScene.h"
+#include "types.h"
 
 #define N_VERTICES 4
 #define N_ELEMENTS N_VERTICES * 3
@@ -20,16 +21,6 @@ static const Vertex vertices[N_VERTICES] =
     };
 
 static const GLuint elements[N_VERTICES * 3] = { 0, 1, 2, 2, 3, 0 };
-
-const std::vector<LinearCSGTreeNode> nodes = {
-    { NO_OP, SHAPE_BOX, 0, 0, glm::vec4(1.0, 1.0, 0.0, 0.0), glm::vec4(1.0f) },
-    { NO_OP, SHAPE_SPHERE, 0, 0, glm::vec4(-1.0, 0.0, 0.0, 0.0), glm::vec4(1.0f) },
-    { OP_UNI, NO_SHAPE, 0, 0, glm::vec4(0), glm::vec4(0) },
-    { NO_OP, SHAPE_BOX, 0, 0, glm::vec4(-1.0), glm::vec4(1.0f) },
-    { OP_UNI, NO_SHAPE, 0, 0, glm::vec4(0), glm::vec4(0) },
-    { NO_OP, SHAPE_SPHERE, 0, 0, glm::vec4(-1.0), glm::vec4(1.0f) },
-    { OP_UNI, NO_SHAPE, 0, 0, glm::vec4(0), glm::vec4(0) },
-};
 
 OpenGLMarcher:: OpenGLMarcher(unsigned int width,
                               unsigned int height,
@@ -95,6 +86,10 @@ void OpenGLMarcher::linearize()
 {
     linearScene.clear();
     linearizeScene(scene, linearScene);
+
+    for (auto obj : linearScene) {
+        printLinearCSGTreeNode(obj);
+    }
 }
 
 void OpenGLMarcher::render()
@@ -109,13 +104,16 @@ void OpenGLMarcher::render()
 
     // TODO: nodes is hardcoded now, this needs to come from the linearization
     int maxNodes = 128;
+
+    assert(linearScene.size() <= maxNodes);
+
     size_t dataSize = sizeof(LinearCSGTreeNode) * maxNodes;
     glGenBuffers(1, &uboID);
     glBindBuffer(GL_UNIFORM_BUFFER, uboID);
-    glBufferData(GL_UNIFORM_BUFFER, dataSize, nodes.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, dataSize, linearScene.data(), GL_DYNAMIC_DRAW);
 
     const GLint loop_length_location = glGetUniformLocation(shaderProgramInt, "loop_length");
-    glUniform1f(loop_length_location, nodes.size());
+    glUniform1f(loop_length_location, linearScene.size());
 
     const GLint window_dim_location = glGetUniformLocation(shaderProgramInt, "window_dimensions");
     glUniform2f(window_dim_location, width, height);

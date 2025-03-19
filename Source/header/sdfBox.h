@@ -7,7 +7,7 @@
 class SDFBox : public WorldObject
 {
 public:
-	SDFBox(glm::vec3 dimenions);
+	SDFBox(glm::vec3 dimensions);
 
 	virtual void drawUI();
 	virtual char* getName() const;
