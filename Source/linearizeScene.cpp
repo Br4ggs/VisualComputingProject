@@ -34,7 +34,7 @@ void linearizeDrawable(IDrawable* drawable, std::vector<LinearCSGTreeNode>& line
             linearizeDrawable(child, linearScene);
         }
         CSGOperation op = std::get<CSGOperation>(type);
-        switch(std::get<CSGOperation>(type)) {
+        switch(op) {
         case OP_UNI:
         case OP_INT:
         case OP_DIFF:
@@ -42,6 +42,7 @@ void linearizeDrawable(IDrawable* drawable, std::vector<LinearCSGTreeNode>& line
             LinearCSGTreeNode node;
             node.op = op;
             node.shape = CSGShape::NO_SHAPE;
+            linearScene.push_back(node);
             break;
         case NO_OP:
             throw std::logic_error("op implementation should always have a valid operation");
