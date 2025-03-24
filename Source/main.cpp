@@ -102,7 +102,9 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(1000, 800, "VisualComputingProject", NULL, NULL);
+    glfwWindowHint(GLFW_DEPTH_BITS, 24); // at least 24 bits
+    GLFWwindow* window = glfwCreateWindow(1000, 800, "VisualComputingProject", nullptr, nullptr);
+
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -131,16 +133,17 @@ int main()
 
     glViewport(0, 0, 1000, 800);
 
+
     ShaderProgram shaderProgMarcher;
-    shaderProgMarcher.attachVertexShader("..\\..\\..\\vertexScreenQuad.glsl"); //since the executable is located in Source/out/build/x64-Debug
-    shaderProgMarcher.attachFragmentShader("..\\..\\..\\fragmentScreenQuad.glsl");
+    shaderProgMarcher.attachVertexShader("vertexScreenQuad.glsl"); //since the executable is located in Source/out/build/x64-Debug
+    shaderProgMarcher.attachFragmentShader("fragmentScreenQuad.glsl");
     shaderProgMarcher.compile();
 
     screen = new TexturedScreenQuad(&shaderProgMarcher);
 
     ShaderProgram shaderProgMarchingCubes;
-    shaderProgMarchingCubes.attachVertexShader("..\\..\\..\\vertexMarchingCubes.glsl");
-    shaderProgMarchingCubes.attachFragmentShader("..\\..\\..\\fragmentMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachVertexShader("vertexMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachFragmentShader("fragmentMarchingCubes.glsl");
     shaderProgMarchingCubes.compile();
 
     //set clearscreen color to a nice navy blue
@@ -152,6 +155,7 @@ int main()
 
     marcher = new RayMarcher(1000, 800);
     marchingCubes = new MarchingCubes(1000, 800, scene, &shaderProgMarchingCubes);
+    glEnable(GL_DEPTH_TEST);
 
 
     while (!glfwWindowShouldClose(window))
@@ -165,7 +169,7 @@ int main()
         imGuiTest();
 
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         switch (selectedRenderBackend)
         {
