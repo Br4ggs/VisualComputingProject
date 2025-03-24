@@ -187,10 +187,12 @@ void MarchingCubes::render() const
 {
 	shaderProg->use();
 
-	//model view projection matrix stuff
 	glm::mat4 model = glm::mat4(1.0f);
-	glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f)); //TODO: camera transform
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)displayWidth / (float)displayHeight, 0.1f, 100.0f);
+	glm::vec3 camPos = scene->getCamPos();
+	glm::vec3 lookAt = scene->getLookAt();
+	glm::mat4 view = glm::lookAt(camPos, lookAt, glm::vec3(0, 1, 0));
+	glm::mat4 proj = glm::perspective(glm::radians(90.0f), (float)displayWidth / (float)displayHeight, 0.1f, 100.0f);
+
 
 	//pass uniforms
 	shaderProg->passUniform4x4floatMatrix("model", model);
@@ -198,14 +200,12 @@ void MarchingCubes::render() const
 	shaderProg->passUniform4x4floatMatrix("projection", proj);
 
 	glm::vec3 lightPos = scene->getLightPos();
-	glm::vec3 viewPos = glm::vec3(0.0f, 0.0f, 3.0f); //TODO: camera transform
+	lightPos.x *= -1;
 	glm::vec3 lightColor = scene->getSpecColor();
-	glm::vec3 objectColor = glm::vec3(1.0f, 0.0f, 0.0f); //TODO: encode this with vertex data for interpolation in fragment shader
 
 	shaderProg->passUniform3floatVector("lightPos", lightPos);
-	shaderProg->passUniform3floatVector("viewPos", viewPos);
+	shaderProg->passUniform3floatVector("viewPos", camPos);
 	shaderProg->passUniform3floatVector("lightColor", lightColor);
-	shaderProg->passUniform3floatVector("objectColor", objectColor);
 
 	//draw buffers
 	glBindVertexArray(VAO);
