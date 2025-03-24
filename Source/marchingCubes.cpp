@@ -156,11 +156,17 @@ MarchingCubes::MarchingCubes(int displayWidth, int displayHeight, Scene* scene, 
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	// Attribute 0: vertex position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 	glEnableVertexAttribArray(0);
-	glDisable(GL_CULL_FACE);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) offsetof(Vertex, normal)); //TODO: can this be done without pointer func?
+
+	// Attribute 1: vertex normal
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 	glEnableVertexAttribArray(1);
+
+	// Attribute 2: vertex color
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -219,9 +225,10 @@ void MarchingCubes::regenerateMarchingCubes()
 				float posZ = (z - gridSize / 2.0f) * gridSpacing;
 
 				glm::vec3 worldPoint(posX, posY, posZ);
-				float dist = scene->map(worldPoint).first;
-
-				grid[x][y][z] = { glm::vec3(posX, posY, posZ), dist };
+				auto mapResult = scene->map(worldPoint);
+				float dist = mapResult.first;
+				glm::vec3 col = mapResult.second;
+				grid[x][y][z] = { glm::vec3(posX, posY, posZ), dist, col };
 			}
 		}
 	}
@@ -274,12 +281,9 @@ void MarchingCubes::marchingCubes()
 					{
 						int v1 = edgeVertexIndices[i][0];
 						int v2 = edgeVertexIndices[i][1];
-
-						glm::vec3 pos = interpolate(cubeCorners[v1], cubeCorners[v2]);
-						glm::vec3 nor = getNormal(pos);
-
-						edgeVertices[i].position = pos;
-						edgeVertices[i].normal = nor;
+						Vertex v = interpolateVertex(cubeCorners[v1], cubeCorners[v2]);
+						v.normal = getNormal(v.position);
+						edgeVertices[i] = v;
 					}
 				}
 
@@ -309,6 +313,16 @@ glm::vec3 MarchingCubes::interpolate(GridPoint p1, GridPoint p2) const
 
 	float t = (0.0f - v1) / (v2 - v1);
 	return p1.position + t * (p2.position - p1.position);
+}
+
+MarchingCubes::Vertex MarchingCubes::interpolateVertex(const GridPoint& p1,
+													   const GridPoint& p2)
+{
+	float t = (0.0f - p1.value) / (p2.value - p1.value);
+	Vertex v{};
+	v.position = p1.position + t * (p2.position - p1.position);
+	v.color = p1.color + t * (p2.color - p1.color);
+	return v;
 }
 
 glm::vec3 MarchingCubes::getNormal(glm::vec3 point) const
