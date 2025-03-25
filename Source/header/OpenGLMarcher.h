@@ -18,6 +18,8 @@ public:
 	void render();
 	void linearize();
 
+	bool dirty;
+
 private:
 
 	Scene* currentScene;

@@ -24,6 +24,8 @@ public:
 	void addObject(IDrawable* obj);
 	void removeObject(IDrawable* obj);
 
+	bool dirty;
+
 private:
 	float camPosf[3] = { 0.0f, 0.0f, -3.0f };
 	float lookAtf[3] = { 0.0f, 0.0f, 0.0f };

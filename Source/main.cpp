@@ -18,7 +18,7 @@
 #include "header/rayMarcher.h"
 #include "header/marchingCubes.h"
 #include "header/OpenGLMarcher.h"
-#include "header/renderTypes.h"
+#include "header/types.h"
 
 #define STRINGIFY(x) #x // makes a string of x
 #define TOSTRING(x) STRINGIFY(x) // expands x
@@ -35,8 +35,6 @@ RayMarcher* marcher;
 MarchingCubes* marchingCubes;
 OpenGLMarcher* oglMarcher;
 Scene* scene;
-
-static bool dirty = true; /* HACK: dirty indicates linearization */
 
 void imGuiTest()
 {
@@ -61,7 +59,6 @@ void imGuiTest()
                 {
                     std::cout << "i was clicked: " << renderTypes[n] << std::endl;
                     selectedRenderBackend = RenderType::getType(n);
-                    dirty = true;
                 }
 
                 if (selected) ImGui::SetItemDefaultFocus();
@@ -105,7 +102,7 @@ void imGuiTest()
             break;
         case RenderType::SPHERE_MARCHING_GPU:
             if (ImGui::Button("Render")) {
-                dirty = true;
+                oglMarcher->dirty = true;
                 oglMarcher->render();
             }
             break;
@@ -198,8 +195,7 @@ int main()
 
         imGuiTest();
 
-        if (dirty && selectedRenderBackend == RenderType::SPHERE_MARCHING_GPU) {
-            dirty = false;
+        if (oglMarcher->dirty && selectedRenderBackend == RenderType::SPHERE_MARCHING_GPU) {
             oglMarcher->linearize();
         }
 

@@ -45,6 +45,15 @@ const int SHAPE_CYL = 2;
 const int SHAPE_PLANE = 3;
 const int NO_SHAPE = 4;
 
+// Rodrigues formula for rotation
+vec3 rotate_arbitrary_axis(vec3 p, vec3 axis, float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    float dot_prod = dot(axis, p);
+    vec3 cross_prod = cross(axis, p);
+    return p * c + cross_prod * s + axis * (dot_prod * (1.0 - c));
+}
+
 float box_sdf(vec3 point, vec3 dimensions)
 {
 	vec3 q = abs(point) - dimensions;

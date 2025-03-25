@@ -90,11 +90,14 @@ void OpenGLMarcher::linearize()
     for (auto obj : linearScene) {
         printLinearCSGTreeNode(obj);
     }
+
+    this->dirty = false;
 }
 
 void OpenGLMarcher::render()
 {
     if (linearScene.size() == 0) return;
+    if (dirty) linearize();
 
     glBindVertexArray(VAOID);
 

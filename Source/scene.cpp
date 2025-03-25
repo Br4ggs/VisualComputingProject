@@ -7,11 +7,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <limits>
-#include <iostream>
 #include <algorithm>
 
 Scene::Scene()
-{}
+{
+    dirty = false;
+}
 
 Scene::~Scene()
 {

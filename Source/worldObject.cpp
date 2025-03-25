@@ -1,12 +1,11 @@
 #include "header/worldObject.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "scene.h"
 #include "imgui.h"
 
 WorldObject::WorldObject()
 {
-	setPosition(glm::vec3(posf[0], posf[1], posf[2]));
-
 	float radiansX = glm::radians(rotf[0]);
 	float radiansY = glm::radians(rotf[1]);
 	float radiansZ = glm::radians(rotf[2]);
@@ -27,30 +26,26 @@ glm::vec3 WorldObject::getScale()
 
 glm::vec3 WorldObject::getPosition()
 {
-	return glm::vec3(position[3][0], position[3][1], position[3][2]);
+	return glm::vec3(posf[0], posf[1], posf[2]);
 }
 
 void WorldObject::drawUI()
 {
-	if (ImGui::InputFloat3("Position", posf))
+	//TODO: make the scene dirty when something changes
+	if (ImGui::SliderFloat3("Position", posf, -1.0, 1.0))
 	{
-		setPosition(glm::vec3(posf[0], posf[1], posf[2]));
 	}
 
-	if (ImGui::InputFloat3("Rotation", rotf))
+	if (ImGui::SliderFloat3("Rotation", rotf, -1.0, 1.0))
 	{
-		float radiansX = glm::radians(rotf[0]);
-		float radiansY = glm::radians(rotf[1]);
-		float radiansZ = glm::radians(rotf[2]);
-
-		glm::mat4 matX = glm::rotate(glm::mat4(1.0f), radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
-		glm::mat4 matY = glm::rotate(glm::mat4(1.0f), radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 matZ = glm::rotate(glm::mat4(1.0f), radiansZ, glm::vec3(0.0f, 0.0f, 1.0f));
-
-		setRotation(matX * matY * matZ);
 	}
 
-	if (ImGui::InputFloat3("Scale", sclf))
+	if (ImGui::SliderFloat("Rotation Angle", &rotation_angle_deg, 0.0, 360.0))
+	{
+		rotation_angle_rad = glm::radians(rotation_angle_deg);
+	}
+
+	if (ImGui::SliderFloat3("Scale", sclf, -2.0, 2.0))
 	{
 		setScale(glm::vec3(sclf[0], sclf[1], sclf[2]));
 	}
@@ -64,12 +59,6 @@ std::vector<IDrawable*> WorldObject::getChildren() const
 std::vector<IDrawable*> WorldObject::detachChildren()
 {
 	return std::vector<IDrawable*>();
-}
-
-void WorldObject::setPosition(glm::vec3 pos)
-{
-	position = glm::translate(glm::mat4(1.0f), pos);
-	recalculateTransform();
 }
 
 void WorldObject::setRotation(glm::mat4 rot)
