@@ -28,7 +28,7 @@ public:
 
 private:
 	float camPosf[3] = { 0.0f, 0.0f, -3.0f };
-	float lookAtf[3] = { 0.0f, 0.0f, 0.0f };
+	float lookAtf[3] = { 0.0f, 0.0f, 1.0f };
 
 	float lightPosf[3] = { 1.0f, 1.0f, -3.0f };
 	float specColorf[3] = { 0.5f, 0.5f, 0.5f };

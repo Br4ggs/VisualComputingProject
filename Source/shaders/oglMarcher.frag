@@ -20,9 +20,11 @@ uniform vec2 window_dimensions;
 
 uniform vec3 u_camera_position;
 uniform vec3 u_light_position;
-uniform vec3 u_look_at;
+uniform vec3 u_look_at; // NOTE: is actually used as look direction
 
 out vec4 fragment_colour;
+
+const int u_fov = 60; // TODO: make this configurable?
 
 const int MAX_ITERATIONS = 100;
 const float THRESHOLD = 0.001;
@@ -142,11 +144,23 @@ vec3 get_shadow_scalar(vec3 point, vec3 light_pos) {
     return vec3(1.0);
 }
 
+mat3 create_look_at_matrix(vec3 camera_pos, vec3 look_direction, vec3 up) {
+	vec3 forward = normalize(look_direction);
+	vec3 right = normalize(cross(forward, up));
+	vec3 camera_up = cross(right, forward);
+	return mat3(right, camera_up, forward);
+}
+
 void main()
 {
-	vec2 xy_clip = ((gl_FragCoord.xy * 2 - window_dimensions) / window_dimensions.y) * 1.0;
-	vec3 ray_direction = normalize(vec3(xy_clip, 1.0));
-	//vec3 ray_origin = vec3(0.0, 0.0, -4.0);
+	vec2 xy_clip = ((gl_FragCoord.xy * 2.0 - window_dimensions) / window_dimensions.y);
+	vec3 ray_direction = normalize(vec3(xy_clip, 1.0 / tan(radians(u_fov * 0.5))));
+
+	vec3 up = vec3(0.0, 1.0, 0.0);
+	mat3 viewMat = create_look_at_matrix(u_camera_position, normalize(vec3(u_look_at.xy, 1.0)), up);
+
+	ray_direction = viewMat * ray_direction;
+
 	vec3 ray_origin = u_camera_position;
 
 	float total_distance = 0.;

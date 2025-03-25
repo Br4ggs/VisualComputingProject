@@ -30,11 +30,11 @@ void Scene::drawUI()
     {
         //camera position
         ImGui::PushID(1);
-        ImGui::SliderFloat3("Position", camPosf, -5.0, 5.0);
+        ImGui::SliderFloat3("Position", camPosf, -15.0, 15.0);
         ImGui::PopID();
 
         //camera lookat direction
-        ImGui::InputFloat3("Look at", lookAtf);
+        ImGui::SliderFloat3("Look at", lookAtf, -2.0, 2.0);
     }
 
     if (ImGui::CollapsingHeader("Lighting"))
