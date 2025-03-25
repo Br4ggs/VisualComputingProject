@@ -136,17 +136,16 @@ int main()
 
     glViewport(0, 0, 1000, 800);
 
-
     ShaderProgram shaderProgMarcher;
-    shaderProgMarcher.attachVertexShader("..\\..\\..\\vertexScreenQuad.glsl"); //since the executable is located in Source/out/build/x64-Debug
-    shaderProgMarcher.attachFragmentShader("..\\..\\..\\fragmentScreenQuad.glsl");
+    shaderProgMarcher.attachVertexShader("vertexScreenQuad.glsl");
+    shaderProgMarcher.attachFragmentShader("fragmentScreenQuad.glsl");
     shaderProgMarcher.compile();
 
     screen = new TexturedScreenQuad(&shaderProgMarcher);
 
     ShaderProgram shaderProgMarchingCubes;
-    shaderProgMarchingCubes.attachVertexShader("..\\..\\..\\vertexMarchingCubes.glsl");
-    shaderProgMarchingCubes.attachFragmentShader("..\\..\\..\\fragmentMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachVertexShader("vertexMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachFragmentShader("fragmentMarchingCubes.glsl");
     shaderProgMarchingCubes.compile();
 
     //set clearscreen color to a nice navy blue
