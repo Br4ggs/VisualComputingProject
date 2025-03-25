@@ -52,7 +52,10 @@ void imGuiTest()
                 }
 
                 if (selected)
+                {
+                    dirty = true;
                     ImGui::SetItemDefaultFocus();
+                }
             }
 
             ImGui::EndCombo();
@@ -77,7 +80,7 @@ void imGuiTest()
 
     if (selectedRenderBackend == 1 && dirty)
     {
-        marchingCubes->regenerateMarchingCubes(); //TODO: trigger only when scene has actually changed
+        marchingCubes->regenerateMarchingCubes();
     }
 
     if (selectedRenderBackend == 0 && ImGui::Button("Render"))
@@ -135,15 +138,15 @@ int main()
 
 
     ShaderProgram shaderProgMarcher;
-    shaderProgMarcher.attachVertexShader("vertexScreenQuad.glsl"); //since the executable is located in Source/out/build/x64-Debug
-    shaderProgMarcher.attachFragmentShader("fragmentScreenQuad.glsl");
+    shaderProgMarcher.attachVertexShader("..\\..\\..\\vertexScreenQuad.glsl"); //since the executable is located in Source/out/build/x64-Debug
+    shaderProgMarcher.attachFragmentShader("..\\..\\..\\fragmentScreenQuad.glsl");
     shaderProgMarcher.compile();
 
     screen = new TexturedScreenQuad(&shaderProgMarcher);
 
     ShaderProgram shaderProgMarchingCubes;
-    shaderProgMarchingCubes.attachVertexShader("vertexMarchingCubes.glsl");
-    shaderProgMarchingCubes.attachFragmentShader("fragmentMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachVertexShader("..\\..\\..\\vertexMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachFragmentShader("..\\..\\..\\fragmentMarchingCubes.glsl");
     shaderProgMarchingCubes.compile();
 
     //set clearscreen color to a nice navy blue

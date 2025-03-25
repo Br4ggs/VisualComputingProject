@@ -33,7 +33,7 @@ int ShaderProgram::attachVertexShader(const char* sourceFile)
 	if (!success)
 	{
 		glGetShaderInfoLog(vertexShader, 512, NULL, info);
-		std::cout << "Error compiling vertex shader:\n" << info << std::endl;
+		std::cout << "Error compiling vertex shader:" << sourceFile << "\n" << info << std::endl;
 		return -1;
 	}
 	else
@@ -63,7 +63,7 @@ int ShaderProgram::attachFragmentShader(const char* sourceFile)
 	if (!success)
 	{
 		glGetShaderInfoLog(fragmentShader, 512, NULL, info);
-		std::cout << "Error compiling fragment shader:\n" << info << std::endl;
+		std::cout << "Error compiling fragment shader:" << sourceFile << "\n" << info << std::endl;
 		return -1;
 	}
 	else
