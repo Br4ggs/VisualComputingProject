@@ -89,6 +89,36 @@ float get_distance(vec3 point) {
 	return stack[0];
 }
 
+vec3 get_normal(vec3 point) {
+    float epsilon = 0.001;
+    return normalize(vec3(
+        get_distance(point + vec3(epsilon, 0, 0)) - get_distance(point - vec3(epsilon, 0, 0)),
+        get_distance(point + vec3(0, epsilon, 0)) - get_distance(point - vec3(0, epsilon, 0)),
+        get_distance(point + vec3(0, 0, epsilon)) - get_distance(point - vec3(0, 0, epsilon))
+    ));
+}
+
+vec3 get_shadow_scalar(vec3 point, vec3 light_pos) {
+    vec3 light_dir = normalize(light_pos - point);
+    float distance_to_light = length(light_pos - point);
+    float shadow_distance = 0.0;
+    vec3 new_point = point + (get_normal(point) * THRESHOLD);
+    for(int i = 0; i < MAX_ITERATIONS * 100; ++i) {
+        vec3 shadow_position = new_point + light_dir * shadow_distance;
+        float df = get_distance(shadow_position);
+        float distance = df;
+
+        if (distance < THRESHOLD) {
+            return vec3(0.4);
+        }
+        if (distance > distance_to_light) {
+            return vec3(1.0);
+        }
+        shadow_distance += distance;
+    }
+    return vec3(1.0);
+}
+
 void main()
 {
 
@@ -110,7 +140,22 @@ void main()
 		}
 
 		if (distance < THRESHOLD) {
-			colour = vec3(1.0);
+			vec3 normal = get_normal(current_position);
+			vec3 light_dir = normalize(light_position - current_position);
+			vec3 view_dir = normalize(-current_position);
+			vec3 halfway_dir = normalize(light_dir + view_dir);
+
+			float diff = max(dot(normal, light_dir), 0.0);
+			float spec = pow(max(dot(normal, halfway_dir), 0.0), shininess);
+
+			vec3 ambient = ambient_color;
+			vec3 diffuse = diff * light_color;
+			vec3 specular = specular_strength * spec * light_color;
+			vec3 shadow_scalar = get_shadow_scalar(current_position, light_position);
+
+			colour = object_color * (ambient + diffuse) + (specular);
+			colour *= shadow_scalar;
+
 			break;
 		}
 	}
