@@ -1,8 +1,8 @@
 #include "header/worldObject.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "scene.h"
 #include "imgui.h"
+#include "OpenGLMarcher.h"
 
 WorldObject::WorldObject()
 {
@@ -31,23 +31,25 @@ glm::vec3 WorldObject::getPosition()
 
 void WorldObject::drawUI()
 {
-	//TODO: make the scene dirty when something changes
-	if (ImGui::SliderFloat3("Position", posf, -1.0, 1.0))
+	if (ImGui::SliderFloat3("Position", posf, -5.0, 5.0))
 	{
+		OpenGLMarcher::dirty = true;
 	}
 
 	if (ImGui::SliderFloat3("Rotation", rotf, -1.0, 1.0))
 	{
+		OpenGLMarcher::dirty = true;
 	}
 
 	if (ImGui::SliderFloat("Rotation Angle", &rotation_angle_deg, 0.0, 360.0))
 	{
 		rotation_angle_rad = glm::radians(rotation_angle_deg);
+		OpenGLMarcher::dirty = true;
 	}
 
 	if (ImGui::SliderFloat3("Scale", sclf, -2.0, 2.0))
 	{
-		setScale(glm::vec3(sclf[0], sclf[1], sclf[2]));
+		OpenGLMarcher::dirty = true;
 	}
 }
 

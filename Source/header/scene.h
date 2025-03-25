@@ -30,7 +30,7 @@ private:
 	float camPosf[3] = { 0.0f, 0.0f, -3.0f };
 	float lookAtf[3] = { 0.0f, 0.0f, 0.0f };
 
-	float lightPosf[3] = { 30.0f, 40.0f, 30.0f };
+	float lightPosf[3] = { 1.0f, 1.0f, -3.0f };
 	float specColorf[3] = { 0.5f, 0.5f, 0.5f };
 
 	glm::vec3 specularColor = glm::vec3(0.5f);

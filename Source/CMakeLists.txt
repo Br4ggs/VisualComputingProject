@@ -61,4 +61,5 @@ elseif (WIN32)
     set(SHADER_PATH "${CMAKE_SOURCE_DIR}/shaders/")
 endif()
 
+set(SHADER_PATH "${CMAKE_SOURCE_DIR}/shaders/")
 add_compile_definitions(SHADER_PATH=${SHADER_PATH})

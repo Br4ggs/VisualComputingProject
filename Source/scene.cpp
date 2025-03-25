@@ -28,7 +28,7 @@ void Scene::drawUI()
     {
         //camera position
         ImGui::PushID(1);
-        ImGui::InputFloat3("Position", camPosf);
+        ImGui::SliderFloat3("Position", camPosf, -5.0, 5.0);
         ImGui::PopID();
 
         //camera lookat direction
@@ -39,7 +39,7 @@ void Scene::drawUI()
     {
         //position
         ImGui::PushID(2);
-        ImGui::InputFloat3("Position", lightPosf);
+        ImGui::SliderFloat3("Position", lightPosf, -10.0, 10.0);
         ImGui::PopID();
 
         //color

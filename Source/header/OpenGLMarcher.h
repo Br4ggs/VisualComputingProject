@@ -15,10 +15,10 @@ public:
 	~OpenGLMarcher();
 
 	void drawUI();
-	void render();
+	void render(int width, int height);
 	void linearize();
 
-	bool dirty;
+	static bool dirty;
 
 private:
 

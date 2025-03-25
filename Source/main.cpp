@@ -102,8 +102,7 @@ void imGuiTest()
             break;
         case RenderType::SPHERE_MARCHING_GPU:
             if (ImGui::Button("Render")) {
-                oglMarcher->dirty = true;
-                oglMarcher->render();
+                OpenGLMarcher::dirty = true;
             }
             break;
         default:
@@ -195,11 +194,14 @@ int main()
 
         imGuiTest();
 
-        if (oglMarcher->dirty && selectedRenderBackend == RenderType::SPHERE_MARCHING_GPU) {
+        if (OpenGLMarcher::dirty && selectedRenderBackend == RenderType::SPHERE_MARCHING_GPU) {
             oglMarcher->linearize();
         }
 
         glClear(GL_COLOR_BUFFER_BIT);
+
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
 
         switch (selectedRenderBackend)
         {
@@ -210,7 +212,7 @@ int main()
             marchingCubes->render();
             break;
         case RenderType::SPHERE_MARCHING_GPU:
-            oglMarcher->render();
+            oglMarcher->render(width, height);
             break;
         default:
             throw std::logic_error("render backend of chosen type is not implemented");

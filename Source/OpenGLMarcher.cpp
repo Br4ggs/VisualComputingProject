@@ -22,6 +22,8 @@ static const Vertex vertices[N_VERTICES] =
 
 static const GLuint elements[N_VERTICES * 3] = { 0, 1, 2, 2, 3, 0 };
 
+bool OpenGLMarcher::dirty = false;
+
 OpenGLMarcher:: OpenGLMarcher(unsigned int width,
                               unsigned int height,
                               Scene *scene,
@@ -91,10 +93,10 @@ void OpenGLMarcher::linearize()
         printLinearCSGTreeNode(obj);
     }
 
-    this->dirty = false;
+    OpenGLMarcher::dirty = false;
 }
 
-void OpenGLMarcher::render()
+void OpenGLMarcher::render(int width, int height)
 {
     if (linearScene.size() == 0) return;
     if (dirty) linearize();
@@ -109,6 +111,14 @@ void OpenGLMarcher::render()
     int maxNodes = 128;
 
     assert(linearScene.size() <= maxNodes);
+
+    glm::vec3 cam_pos = scene->getCamPos();
+    const GLint cam_pos_location = glGetUniformLocation(shaderProgramInt, "u_camera_position");
+    glUniform3f(cam_pos_location, cam_pos[0], cam_pos[1], cam_pos[2]);
+
+    glm::vec3 light_pos = scene->getLightPos();
+    const GLint light_pos_location = glGetUniformLocation(shaderProgramInt, "u_light_position");
+    glUniform3f(light_pos_location, light_pos[0], light_pos[1], light_pos[2]);
 
     size_t dataSize = sizeof(LinearCSGTreeNode) * maxNodes;
     glGenBuffers(1, &uboID);

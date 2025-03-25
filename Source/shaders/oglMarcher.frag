@@ -18,12 +18,14 @@ layout(std140) uniform CSGBuffer {
 uniform float loop_length;
 uniform vec2 window_dimensions;
 
+uniform vec3 u_camera_position;
+uniform vec3 u_light_position;
+
 out vec4 fragment_colour;
 
-const int MAX_ITERATIONS = 40;
+const int MAX_ITERATIONS = 100;
 const float THRESHOLD = 0.001;
 const float MAX_DISTANCE = 50.0;
-const float floor_level = -2.0;
 
 // BLINN-PHONG constants
 const vec3 light_position = vec3(1.0, 3.0, -1.0);
@@ -124,7 +126,8 @@ void main()
 
 	vec2 xy_clip = ((gl_FragCoord.xy * 2 - window_dimensions) / window_dimensions.y) * 1.0;
 	vec3 ray_direction = normalize(vec3(xy_clip, 1.0));
-	vec3 ray_origin = vec3(0.0, 0.0, -4.0);
+	//vec3 ray_origin = vec3(0.0, 0.0, -4.0);
+	vec3 ray_origin = u_camera_position;
 
 	float total_distance = 0.;
 	vec3 colour = vec3(0.);
@@ -141,7 +144,7 @@ void main()
 
 		if (distance < THRESHOLD) {
 			vec3 normal = get_normal(current_position);
-			vec3 light_dir = normalize(light_position - current_position);
+			vec3 light_dir = normalize(u_light_position - current_position);
 			vec3 view_dir = normalize(-current_position);
 			vec3 halfway_dir = normalize(light_dir + view_dir);
 
@@ -151,7 +154,7 @@ void main()
 			vec3 ambient = ambient_color;
 			vec3 diffuse = diff * light_color;
 			vec3 specular = specular_strength * spec * light_color;
-			vec3 shadow_scalar = get_shadow_scalar(current_position, light_position);
+			vec3 shadow_scalar = get_shadow_scalar(current_position, u_light_position);
 
 			colour = object_color * (ambient + diffuse) + (specular);
 			colour *= shadow_scalar;
