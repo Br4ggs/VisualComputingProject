@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 ShaderProgram::~ShaderProgram()
 {
@@ -32,7 +33,7 @@ int ShaderProgram::attachVertexShader(const char* sourceFile)
 	if (!success)
 	{
 		glGetShaderInfoLog(vertexShader, 512, NULL, info);
-		std::cout << "Error compiling vertex shader:\n" << info << std::endl;
+		std::cout << "Error compiling vertex shader:" << sourceFile << "\n" << info << std::endl;
 		return -1;
 	}
 	else
@@ -62,7 +63,7 @@ int ShaderProgram::attachFragmentShader(const char* sourceFile)
 	if (!success)
 	{
 		glGetShaderInfoLog(fragmentShader, 512, NULL, info);
-		std::cout << "Error compiling fragment shader:\n" << info << std::endl;
+		std::cout << "Error compiling fragment shader:" << sourceFile << "\n" << info << std::endl;
 		return -1;
 	}
 	else
@@ -108,6 +109,16 @@ int ShaderProgram::compile()
 void ShaderProgram::use() const
 {
 	glUseProgram(shaderProgram);
+}
+
+void ShaderProgram::passUniform4x4floatMatrix(char* name, glm::mat4 matrix) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name), 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void ShaderProgram::passUniform3floatVector(char* name, glm::vec3 vector) const
+{
+	glUniform3fv(glGetUniformLocation(shaderProgram, name), 1, glm::value_ptr(vector));
 }
 
 void ShaderProgram::destroy()

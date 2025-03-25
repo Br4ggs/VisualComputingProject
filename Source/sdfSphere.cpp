@@ -13,14 +13,15 @@ SDFSphere::SDFSphere(float radius)
 	color = glm::vec3(colf[0], colf[1], colf[2]);
 }
 
-void SDFSphere::drawUI()
+void SDFSphere::drawUI(bool& dirty)
 {
 	if (ImGui::ColorEdit3("Color", colf))
 	{
+		dirty = true;
 		color = glm::vec3(colf[0], colf[1], colf[2]);
 	}
 
-	WorldObject::drawUI();
+	WorldObject::drawUI(dirty);
 }
 
 char* SDFSphere::getName() const

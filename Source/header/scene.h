@@ -11,7 +11,7 @@ public:
 	Scene();
 	~Scene();
 
-	void drawUI();
+	void drawUI(bool& dirty);
 	std::pair<float, glm::vec3> map(glm::vec3 point) const;
 
 	glm::vec3 getCamPos() const;
@@ -36,13 +36,11 @@ private:
 	//list of Idrawables allocated on the heap
 	std::vector<IDrawable*> objects;
 
-	void objectNodeWithDelete(IDrawable* obj);
+	void objectNodeWithDelete(IDrawable* obj, bool& dirty);
 
 	void deleteAsParent(IDrawable* obj);
 
 	std::pair<float, glm::vec3> sdfUnion(std::pair<float, glm::vec3> obj1, std::pair<float, glm::vec3> obj2) const;
-
-	glm::vec3 repeat(glm::vec3 point, glm::vec3 scale) const;
 };
 
 #endif

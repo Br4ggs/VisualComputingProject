@@ -7,12 +7,12 @@
 class WorldObject : public IDrawable
 {
 public:
-	virtual ~WorldObject() {};
+	~WorldObject() override {};
 
-	virtual void drawUI();
+	void drawUI(bool& dirty) override;
 
-	virtual std::vector<IDrawable*> getChildren() const;
-	virtual std::vector<IDrawable*> detachChildren();
+	std::vector<IDrawable*> getChildren() const override;
+	std::vector<IDrawable*> detachChildren() override;
 
 	void setPosition(glm::vec3 pos);
 	void setRotation(glm::mat4 rot);

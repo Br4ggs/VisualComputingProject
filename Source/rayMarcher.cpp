@@ -16,27 +16,24 @@ RayMarcher::~RayMarcher()
 
 void RayMarcher::drawUI()
 {
-    if (ImGui::CollapsingHeader("Rendering"))
+    if (ImGui::InputInt("max steps", &maxSteps))
     {
-        if (ImGui::InputInt("max steps", &maxSteps))
-        {
-            if (maxSteps < 1)
-                maxSteps = 1;
-        }
-
-        if (ImGui::InputFloat("max distance", &maxDist))
-        {
-            if (maxDist < 1)
-                maxDist = 1.0f;
-        }
-
-        if (ImGui::ColorEdit3("background color", colf))
-        {
-            backgroundColor = glm::vec3(colf[0], colf[1], colf[2]);
-        }
-
-        ImGui::InputDouble("fog creep", &fogCreep);
+        if (maxSteps < 1)
+            maxSteps = 1;
     }
+
+    if (ImGui::InputFloat("max distance", &maxDist))
+    {
+        if (maxDist < 1)
+            maxDist = 1.0f;
+    }
+
+    if (ImGui::ColorEdit3("background color", colf))
+    {
+        backgroundColor = glm::vec3(colf[0], colf[1], colf[2]);
+    }
+
+    ImGui::InputDouble("fog creep", &fogCreep);
 }
 
 void RayMarcher::render(Scene* scene)

@@ -13,14 +13,15 @@ SDFBox::SDFBox(glm::vec3 dimensions)
 	color = glm::vec3(colf[0], colf[1], colf[2]);
 }
 
-void SDFBox::drawUI()
+void SDFBox::drawUI(bool& dirty)
 {
 	if (ImGui::ColorEdit3("Color", colf))
 	{
+		dirty = true;
 		color = glm::vec3(colf[0], colf[1], colf[2]);
 	}
 
-	WorldObject::drawUI();
+	WorldObject::drawUI(dirty);
 }
 
 char* SDFBox::getName() const

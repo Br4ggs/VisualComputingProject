@@ -26,28 +26,28 @@ Scene::~Scene()
     }
 }
 
-void Scene::drawUI()
+void Scene::drawUI(bool& dirty)
 {
     if (ImGui::CollapsingHeader("Camera"))
     {
         //camera position
         ImGui::PushID(1);
-        ImGui::InputFloat3("Position", camPosf);
+        if (ImGui::InputFloat3("Position", camPosf)) dirty = true;
         ImGui::PopID();
 
         //camera lookat direction
-        ImGui::InputFloat3("Look at", lookAtf);
+        if (ImGui::InputFloat3("Look at", lookAtf)) dirty = true;
     }
 
     if (ImGui::CollapsingHeader("Lighting"))
     {
         //position
         ImGui::PushID(2);
-        ImGui::InputFloat3("Position", lightPosf);
+        if (ImGui::InputFloat3("Position", lightPosf)) dirty = true;
         ImGui::PopID();
 
         //color
-        ImGui::ColorEdit3("Color", specColorf);
+        if (ImGui::ColorEdit3("Color", specColorf)) dirty = true;
     }
 
     if (ImGui::CollapsingHeader("Geometry"))
@@ -59,7 +59,7 @@ void Scene::drawUI()
 
             ImGui::PushID(i);
 
-            objectNodeWithDelete(obj);
+            objectNodeWithDelete(obj, dirty);
 
             ImGui::PopID();
         }
@@ -69,21 +69,19 @@ void Scene::drawUI()
         if (ImGui::Button("Add primitive"))
             ImGui::OpenPopup("Add primitive");
 
-        addPrimitiveModal.drawUI(*this);
+        addPrimitiveModal.drawUI(*this, dirty);
 
         static AddOperatorModal addOperatorModal;
 
         if (ImGui::Button("Add operator"))
             ImGui::OpenPopup("Add operator");
 
-        addOperatorModal.drawUI(*this);
+        addOperatorModal.drawUI(*this, dirty);
     }
 }
 
 std::pair<float, glm::vec3> Scene::map(glm::vec3 point) const
 {
-    //point = repeat(point, glm::vec3(2, 2, 2));
-
     std::pair<float, glm::vec3> res(std::numeric_limits<float>::infinity(), glm::vec3(1.0f));
     for (int i = 0; i < objects.size(); i++)
     {
@@ -128,20 +126,21 @@ void Scene::removeObject(IDrawable* obj)
     objects.erase(std::remove_if(objects.begin(), objects.end(), [obj](IDrawable* i) {return i == obj; }));
 }
 
-void Scene::objectNodeWithDelete(IDrawable* obj)
+void Scene::objectNodeWithDelete(IDrawable* obj, bool& dirty)
 {
     if (ImGui::TreeNode(obj->getName()))
     {
         ImGui::SameLine();
         if (ImGui::SmallButton("delete"))
         {
+            dirty = true;
             deleteAsParent(obj);
             obj = nullptr;
         }
 
         ImGui::PushID(1);
         if (obj != nullptr)
-            obj->drawUI();
+            obj->drawUI(dirty);
         ImGui::PopID();
 
         ImGui::TreePop();
@@ -151,6 +150,7 @@ void Scene::objectNodeWithDelete(IDrawable* obj)
         ImGui::SameLine();
         if (ImGui::SmallButton("delete"))
         {
+            dirty = true;
             deleteAsParent(obj);
         }
     }

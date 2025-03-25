@@ -9,7 +9,7 @@ class AddOperatorModal
 public:
 	AddOperatorModal() = default;
 
-	void drawUI(Scene& scene);
+	void drawUI(Scene& scene, bool& dirty);
 
 private:
 	void selectButton(IDrawable* obj);

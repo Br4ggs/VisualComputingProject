@@ -12,13 +12,13 @@ OpModulo::~OpModulo()
 		delete operant;
 }
 
-void OpModulo::drawUI()
+void OpModulo::drawUI(bool& dirty)
 {
-	ImGui::InputFloat3("scale", sclf);
+	if (ImGui::InputFloat3("scale", sclf)) dirty = true;
 
 	if (ImGui::TreeNode(operant->getName()))
 	{
-		operant->drawUI();
+		operant->drawUI(dirty);
 		ImGui::TreePop();
 	}
 }
