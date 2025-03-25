@@ -3,6 +3,8 @@
 #include "header/addOperatorModal.h"
 #include "header/addPrimitiveModal.h"
 
+#include "header/OpenGLMarcher.h"
+
 #include "imgui.h"
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -131,6 +133,7 @@ void Scene::objectNodeWithDelete(IDrawable* obj)
         {
             deleteAsParent(obj);
             obj = nullptr;
+            OpenGLMarcher::dirty = true;
         }
 
         ImGui::PushID(1);
@@ -146,6 +149,7 @@ void Scene::objectNodeWithDelete(IDrawable* obj)
         if (ImGui::SmallButton("delete"))
         {
             deleteAsParent(obj);
+            OpenGLMarcher::dirty = true;
         }
     }
 }

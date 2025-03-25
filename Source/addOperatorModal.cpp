@@ -3,6 +3,7 @@
 #include "header/opIntersect.h"
 #include "header/opDifference.h"
 #include "header/opModulo.h"
+#include "header/OpenGLMarcher.h"
 
 #include "imgui.h"
 
@@ -67,6 +68,8 @@ void AddOperatorModal::drawUI(Scene& scene)
             state = 0;
             operant1 = nullptr;
             operant2 = nullptr;
+
+            OpenGLMarcher::dirty = true;
 
             ImGui::CloseCurrentPopup();
         }

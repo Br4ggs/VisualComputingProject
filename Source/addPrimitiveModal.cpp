@@ -1,9 +1,10 @@
 #include "header/addPrimitiveModal.h"
 
 #include "header/sdfSphere.h"
-#include "header/sdfBox.h";
+#include "header/sdfBox.h"
 #include "header/sdfCylinder.h"
 #include "header/sdfPlane.h"
+#include "header/OpenGLMarcher.h"
 
 #include "imgui.h"
 
@@ -37,6 +38,7 @@ void AddPrimitiveModal::drawUI(Scene& scene) const
 			IDrawable* prim = createPrimitive(primSelected);
 			scene.addObject(prim);
 			ImGui::CloseCurrentPopup();
+			OpenGLMarcher::dirty = true;
 		}
 
 		ImGui::SameLine();
