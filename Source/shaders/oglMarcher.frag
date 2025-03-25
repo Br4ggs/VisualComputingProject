@@ -20,6 +20,7 @@ uniform vec2 window_dimensions;
 
 uniform vec3 u_camera_position;
 uniform vec3 u_light_position;
+uniform vec3 u_look_at;
 
 out vec4 fragment_colour;
 
@@ -56,6 +57,18 @@ vec3 rotate_arbitrary_axis(vec3 p, vec3 axis, float angle) {
     return p * c + cross_prod * s + axis * (dot_prod * (1.0 - c));
 }
 
+// SDF functions inspired by https://iquilezles.org/articles/distfunctions/
+float plane_sdf(vec3 point, vec3 orientation, float distance)
+{
+	return dot(point, normalize(orientation)) + distance;
+}
+
+float cylinder_sdf(vec3 point, float height, float radius)
+{
+	vec2 distance = abs(vec2(length(point.xz), point.y)) - vec2(radius, height);
+	return min(max(distance.x, distance.y), 0.0) + length(max(distance, 0.0));
+}
+
 float box_sdf(vec3 point, vec3 dimensions)
 {
 	vec3 q = abs(point) - dimensions;
@@ -75,9 +88,17 @@ float get_distance(vec3 point) {
 		int op = nodes[i].op;
 		if (shape != NO_SHAPE) {
 			if (shape == SHAPE_SPHERE) {
-				stack[sp++] = sphere_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x);
+				stack[sp++] = sphere_sdf(point - nodes[i].position.xyz,
+			     nodes[i].dimensions.x);
 			} else if (shape == SHAPE_BOX) {
-				stack[sp++] = box_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz);
+				stack[sp++] = box_sdf(point - nodes[i].position.xyz,
+			  nodes[i].dimensions.xyz);
+			} else if (shape == SHAPE_CYL) {
+				stack[sp++] = cylinder_sdf(point - nodes[i].position.xyz,
+			       nodes[i].dimensions.x, nodes[i].dimensions.y);
+			} else if (shape == SHAPE_PLANE) {
+				stack[sp++] = plane_sdf(point - nodes[i].position.xyz,
+			       nodes[i].dimensions.xyz, 1);
 			}
 		} else if (op != NO_OP) {
 			if (op == OP_UNI) {
@@ -123,7 +144,6 @@ vec3 get_shadow_scalar(vec3 point, vec3 light_pos) {
 
 void main()
 {
-
 	vec2 xy_clip = ((gl_FragCoord.xy * 2 - window_dimensions) / window_dimensions.y) * 1.0;
 	vec3 ray_direction = normalize(vec3(xy_clip, 1.0));
 	//vec3 ray_origin = vec3(0.0, 0.0, -4.0);
@@ -165,4 +185,3 @@ void main()
 
 	fragment_colour = vec4(colour, 1.0);
 }
-

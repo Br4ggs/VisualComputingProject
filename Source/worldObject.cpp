@@ -21,7 +21,7 @@ WorldObject::WorldObject()
 
 glm::vec3 WorldObject::getScale()
 {
-	return scale;
+	return glm::vec3(sclf[0], sclf[1], sclf[2]);
 }
 
 glm::vec3 WorldObject::getPosition()
@@ -47,7 +47,7 @@ void WorldObject::drawUI()
 		OpenGLMarcher::dirty = true;
 	}
 
-	if (ImGui::SliderFloat3("Scale", sclf, -2.0, 2.0))
+	if (ImGui::SliderFloat3("Scale", sclf, 0.1, 3.0))
 	{
 		OpenGLMarcher::dirty = true;
 	}

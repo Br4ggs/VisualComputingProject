@@ -120,6 +120,10 @@ void OpenGLMarcher::render(int width, int height)
     const GLint light_pos_location = glGetUniformLocation(shaderProgramInt, "u_light_position");
     glUniform3f(light_pos_location, light_pos[0], light_pos[1], light_pos[2]);
 
+    glm::vec3 look_at = scene->getLookAt();
+    const GLint look_at_location = glGetUniformLocation(shaderProgramInt, "u_look_at");
+    glUniform3f(look_at_location, look_at[0], look_at[1], look_at[2]);
+
     size_t dataSize = sizeof(LinearCSGTreeNode) * maxNodes;
     glGenBuffers(1, &uboID);
     glBindBuffer(GL_UNIFORM_BUFFER, uboID);
