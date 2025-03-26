@@ -86,10 +86,6 @@ void OpenGLMarcher::linearize(bool &dirty)
     linearScene.clear();
     linearizeScene(scene, linearScene);
 
-    for (auto obj : linearScene) {
-        printLinearCSGTreeNode(obj);
-    }
-
     dirty = false;
 }
 
@@ -110,6 +106,7 @@ void OpenGLMarcher::render(int width, int height)
 
     assert(linearScene.size() <= maxNodes);
 
+    //uniform transfer
     glm::vec3 cam_pos = scene->getCamPos();
     const GLint cam_pos_location = glGetUniformLocation(shaderProgramInt, "u_camera_position");
     glUniform3f(cam_pos_location, cam_pos[0], cam_pos[1], cam_pos[2]);

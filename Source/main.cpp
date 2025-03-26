@@ -51,11 +51,11 @@ void imGuiTest()
                 {
                     std::cout << "i was clicked" << std::endl;
                     selectedRenderBackend = n;
+                    dirty = true;
                 }
 
                 if (selected)
                 {
-                    dirty = true;
                     ImGui::SetItemDefaultFocus();
                 }
             }
@@ -88,9 +88,9 @@ void imGuiTest()
     }
     if (selectedRenderBackend == 2 && dirty)
     {
+        std::cout << "dirtying\n";
         oglMarcher->dirty = dirty;
         oglMarcher->linearize(dirty);
-        std::cout << "dirtying\n";
     }
 
 
@@ -148,20 +148,20 @@ int main()
     glViewport(0, 0, 1000, 800);
 
     ShaderProgram shaderProgMarcher;
-    shaderProgMarcher.attachVertexShader("./build/vertexScreenQuad.glsl");
-    shaderProgMarcher.attachFragmentShader("./build/fragmentScreenQuad.glsl");
+    shaderProgMarcher.attachVertexShader("vertexScreenQuad.glsl");
+    shaderProgMarcher.attachFragmentShader("fragmentScreenQuad.glsl");
     shaderProgMarcher.compile();
 
     screen = new TexturedScreenQuad(&shaderProgMarcher);
 
     ShaderProgram shaderProgMarchingCubes;
-    shaderProgMarchingCubes.attachVertexShader("./build/vertexMarchingCubes.glsl");
-    shaderProgMarchingCubes.attachFragmentShader("./build/fragmentMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachVertexShader("vertexMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachFragmentShader("fragmentMarchingCubes.glsl");
     shaderProgMarchingCubes.compile();
 
     ShaderProgram OpenGLMarcherShader;
-    OpenGLMarcherShader.attachVertexShader("./build/oglMarcher.vert");
-    OpenGLMarcherShader.attachFragmentShader("./build/oglMarcher.frag");
+    OpenGLMarcherShader.attachVertexShader("oglMarcher.vert");
+    OpenGLMarcherShader.attachFragmentShader("oglMarcher.frag");
     OpenGLMarcherShader.compile();
 
     //set clearscreen color to a nice navy blue
@@ -201,7 +201,7 @@ int main()
         case 1: //marching cubes.
             marchingCubes->render();
             break;
-        case 2:
+        case 2: //gpu-based sphere tracing
             oglMarcher->render(width, height);
             break;
         default:
