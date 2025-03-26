@@ -19,7 +19,7 @@
 #include "header/marchingCubes.h"
 #include "header/OpenGLMarcher.h"
 
-int selectedRenderBackend = 0;
+int selectedRenderBackend = 2;
 
 TexturedScreenQuad* screen;
 RayMarcher* marcher;
@@ -39,12 +39,12 @@ void imGuiTest()
     if (ImGui::CollapsingHeader("Rendering"))
     {
         //rendering backend dropdown
-        const char* renderTypes[] = { "sphere tracing (cpu)", "marching cubes"};
+        const char* renderTypes[] = { "sphere tracing (cpu)", "marching cubes", "sphere tracing gpu"};
         const char* renderPreview = renderTypes[selectedRenderBackend];
 
         if (ImGui::BeginCombo("rendering backend", renderPreview))
         {
-            for (int n = 0; n < 2; n++)
+            for (int n = 0; n < 3; n++)
             {
                 const bool selected = (selectedRenderBackend == n);
                 if (ImGui::Selectable(renderTypes[n], selected))
@@ -72,7 +72,7 @@ void imGuiTest()
         case 1: //marching cubes
             marchingCubes->drawUI(dirty);
             break;
-        case 2:
+        case 2: // sphere marching opengl
             oglMarcher->drawUI(dirty);
         default:
             break;
@@ -86,6 +86,13 @@ void imGuiTest()
     {
         marchingCubes->regenerateMarchingCubes();
     }
+    if (selectedRenderBackend == 2 && dirty)
+    {
+        oglMarcher->dirty = dirty;
+        oglMarcher->linearize(dirty);
+        std::cout << "dirtying\n";
+    }
+
 
     if (selectedRenderBackend == 0 && ImGui::Button("Render"))
     {
@@ -141,16 +148,21 @@ int main()
     glViewport(0, 0, 1000, 800);
 
     ShaderProgram shaderProgMarcher;
-    shaderProgMarcher.attachVertexShader("vertexScreenQuad.glsl");
-    shaderProgMarcher.attachFragmentShader("fragmentScreenQuad.glsl");
+    shaderProgMarcher.attachVertexShader("./build/vertexScreenQuad.glsl");
+    shaderProgMarcher.attachFragmentShader("./build/fragmentScreenQuad.glsl");
     shaderProgMarcher.compile();
 
     screen = new TexturedScreenQuad(&shaderProgMarcher);
 
     ShaderProgram shaderProgMarchingCubes;
-    shaderProgMarchingCubes.attachVertexShader("vertexMarchingCubes.glsl");
-    shaderProgMarchingCubes.attachFragmentShader("fragmentMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachVertexShader("./build/vertexMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachFragmentShader("./build/fragmentMarchingCubes.glsl");
     shaderProgMarchingCubes.compile();
+
+    ShaderProgram OpenGLMarcherShader;
+    OpenGLMarcherShader.attachVertexShader("./build/oglMarcher.vert");
+    OpenGLMarcherShader.attachFragmentShader("./build/oglMarcher.frag");
+    OpenGLMarcherShader.compile();
 
     //set clearscreen color to a nice navy blue
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
@@ -161,8 +173,9 @@ int main()
 
     marcher = new RayMarcher(1000, 800);
     marchingCubes = new MarchingCubes(1000, 800, scene, &shaderProgMarchingCubes);
-    glEnable(GL_DEPTH_TEST);
+    oglMarcher = new OpenGLMarcher(1000,800, scene, &OpenGLMarcherShader);
 
+    glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -170,9 +183,12 @@ int main()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
+        //ImGui::ShowDemoWindow();
 
         imGuiTest();
+
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
 
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -184,6 +200,12 @@ int main()
             break;
         case 1: //marching cubes.
             marchingCubes->render();
+            break;
+        case 2:
+            oglMarcher->render(width, height);
+            break;
+        default:
+            std::cout << "default\n";
             break;
         }
 

@@ -61,3 +61,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/vertexScreenQuad.glsl" "${CMAKE_BINA
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/fragmentScreenQuad.glsl" "${CMAKE_BINARY_DIR}/fragmentScreenQuad.glsl" COPYONLY)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/vertexMarchingCubes.glsl" "${CMAKE_BINARY_DIR}/vertexMarchingCubes.glsl" COPYONLY)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/fragmentMarchingCubes.glsl" "${CMAKE_BINARY_DIR}/fragmentMarchingCubes.glsl" COPYONLY)
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/oglMarcher.vert" "${CMAKE_BINARY_DIR}/oglMarcher.vert" COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/oglMarcher.frag" "${CMAKE_BINARY_DIR}/oglMarcher.frag" COPYONLY)
+

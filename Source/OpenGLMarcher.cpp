@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "linearizeScene.h"
 #include "types.h"
+#include <iostream>
 
 #define N_VERTICES 4
 #define N_ELEMENTS N_VERTICES * 3
@@ -92,10 +93,11 @@ void OpenGLMarcher::linearize(bool &dirty)
     dirty = false;
 }
 
-void OpenGLMarcher::render(int width, int height, bool &dirty)
+void OpenGLMarcher::render(int width, int height)
 {
     if (linearScene.size() == 0) return;
-    if (dirty) linearize(dirty);
+
+    if (this->dirty) linearize(this->dirty);
 
     glBindVertexArray(VAOID);
 

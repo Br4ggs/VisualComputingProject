@@ -16,8 +16,10 @@ public:
 	~OpenGLMarcher();
 
 	void drawUI(bool& dirty);
-	void render(int width, int height, bool &dirty);
+	void render(int width, int height);
 	void linearize(bool& dirty);
+
+	bool dirty;
 
 private:
 
