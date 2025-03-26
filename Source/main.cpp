@@ -88,8 +88,6 @@ void imGuiTest()
     }
     if (selectedRenderBackend == 2 && dirty)
     {
-        std::cout << "dirtying\n";
-        oglMarcher->dirty = dirty;
         oglMarcher->linearize(dirty);
     }
 

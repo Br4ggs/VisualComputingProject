@@ -21,6 +21,7 @@ uniform vec2 window_dimensions;
 uniform vec3 u_camera_position;
 uniform vec3 u_light_position;
 uniform vec3 u_look_at; // NOTE: is actually used as look direction
+uniform vec3 u_background_color;
 
 uniform int u_max_steps;
 uniform float u_max_distance;
@@ -176,7 +177,7 @@ void main()
 		total_distance += distance;
 
 		if (total_distance > MAX_DISTANCE) {
-			colour = vec3(0.0);
+			colour = u_background_color;
 			break;
 		}
 

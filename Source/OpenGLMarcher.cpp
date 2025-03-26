@@ -4,8 +4,8 @@
 #include "types.h"
 #include <iostream>
 
-#define N_VERTICES 4
-#define N_ELEMENTS N_VERTICES * 3
+constexpr int N_VERTICES = 4;
+constexpr int N_ELEMENTS  = N_VERTICES * 3;
 
 typedef struct Vertex
 {
@@ -13,7 +13,7 @@ typedef struct Vertex
     glm::vec3 col;
 } Vertex;
 
-static const Vertex vertices[N_VERTICES] =
+constexpr Vertex vertices[N_VERTICES] =
     {
         { { -1.0f, -1.0f, 0.0f }, { 1.f, 0.f, 0.f } },
         { {  1.0f, -1.0f, 0.0f }, { 0.f, 1.f, 0.f } },
@@ -21,7 +21,7 @@ static const Vertex vertices[N_VERTICES] =
         { { -1.0f,  1.0f, 0.0f }, { 1.f, 1.f, 1.f } },
     };
 
-static const GLuint elements[N_VERTICES * 3] = { 0, 1, 2, 2, 3, 0 };
+constexpr GLuint elements[N_VERTICES * 3] = { 0, 1, 2, 2, 3, 0 };
 
 OpenGLMarcher:: OpenGLMarcher(unsigned int width,
                               unsigned int height,
@@ -63,22 +63,14 @@ OpenGLMarcher::~OpenGLMarcher()
 
 void OpenGLMarcher::drawUI(bool &dirty)
 {
-    if (ImGui::SliderInt("max steps", &maxSteps, 10, 200)) {
-    }
-    if (ImGui::SliderFloat("max distance", &maxDist, 1, 20)) {
-    }
-    const float minEpsilon = 0.00001f;
+    ImGui::SliderInt("max steps", &maxSteps, 10, 200);
+    ImGui::SliderFloat("max distance", &maxDist, 1, 20);
 
     if (ImGui::InputFloat("epsilon", &epsilon, 0.00001f, 0.0f, "%.8f")) {
         epsilon = glm::max(minEpsilon, epsilon);
     }
 
-    if (ImGui::ColorEdit3("background color", colf))
-    {
-        backgroundColor = glm::vec3(colf[0], colf[1], colf[2]);
-    }
-
-    ImGui::InputDouble("fog creep", &fogCreep);
+    ImGui::ColorEdit3("background color", colf);
 }
 
 void OpenGLMarcher::linearize(bool &dirty)
@@ -91,10 +83,6 @@ void OpenGLMarcher::linearize(bool &dirty)
 
 void OpenGLMarcher::render(int width, int height)
 {
-    if (linearScene.size() == 0) return;
-
-    if (this->dirty) linearize(this->dirty);
-
     glBindVertexArray(VAOID);
 
     shaderProgram->use();
@@ -124,6 +112,9 @@ void OpenGLMarcher::render(int width, int height)
 
     const GLint max_distance_location = glGetUniformLocation(shaderProgramInt, "u_max_distance");
     glUniform1f(max_distance_location, maxDist);
+
+    const GLint background_color_location = glGetUniformLocation(shaderProgramInt, "u_background_color");
+    glUniform3f(background_color_location, colf[0], colf[1], colf[2]);
 
     const GLint epsilon_location = glGetUniformLocation(shaderProgramInt, "u_epsilon");
     glUniform1f(epsilon_location, epsilon);
