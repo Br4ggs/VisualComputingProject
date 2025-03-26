@@ -18,6 +18,9 @@ public:
 	void setRotation(glm::mat4 rot);
 	void setScale(glm::vec3 scl);
 
+	glm::vec3 getPosition();
+	glm::vec3 getScale();
+
 protected:
 	float posf[3] = { 0.0f, 0.0f, 0.0f };
 	float rotf[3] = { 0.0f, 0.0f, 0.0f };

@@ -2,12 +2,15 @@
 #define SDFSPHERE_H
 
 #include "worldObject.h"
+#include "types.h"
 #include <glm/glm.hpp>
 
 class SDFSphere : public WorldObject
 {
 public:
 	SDFSphere(float radius);
+
+	CSGType getType() const { return CSGShape::SHAPE_SPHERE; };
 
 	void drawUI(bool& dirty) override;
 	char* getName() const override;

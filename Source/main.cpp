@@ -17,12 +17,14 @@
 #include "header/texturedScreenQuad.h"
 #include "header/rayMarcher.h"
 #include "header/marchingCubes.h"
+#include "header/OpenGLMarcher.h"
 
-int selectedRenderBackend = 0;
+int selectedRenderBackend = 2;
 
 TexturedScreenQuad* screen;
 RayMarcher* marcher;
 MarchingCubes* marchingCubes;
+OpenGLMarcher* oglMarcher;
 Scene* scene;
 
 void imGuiTest()
@@ -37,23 +39,23 @@ void imGuiTest()
     if (ImGui::CollapsingHeader("Rendering"))
     {
         //rendering backend dropdown
-        const char* renderTypes[] = { "sphere tracing (cpu)", "marching cubes"};
+        const char* renderTypes[] = { "sphere tracing (cpu)", "marching cubes", "sphere tracing gpu"};
         const char* renderPreview = renderTypes[selectedRenderBackend];
 
         if (ImGui::BeginCombo("rendering backend", renderPreview))
         {
-            for (int n = 0; n < 2; n++)
+            for (int n = 0; n < 3; n++)
             {
                 const bool selected = (selectedRenderBackend == n);
                 if (ImGui::Selectable(renderTypes[n], selected))
                 {
                     std::cout << "i was clicked" << std::endl;
                     selectedRenderBackend = n;
+                    dirty = true;
                 }
 
                 if (selected)
                 {
-                    dirty = true;
                     ImGui::SetItemDefaultFocus();
                 }
             }
@@ -70,6 +72,8 @@ void imGuiTest()
         case 1: //marching cubes
             marchingCubes->drawUI(dirty);
             break;
+        case 2: // sphere marching opengl
+            oglMarcher->drawUI(dirty);
         default:
             break;
         }
@@ -82,6 +86,11 @@ void imGuiTest()
     {
         marchingCubes->regenerateMarchingCubes();
     }
+    if (selectedRenderBackend == 2 && dirty)
+    {
+        oglMarcher->linearize(dirty);
+    }
+
 
     if (selectedRenderBackend == 0 && ImGui::Button("Render"))
     {
@@ -148,6 +157,11 @@ int main()
     shaderProgMarchingCubes.attachFragmentShader("fragmentMarchingCubes.glsl");
     shaderProgMarchingCubes.compile();
 
+    ShaderProgram OpenGLMarcherShader;
+    OpenGLMarcherShader.attachVertexShader("oglMarcher.vert");
+    OpenGLMarcherShader.attachFragmentShader("oglMarcher.frag");
+    OpenGLMarcherShader.compile();
+
     //set clearscreen color to a nice navy blue
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -157,8 +171,9 @@ int main()
 
     marcher = new RayMarcher(1000, 800);
     marchingCubes = new MarchingCubes(1000, 800, scene, &shaderProgMarchingCubes);
-    glEnable(GL_DEPTH_TEST);
+    oglMarcher = new OpenGLMarcher(1000,800, scene, &OpenGLMarcherShader);
 
+    glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -166,9 +181,12 @@ int main()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
+        //ImGui::ShowDemoWindow();
 
         imGuiTest();
+
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
 
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -180,6 +198,12 @@ int main()
             break;
         case 1: //marching cubes.
             marchingCubes->render();
+            break;
+        case 2: //gpu-based sphere tracing
+            oglMarcher->render(width, height);
+            break;
+        default:
+            std::cout << "default\n";
             break;
         }
 

@@ -2,11 +2,14 @@
 #define SDFPLANE_H
 
 #include "worldObject.h"
+#include "types.h"
 
 class SDFPlane : public WorldObject
 {
 public:
 	SDFPlane(float height);
+
+	CSGType getType() const { return CSGShape::SHAPE_PLANE; };
 
 	void drawUI(bool& dirty) override;
 	char* getName() const override;
