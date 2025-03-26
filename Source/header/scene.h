@@ -15,7 +15,10 @@ public:
 	std::pair<float, glm::vec3> map(glm::vec3 point) const;
 
 	glm::vec3 getCamPos() const;
+	void setCamPos(glm::vec3 pos);
+
 	glm::vec3 getLookAt() const;
+	void setLookAt(glm::vec3 pos);
 
 	glm::vec3 getLightPos() const;
 	glm::vec3 getSpecColor() const;

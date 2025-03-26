@@ -18,6 +18,7 @@
 #include "header/rayMarcher.h"
 #include "header/marchingCubes.h"
 #include "header/OpenGLMarcher.h"
+#include "header/inputController.h"
 
 int selectedRenderBackend = 2;
 
@@ -26,8 +27,9 @@ RayMarcher* marcher;
 MarchingCubes* marchingCubes;
 OpenGLMarcher* oglMarcher;
 Scene* scene;
+InputController* input;
 
-void imGuiTest()
+void drawUI()
 {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(400, 680));
@@ -172,18 +174,21 @@ int main()
     marcher = new RayMarcher(1000, 800);
     marchingCubes = new MarchingCubes(1000, 800, scene, &shaderProgMarchingCubes);
     oglMarcher = new OpenGLMarcher(1000,800, scene, &OpenGLMarcherShader);
+    input = new InputController(window, scene);
 
     glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window))
     {
+
         //imgui stuff
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         //ImGui::ShowDemoWindow();
 
-        imGuiTest();
+        drawUI();
+        input->processInput();
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
