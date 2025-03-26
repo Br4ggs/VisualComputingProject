@@ -8,6 +8,9 @@ struct LinearCSGTreeNode {
 	vec2 _padding;
 	vec4 position;
 	vec4 dimensions;
+	mat4 rotation;
+	vec4 scale;
+	vec4 color;
 };
 
 
@@ -39,7 +42,7 @@ float MAX_DISTANCE = u_max_distance;
 const vec3 light_position = vec3(1.0, 3.0, -1.0);
 const vec3 light_color = vec3(1.0, 1.0, 1.0);
 const vec3 ambient_color = vec3(0.3, 0.3, 0.3);
-const vec3 object_color = vec3(0.3, 0.7, 0.3);
+//const vec3 object_color = vec3(0.3, 0.7, 0.3);
 const float specular_strength = 0.5;
 const float shininess = 64.0;
 
@@ -87,26 +90,37 @@ float sphere_sdf(vec3 point, float radius)
 	return length(point) - radius;
 }
 
-float get_distance(vec3 point) {
+float get_distance(vec3 point, out vec3 out_color) {
 	float stack[20];
 	int sp = 0; // pointer to next empty slot
+
+	float min_dist = MAX_DISTANCE;
+	vec3 min_color = vec3(1.0);
+
 	for (int i = 0; i < loop_length; ++i) {
 		int shape = nodes[i].shape;
 		int op = nodes[i].op;
 		if (shape != NO_SHAPE) {
+			float d;
 			if (shape == SHAPE_SPHERE) {
-				stack[sp++] = sphere_sdf(point - nodes[i].position.xyz,
-			     nodes[i].dimensions.x);
+				stack[sp++] = sphere_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x);
+				d = sphere_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x);
 			} else if (shape == SHAPE_BOX) {
-				stack[sp++] = box_sdf(point - nodes[i].position.xyz,
-			  nodes[i].dimensions.xyz);
+				stack[sp++] = box_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz);
+				d = box_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz);
 			} else if (shape == SHAPE_CYL) {
-				stack[sp++] = cylinder_sdf(point - nodes[i].position.xyz,
-			       nodes[i].dimensions.x, nodes[i].dimensions.y);
+				stack[sp++] = cylinder_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x, nodes[i].dimensions.y);
+				d = cylinder_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x, nodes[i].dimensions.y);
 			} else if (shape == SHAPE_PLANE) {
-				stack[sp++] = plane_sdf(point - nodes[i].position.xyz,
-			       nodes[i].dimensions.xyz, 1);
+				stack[sp++] = plane_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz, 1);
+				d = plane_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz, 1);
 			}
+
+			if (d < min_dist) {
+				min_dist = d;
+				min_color = nodes[i].color.xyz;
+			}
+
 		} else if (op != NO_OP) {
 			if (op == OP_UNI) {
 				stack[sp - 2] = min(stack[sp - 1], stack[sp - 2]);
@@ -116,27 +130,31 @@ float get_distance(vec3 point) {
 			sp--;
 		}
 	}
+
+	out_color = min_color;
 	return stack[0];
 }
 
 vec3 get_normal(vec3 point) {
-    float epsilon = 0.001;
-    return normalize(vec3(
-        get_distance(point + vec3(epsilon, 0, 0)) - get_distance(point - vec3(epsilon, 0, 0)),
-        get_distance(point + vec3(0, epsilon, 0)) - get_distance(point - vec3(0, epsilon, 0)),
-        get_distance(point + vec3(0, 0, epsilon)) - get_distance(point - vec3(0, 0, epsilon))
-    ));
+	float epsilon = 0.001;
+	vec3 dummy;
+	return normalize(vec3(
+		get_distance(point + vec3(epsilon, 0, 0), dummy) - get_distance(point - vec3(epsilon, 0, 0), dummy),
+		get_distance(point + vec3(0, epsilon, 0), dummy) - get_distance(point - vec3(0, epsilon, 0), dummy),
+		get_distance(point + vec3(0, 0, epsilon), dummy) - get_distance(point - vec3(0, 0, epsilon), dummy)
+	));
 }
 
 vec3 get_shadow_scalar(vec3 point, vec3 light_pos) {
-    vec3 light_dir = normalize(light_pos - point);
-    float distance_to_light = length(light_pos - point);
-    float shadow_distance = 0.0;
-    vec3 new_point = point + (get_normal(point) * THRESHOLD);
-    for(int i = 0; i < MAX_ITERATIONS * 100; ++i) {
-        vec3 shadow_position = new_point + light_dir * shadow_distance;
-        float df = get_distance(shadow_position);
-        float distance = df;
+	vec3 light_dir = normalize(light_pos - point);
+	float distance_to_light = length(light_pos - point);
+	float shadow_distance = 0.0;
+	vec3 new_point = point + (get_normal(point) * THRESHOLD);
+	vec3 dummy;
+	for(int i = 0; i < MAX_ITERATIONS * 100; ++i) {
+		vec3 shadow_position = new_point + light_dir * shadow_distance;
+		float df = get_distance(shadow_position, dummy);
+		float distance = df;
 
         if (distance < THRESHOLD) {
             return vec3(0.4);
@@ -169,11 +187,13 @@ void main()
 	vec3 ray_origin = u_camera_position;
 
 	float total_distance = 0.;
-	vec3 colour = vec3(0.);
+
+	vec3 colour = vec3(0.0);
+	vec3 object_color;
 
 	for(int i = 0; i < MAX_ITERATIONS; ++i) {
 		vec3 current_position = ray_origin + ray_direction * total_distance;
-		float distance = get_distance(current_position);
+		float distance = get_distance(current_position, object_color);
 		total_distance += distance;
 
 		if (total_distance > MAX_DISTANCE) {

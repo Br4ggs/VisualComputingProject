@@ -13,6 +13,9 @@ typedef struct LinearCSGTreeNode {
 	float _padding[2];
 	glm::vec4 position;
 	glm::vec4 dimensions;
+	glm::mat4 rotation;
+	glm::vec4 scale;
+	glm::vec4 color;
 } LinearCSGTreeNode;
 
 // NOTE: should be the same as the shader constants

@@ -25,6 +25,11 @@ glm::vec3 WorldObject::getPosition()
 	return glm::vec3(posf[0],posf[1],posf[2]);
 }
 
+glm::vec3 WorldObject::getCol()
+{
+	return glm::vec3(color);
+}
+
 glm::vec3 WorldObject::getScale()
 {
 	return glm::vec3(sclf[0],sclf[1],sclf[2]);
@@ -84,6 +89,11 @@ void WorldObject::setRotation(glm::mat4 rot)
 void WorldObject::setScale(glm::vec3 scl)
 {
 	scale = scl;
+}
+
+glm::mat4 WorldObject::getTransform()
+{
+	return transform;
 }
 
 void WorldObject::recalculateTransform()

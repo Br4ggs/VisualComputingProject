@@ -91,7 +91,6 @@ void imGuiTest()
         oglMarcher->linearize(dirty);
     }
 
-
     if (selectedRenderBackend == 0 && ImGui::Button("Render"))
     {
         marcher->render(scene);

@@ -19,8 +19,11 @@ void linearizeDrawable(IDrawable* drawable, std::vector<LinearCSGTreeNode>& line
             LinearCSGTreeNode node;
             node.op = CSGOperation::NO_OP;
             node.shape = shape;
-            node.position = glm::vec4(wObject->getPosition(), 0.0);
-            node.dimensions = glm::vec4(wObject->getScale(), 0.0);
+            node.position = glm::vec4(wObject->getPosition(), 1.0);
+            node.dimensions = glm::vec4(1.0f);
+            node.scale = glm::vec4(wObject->getScale(), 0.0);
+            node.rotation = wObject->getTransform();
+            node.color = glm::vec4(wObject->getCol(), 0.0);
             linearScene.push_back(node);
             break;
         case NO_SHAPE:
