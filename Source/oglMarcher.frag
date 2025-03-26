@@ -25,6 +25,7 @@ uniform vec3 u_camera_position;
 uniform vec3 u_light_position;
 uniform vec3 u_look_at; // NOTE: is actually used as look direction
 uniform vec3 u_background_color;
+uniform vec3 u_spec_color;
 
 uniform int u_max_steps;
 uniform float u_max_distance;
@@ -39,8 +40,7 @@ float THRESHOLD = u_epsilon;
 float MAX_DISTANCE = u_max_distance;
 
 // BLINN-PHONG constants
-const vec3 light_position = vec3(1.0, 3.0, -1.0);
-const vec3 light_color = vec3(1.0, 1.0, 1.0);
+vec3 light_color = u_spec_color;
 const vec3 ambient_color = vec3(0.3, 0.3, 0.3);
 //const vec3 object_color = vec3(0.3, 0.7, 0.3);
 const float specular_strength = 0.5;
@@ -103,18 +103,16 @@ float get_distance(vec3 point, out vec3 out_color) {
 		if (shape != NO_SHAPE) {
 			float d;
 			if (shape == SHAPE_SPHERE) {
-				stack[sp++] = sphere_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x);
 				d = sphere_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x);
 			} else if (shape == SHAPE_BOX) {
-				stack[sp++] = box_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz);
 				d = box_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz);
 			} else if (shape == SHAPE_CYL) {
-				stack[sp++] = cylinder_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x, nodes[i].dimensions.y);
 				d = cylinder_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x, nodes[i].dimensions.y);
 			} else if (shape == SHAPE_PLANE) {
-				stack[sp++] = plane_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz, 1);
 				d = plane_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz, 1);
 			}
+
+			stack[sp++] = d;
 
 			if (d < min_dist) {
 				min_dist = d;
@@ -136,7 +134,7 @@ float get_distance(vec3 point, out vec3 out_color) {
 }
 
 vec3 get_normal(vec3 point) {
-	float epsilon = 0.001;
+	float epsilon = 0.0001;
 	vec3 dummy;
 	return normalize(vec3(
 		get_distance(point + vec3(epsilon, 0, 0), dummy) - get_distance(point - vec3(epsilon, 0, 0), dummy),
@@ -202,21 +200,22 @@ void main()
 		}
 
 		if (distance < THRESHOLD) {
-			vec3 normal = get_normal(current_position);
 			vec3 light_dir = normalize(u_light_position - current_position);
-			vec3 view_dir = normalize(-current_position);
+			vec3 view_dir = normalize(-ray_direction);
 			vec3 halfway_dir = normalize(light_dir + view_dir);
+			vec3 normal = get_normal(current_position);
 
 			float diff = max(dot(normal, light_dir), 0.0);
-			float spec = pow(max(dot(normal, halfway_dir), 0.0), shininess);
+			float spec = 0.0;
+			if (diff > 0.0) {
+				spec = pow(max(dot(normal, halfway_dir), 0.0), shininess);
+			}
 
-			vec3 ambient = ambient_color;
-			vec3 diffuse = diff * light_color;
+			vec3 ambient = ambient_color * object_color;
+			vec3 diffuse = diff * light_color * object_color;
 			vec3 specular = specular_strength * spec * light_color;
-			vec3 shadow_scalar = get_shadow_scalar(current_position, u_light_position);
 
-			colour = object_color * (ambient + diffuse) + (specular);
-			colour *= shadow_scalar;
+			colour = ambient + diffuse + specular;
 
 			break;
 		}
