@@ -111,6 +111,11 @@ void ShaderProgram::use() const
 	glUseProgram(shaderProgram);
 }
 
+unsigned int ShaderProgram::getRawShaderProgram()
+{
+	return shaderProgram;
+}
+
 void ShaderProgram::passUniform4x4floatMatrix(char* name, glm::mat4 matrix) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, name), 1, GL_FALSE, glm::value_ptr(matrix));

@@ -4,7 +4,8 @@
 #include <glm/glm.hpp>
 #include <utility>
 #include <vector>
-#include <string>
+
+#include "types.h"
 
 class IDrawable
 {
@@ -13,6 +14,8 @@ public:
 	virtual void drawUI(bool& dirty) = 0;
 
 	virtual char* getName() const = 0;
+
+	virtual CSGType getType() const = 0;
 
 	/// <summary>
 	/// todo

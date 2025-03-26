@@ -9,6 +9,8 @@ public:
 	OpModulo(IDrawable* operant);
 	~OpModulo() override;
 
+	CSGType getType() const { return CSGOperation::OP_MOD; };
+
 	void drawUI(bool& dirty) override;
 	char* getName() const override;
 	std::vector<IDrawable*> getChildren() const override;

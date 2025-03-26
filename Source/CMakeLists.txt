@@ -8,6 +8,8 @@ add_executable(VisualComputingProject
     texturedScreenQuad.cpp
     rayMarcher.cpp
     marchingCubes.cpp
+    OpenGLMarcher.cpp
+    linearizeScene.cpp
     scene.cpp
     sdfSphere.cpp
     sdfBox.cpp
@@ -34,10 +36,11 @@ set(LIBRARY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Libraries")
 
 set_property(
     TARGET VisualComputingProject
-    PROPERTY CXX_STANDARD 11
+    PROPERTY CXX_STANDARD 17
 )
 
 target_include_directories(VisualComputingProject PRIVATE ${LIBRARY_PATH}/include)
+target_include_directories(VisualComputingProject PRIVATE ${PROJECT_SOURCE_DIR}/header)
 
 if (APPLE)
     message(STATUS "Configuring for macOS")

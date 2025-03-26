@@ -17,12 +17,14 @@
 #include "header/texturedScreenQuad.h"
 #include "header/rayMarcher.h"
 #include "header/marchingCubes.h"
+#include "header/OpenGLMarcher.h"
 
 int selectedRenderBackend = 0;
 
 TexturedScreenQuad* screen;
 RayMarcher* marcher;
 MarchingCubes* marchingCubes;
+OpenGLMarcher* oglMarcher;
 Scene* scene;
 
 void imGuiTest()
@@ -70,6 +72,8 @@ void imGuiTest()
         case 1: //marching cubes
             marchingCubes->drawUI(dirty);
             break;
+        case 2:
+            oglMarcher->drawUI(dirty);
         default:
             break;
         }

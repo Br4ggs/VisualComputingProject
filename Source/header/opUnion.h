@@ -9,6 +9,8 @@ public:
 	OpUnion(IDrawable* operant1, IDrawable* operant2);
 	~OpUnion() override;
 
+	CSGType getType() const { return CSGOperation::OP_UNI; };
+
 	void drawUI(bool& dirty) override;
 	char* getName() const override;
 	std::vector<IDrawable*> getChildren() const override;

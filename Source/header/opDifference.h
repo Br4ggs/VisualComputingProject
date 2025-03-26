@@ -9,6 +9,8 @@ public:
 	OpDifference(IDrawable* operant1, IDrawable* operant2);
 	~OpDifference() override;
 
+	CSGType getType() const { return CSGOperation::OP_DIFF; };
+
 	void drawUI(bool& dirty) override;
 	char* getName() const override;
 	std::vector<IDrawable*> getChildren() const override;

@@ -25,6 +25,8 @@ public:
 	void passUniform3floatVector(char* name, glm::vec3 vector) const;
 	void destroy();
 
+	unsigned int getRawShaderProgram();
+
 private:
 	GLuint vertexShader = 0;
 	GLuint fragmentShader = 0;

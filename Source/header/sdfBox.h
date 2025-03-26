@@ -9,6 +9,8 @@ class SDFBox : public WorldObject
 public:
 	SDFBox(glm::vec3 dimenions);
 
+	CSGType getType() const { return CSGShape::SHAPE_BOX; } ;
+
 	void drawUI(bool& dirty) override;
 	char* getName() const override;
 	std::pair<float, glm::vec3> sdf(glm::vec3 point) const override;

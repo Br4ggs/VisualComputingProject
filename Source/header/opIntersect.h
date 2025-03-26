@@ -8,6 +8,8 @@ public:
 	OpIntersect(IDrawable* operant1, IDrawable* operant2);
 	~OpIntersect() override;
 
+	CSGType getType() const { return CSGOperation::OP_INT; };
+
 	void drawUI(bool& dirty) override;
 	char* getName() const override;
 	std::vector<IDrawable*> getChildren() const override;
