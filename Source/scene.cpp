@@ -37,6 +37,8 @@ void Scene::drawUI(bool& dirty)
 
         //camera lookat direction
         if (ImGui::InputFloat3("Look at", lookAtf)) dirty = true;
+
+        ImGui::SliderInt("Field of view", &fov, 30, 120);
     }
 
     if (ImGui::CollapsingHeader("Lighting"))
@@ -47,7 +49,11 @@ void Scene::drawUI(bool& dirty)
         ImGui::PopID();
 
         //color
-        if (ImGui::ColorEdit3("Color", specColorf)) dirty = true;
+        if (ImGui::ColorEdit3("Specular color", specColorf)) dirty = true;
+
+        ImGui::ColorEdit3("Ambient color", ambientColorf);
+        ImGui::SliderFloat("Specular strength", &specular_strength, 0.1, 0.9);
+        ImGui::SliderFloat("Shininess", &shininess, 2.0, 128.0);
     }
 
     if (ImGui::CollapsingHeader("Geometry"))

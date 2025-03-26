@@ -26,14 +26,17 @@ uniform vec3 u_light_position;
 uniform vec3 u_look_at; // NOTE: is actually used as look direction
 uniform vec3 u_background_color;
 uniform vec3 u_spec_color;
+uniform vec3 u_ambient_color;
 
 uniform int u_max_steps;
 uniform float u_max_distance;
 uniform float u_epsilon;
 
-out vec4 fragment_colour;
+uniform float u_shininess;
+uniform float u_specular_strength;
+uniform int u_fov;
 
-const int u_fov = 60; // TODO: make this configurable?
+out vec4 fragment_colour;
 
 int MAX_ITERATIONS = u_max_steps;
 float THRESHOLD = u_epsilon;
@@ -41,10 +44,9 @@ float MAX_DISTANCE = u_max_distance;
 
 // BLINN-PHONG constants
 vec3 light_color = u_spec_color;
-const vec3 ambient_color = vec3(0.3, 0.3, 0.3);
-//const vec3 object_color = vec3(0.3, 0.7, 0.3);
-const float specular_strength = 0.5;
-const float shininess = 64.0;
+vec3 ambient_color = u_ambient_color;
+float specular_strength = u_specular_strength;
+float shininess = u_shininess;
 
 const int OP_UNI = 0;
 const int OP_INT = 1;

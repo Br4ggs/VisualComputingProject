@@ -24,6 +24,12 @@ public:
 	void addObject(IDrawable* obj);
 	void removeObject(IDrawable* obj);
 
+	float ambientColorf[3] = { 0.3f, 0.3f, 0.3f };
+
+	int fov = 60;
+	float specular_strength = 0.5;
+	float shininess = 64.0;
+
 private:
 	float camPosf[3] = { 0.0f, 0.0f, -3.0f };
 	float lookAtf[3] = { 0.0f, 0.0f, 0.0f };

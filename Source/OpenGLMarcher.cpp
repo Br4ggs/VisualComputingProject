@@ -63,7 +63,7 @@ OpenGLMarcher::~OpenGLMarcher()
 
 void OpenGLMarcher::drawUI(bool &dirty)
 {
-    ImGui::SliderInt("max steps", &maxSteps, 10, 200);
+    ImGui::SliderInt("max steps", &maxSteps, 10, 500);
     ImGui::SliderFloat("max distance", &maxDist, 1, 20);
 
     if (ImGui::InputFloat("epsilon", &epsilon, 0.00001f, 0.0f, "%.8f")) {
@@ -122,6 +122,18 @@ void OpenGLMarcher::render(int width, int height)
 
     const GLint epsilon_location = glGetUniformLocation(shaderProgramInt, "u_epsilon");
     glUniform1f(epsilon_location, epsilon);
+
+    const GLint fovLoc = glGetUniformLocation(shaderProgramInt, "u_fov");
+    glUniform1i(fovLoc, scene->fov);
+
+    const GLint ambientColLoc = glGetUniformLocation(shaderProgramInt, "u_ambient_color");
+    glUniform3f(ambientColLoc, scene->ambientColorf[0],scene->ambientColorf[1],scene->ambientColorf[2]);
+
+    const GLint specStrLoc = glGetUniformLocation(shaderProgramInt, "u_specular_strength");
+    glUniform1f(specStrLoc, scene->specular_strength);
+
+    const GLint shinyLoc = glGetUniformLocation(shaderProgramInt, "u_shininess");
+    glUniform1f(shinyLoc, scene->shininess);
 
     size_t dataSize = sizeof(LinearCSGTreeNode) * maxNodes;
     glGenBuffers(1, &uboID);
