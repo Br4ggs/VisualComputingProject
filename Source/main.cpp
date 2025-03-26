@@ -176,7 +176,10 @@ int main()
     oglMarcher = new OpenGLMarcher(1000,800, scene, &OpenGLMarcherShader);
     input = new InputController(window, scene);
 
+
     glEnable(GL_DEPTH_TEST);
+
+    input = new InputController(window, scene);
 
     while (!glfwWindowShouldClose(window))
     {
