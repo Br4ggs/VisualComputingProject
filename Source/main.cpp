@@ -17,6 +17,7 @@
 #include "header/texturedScreenQuad.h"
 #include "header/rayMarcher.h"
 #include "header/marchingCubes.h"
+#include "header/inputController.h"
 
 int selectedRenderBackend = 0;
 
@@ -24,8 +25,9 @@ TexturedScreenQuad* screen;
 RayMarcher* marcher;
 MarchingCubes* marchingCubes;
 Scene* scene;
+InputController* input;
 
-void imGuiTest()
+void drawUI()
 {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(400, 680));
@@ -159,16 +161,19 @@ int main()
     marchingCubes = new MarchingCubes(1000, 800, scene, &shaderProgMarchingCubes);
     glEnable(GL_DEPTH_TEST);
 
+    input = new InputController(window, scene);
 
     while (!glfwWindowShouldClose(window))
     {
+
         //imgui stuff
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGui::ShowDemoWindow();
 
-        imGuiTest();
+        drawUI();
+        input->processInput();
 
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
