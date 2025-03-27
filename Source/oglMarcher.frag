@@ -92,6 +92,10 @@ float sphere_sdf(vec3 point, float radius)
 	return length(point) - radius;
 }
 
+float minComponent3(vec3 v) {
+	return min(min(v.x, v.y), v.z);
+}
+
 float get_distance(vec3 point, out vec3 out_color) {
 	float stack[20];
 	int sp = 0; // pointer to next empty slot
@@ -104,15 +108,22 @@ float get_distance(vec3 point, out vec3 out_color) {
 		int op = nodes[i].op;
 		if (shape != NO_SHAPE) {
 			float d;
+
+			vec4 hpoint = vec4(point, 1.0);
+			hpoint = nodes[i].transform * hpoint;
+			hpoint = hpoint / nodes[i].scale;
+
 			if (shape == SHAPE_SPHERE) {
-				d = sphere_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x);
+				d = sphere_sdf(hpoint.xyz, nodes[i].dimensions.x);
 			} else if (shape == SHAPE_BOX) {
-				d = box_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz);
+				d = box_sdf(hpoint.xyz, nodes[i].dimensions.xyz);
 			} else if (shape == SHAPE_CYL) {
-				d = cylinder_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x, nodes[i].dimensions.y);
+				d = cylinder_sdf(hpoint.xyz, nodes[i].dimensions.x, nodes[i].dimensions.y);
 			} else if (shape == SHAPE_PLANE) {
-				d = plane_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz, 1);
+				d = plane_sdf(hpoint.xyz, nodes[i].dimensions.xyz, 1);
 			}
+
+			d = d * minComponent3(nodes[i].scale.xyz);
 
 			stack[sp++] = d;
 
