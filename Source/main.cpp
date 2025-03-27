@@ -22,12 +22,21 @@
 
 int selectedRenderBackend = 2;
 
-TexturedScreenQuad* screen;
-RayMarcher* marcher;
-MarchingCubes* marchingCubes;
-OpenGLMarcher* oglMarcher;
-Scene* scene;
-InputController* input;
+TexturedScreenQuad* screen = nullptr;
+RayMarcher* marcher = nullptr;
+MarchingCubes* marchingCubes = nullptr;
+OpenGLMarcher* oglMarcher = nullptr;
+Scene* scene = nullptr;
+InputController* input = nullptr;
+
+//unfortunately there is no way in glfw to poll scroll position, and since glfw is a C library only function
+//callbacks are supported (no class instance methods). So this is a little hack to reroute the callback to our input class.
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    if (input == nullptr) return;
+
+    input->processScrollEvent(xoffset, yoffset);
+}
 
 void drawUI()
 {
@@ -180,10 +189,10 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     input = new InputController(window, scene);
+    glfwSetScrollCallback(window, scrollCallback);
 
     while (!glfwWindowShouldClose(window))
     {
-
         //imgui stuff
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

@@ -13,6 +13,8 @@ InputController::InputController(GLFWwindow* window, Scene* scene)
 void InputController::processInput()
 {
 	//TODO: deltatime
+	//TODO: zoom
+
 
 	int stateW = glfwGetKey(window, GLFW_KEY_W); //forward
 	int stateA = glfwGetKey(window, GLFW_KEY_A); //left
@@ -24,11 +26,11 @@ void InputController::processInput()
 	int stateM1 = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
 	int stateM2 = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
 
+	// mouse-based rotation
 	if (stateM2 == GLFW_PRESS)
 	{
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
-		std::cout << xpos << std::endl;
 
 		if (firstMousePress)
 		{
@@ -41,9 +43,6 @@ void InputController::processInput()
 
 		double deltaX = firstXpos - xpos;
 		double deltaY = firstYpos - ypos;
-
-		//glm::vec3 cam = scene->getCamPos();
-		//glm::vec3 lookAt = scene->getLookAt();
 
 		glm::vec4 camHomog(firstCam.x, firstCam.y, firstCam.z, 1.0f);
 		glm::vec4 lookAtHomog(firstLookAt.x, firstLookAt.y, firstLookAt.z, 0.0f);
@@ -66,38 +65,41 @@ void InputController::processInput()
 	else if (stateM2 == GLFW_RELEASE)
 		firstMousePress = true;
 
+
+
+	//moving the lookat and camera position
 	glm::vec3 offset(0.0f);
 
-	if (stateW == GLFW_PRESS)
-	{
-		offset.z += 0.01f;
-	}
-
-	if (stateA == GLFW_PRESS)
-	{
-		offset.x += 0.01f;
-	}
-
-	if (stateS == GLFW_PRESS)
-	{
-		offset.z -= 0.01f;
-	}
-
-	if (stateD == GLFW_PRESS)
-	{
-		offset.x -= 0.01f;
-	}
-
-	if (stateQ == GLFW_PRESS)
-	{
-		offset.y += 0.01f;
-	}
-
-	if (stateE == GLFW_PRESS)
-	{
-		offset.y -= 0.01f;
-	}
+	if (stateW == GLFW_PRESS) offset.z += 0.01f;
+	if (stateA == GLFW_PRESS) offset.x += 0.01f;
+	if (stateS == GLFW_PRESS) offset.z -= 0.01f;
+	if (stateD == GLFW_PRESS) offset.x -= 0.01f;
+	if (stateQ == GLFW_PRESS) offset.y += 0.01f;
+	if (stateE == GLFW_PRESS) offset.y -= 0.01f;
 
 	scene->setCamPos(scene->getCamPos() + offset);
 	scene->setLookAt(scene->getLookAt() + offset);
+}
+
+void InputController::processScrollEvent(double xoffset, double yoffset)
+{
+	int stateM2 = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
+
+	//if we are currently rotating the camera we need to modify the original base position of the camera
+	if (stateM2 == GLFW_PRESS && !firstMousePress)
+	{
+		glm::vec3 camForward = glm::normalize(firstLookAt - firstCam);
+		firstCam += camForward * (float)yoffset * 0.1f;
+	}
+	//otherwise, we can manipulate the current camera position directly
+	else
+	{
+		glm::vec3 cam = scene->getCamPos();
+		glm::vec3 lookAt = scene->getLookAt();
+
+		glm::vec3 camForward = glm::normalize(lookAt - cam);
+
+		cam += camForward * (float)yoffset * 0.1f;
+		scene->setCamPos(cam);
+	}
 }

@@ -10,6 +10,7 @@ public:
 	InputController(GLFWwindow* window, Scene* scene);
 
 	void processInput();
+	void processScrollEvent(double xoffset, double yoffset);
 
 private:
 	GLFWwindow* window;
