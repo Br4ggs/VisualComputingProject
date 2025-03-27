@@ -22,6 +22,7 @@ add_executable(VisualComputingProject
     worldObject.cpp
     addOperatorModal.cpp
     addPrimitiveModal.cpp
+    inputController.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/glad.c
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_demo.cpp

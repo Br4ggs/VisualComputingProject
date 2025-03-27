@@ -18,16 +18,27 @@
 #include "header/rayMarcher.h"
 #include "header/marchingCubes.h"
 #include "header/OpenGLMarcher.h"
+#include "header/inputController.h"
 
 int selectedRenderBackend = 2;
 
-TexturedScreenQuad* screen;
-RayMarcher* marcher;
-MarchingCubes* marchingCubes;
-OpenGLMarcher* oglMarcher;
-Scene* scene;
+TexturedScreenQuad* screen = nullptr;
+RayMarcher* marcher = nullptr;
+MarchingCubes* marchingCubes = nullptr;
+OpenGLMarcher* oglMarcher = nullptr;
+Scene* scene = nullptr;
+InputController* input = nullptr;
 
-void imGuiTest()
+//unfortunately there is no way in glfw to poll scroll position, and since glfw is a C library only function
+//callbacks are supported (no class instance methods). So this is a little hack to reroute the callback to our input class.
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    if (input == nullptr) return;
+
+    input->processScrollEvent(xoffset, yoffset);
+}
+
+void drawUI()
 {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(400, 680));
@@ -35,6 +46,10 @@ void imGuiTest()
     bool dirty = false;
 
     ImGui::Begin("Settings");
+    if (ImGui::CollapsingHeader("Controls"))
+    {
+        input->drawUI();
+    }
 
     if (ImGui::CollapsingHeader("Rendering"))
     {
@@ -171,8 +186,13 @@ int main()
     marcher = new RayMarcher(1000, 800);
     marchingCubes = new MarchingCubes(1000, 800, scene, &shaderProgMarchingCubes);
     oglMarcher = new OpenGLMarcher(1000,800, scene, &OpenGLMarcherShader);
+    input = new InputController(window, scene);
+
 
     glEnable(GL_DEPTH_TEST);
+
+    input = new InputController(window, scene);
+    glfwSetScrollCallback(window, scrollCallback);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -182,7 +202,8 @@ int main()
         ImGui::NewFrame();
         //ImGui::ShowDemoWindow();
 
-        imGuiTest();
+        drawUI();
+        input->processInput();
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);

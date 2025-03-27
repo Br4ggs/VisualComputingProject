@@ -102,9 +102,23 @@ glm::vec3 Scene::getCamPos() const
     return glm::vec3(camPosf[0], camPosf[1], camPosf[2]);
 }
 
+void Scene::setCamPos(glm::vec3 pos)
+{
+    camPosf[0] = pos.x;
+    camPosf[1] = pos.y;
+    camPosf[2] = pos.z;
+}
+
 glm::vec3 Scene::getLookAt() const
 {
     return glm::vec3(lookAtf[0], lookAtf[1], lookAtf[2]);
+}
+
+void Scene::setLookAt(glm::vec3 pos)
+{
+    lookAtf[0] = pos.x;
+    lookAtf[1] = pos.y;
+    lookAtf[2] = pos.z;
 }
 
 glm::vec3 Scene::getLightPos() const
