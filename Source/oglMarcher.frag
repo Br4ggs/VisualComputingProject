@@ -182,7 +182,6 @@ mat3 create_look_at_matrix(vec3 camera_pos, vec3 look_at, vec3 up) {
 	vec3 forward = normalize(look_at - camera_pos);
 	vec3 right = normalize(cross(up, forward));
 	vec3 camera_up = cross(forward, right);
-
 	return mat3(right, camera_up, forward);
 }
 
