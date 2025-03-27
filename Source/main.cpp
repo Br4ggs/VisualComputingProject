@@ -46,6 +46,10 @@ void drawUI()
     bool dirty = false;
 
     ImGui::Begin("Settings");
+    if (ImGui::CollapsingHeader("Controls"))
+    {
+        input->drawUI();
+    }
 
     if (ImGui::CollapsingHeader("Rendering"))
     {

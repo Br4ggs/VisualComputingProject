@@ -2,6 +2,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "imgui.h"
 
 #include <iostream>
 
@@ -9,6 +10,29 @@ InputController::InputController(GLFWwindow* window, Scene* scene)
 	:window(window),
 	 scene(scene)
 {}
+
+void InputController::drawUI()
+{
+	//control explanation
+	ImGui::Text("Use W/S keys to move forward/backward");
+	ImGui::Text("Use A/D keys to move left/right");
+	ImGui::Text("Use Q/E keys to move up/down");
+	ImGui::Text("Use the scroll wheel to zoom in/out");
+	ImGui::Text("Press and hold right mouse button to rotate \ncamera around current lookat point");
+
+	//reset orientation
+	if (ImGui::Button("Reset camera orientation"))
+	{
+		scene->setLookAt(glm::vec3(0.0f));
+		scene->setCamPos(glm::vec3(0.0f, 0.0f, -3.0f));
+	}
+
+	//set scroll multiplier
+	ImGui::InputFloat("scroll factor", &camZoomScalar);
+
+	//set wasd speed multiplier
+	ImGui::InputFloat("movement factor", &camMovementScalar);
+}
 
 void InputController::processInput()
 {
@@ -76,12 +100,12 @@ void InputController::processInput()
 		glm::vec3 camRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), camForward));
 		glm::vec3 camUp = glm::cross(camForward, camRight);
 
-		if (stateW == GLFW_PRESS) offset += camForward * 0.01f;
-		if (stateA == GLFW_PRESS) offset += camRight * 0.01f;
-		if (stateS == GLFW_PRESS) offset -= camForward * 0.01f;
-		if (stateD == GLFW_PRESS) offset -= camRight * 0.01f;
-		if (stateQ == GLFW_PRESS) offset += camUp * 0.01f;
-		if (stateE == GLFW_PRESS) offset -= camUp * 0.01f;
+		if (stateW == GLFW_PRESS) offset += camForward * camMovementScalar;
+		if (stateA == GLFW_PRESS) offset += camRight * camMovementScalar;
+		if (stateS == GLFW_PRESS) offset -= camForward * camMovementScalar;
+		if (stateD == GLFW_PRESS) offset -= camRight * camMovementScalar;
+		if (stateQ == GLFW_PRESS) offset += camUp * camMovementScalar;
+		if (stateE == GLFW_PRESS) offset -= camUp * camMovementScalar;
 
 		scene->setCamPos(scene->getCamPos() + offset);
 		scene->setLookAt(scene->getLookAt() + offset);
@@ -97,7 +121,7 @@ void InputController::processScrollEvent(double xoffset, double yoffset)
 	if (stateM2 == GLFW_PRESS && !firstMousePress)
 	{
 		glm::vec3 camForward = glm::normalize(firstLookAt - firstCam);
-		firstCam += camForward * (float)yoffset * 0.1f;
+		firstCam += camForward * (float)yoffset * camZoomScalar;
 	}
 	//otherwise, we can manipulate the current camera position directly
 	else
@@ -107,7 +131,7 @@ void InputController::processScrollEvent(double xoffset, double yoffset)
 
 		glm::vec3 camForward = glm::normalize(lookAt - cam);
 
-		cam += camForward * (float)yoffset * 0.1f;
+		cam += camForward * (float)yoffset * camZoomScalar;
 		scene->setCamPos(cam);
 	}
 }
