@@ -74,7 +74,7 @@ void InputController::processInput()
 		glm::vec3 camUp = glm::cross(camForward, camRight);
 
 		glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), (float)deltaY * 0.01f, camRight);
-		glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), (float)deltaX * -0.01f, glm::vec3(0, 1, 0));
+		glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), (float)deltaX * 0.01f, glm::vec3(0, 1, 0));
 
 		//handle offset using translation matrices?
 		camHomog -= lookAtHomog;
@@ -101,9 +101,9 @@ void InputController::processInput()
 		glm::vec3 camUp = glm::cross(camForward, camRight);
 
 		if (stateW == GLFW_PRESS) offset += camForward * camMovementScalar;
-		if (stateA == GLFW_PRESS) offset += camRight * camMovementScalar;
+		if (stateA == GLFW_PRESS) offset -= camRight * camMovementScalar;
 		if (stateS == GLFW_PRESS) offset -= camForward * camMovementScalar;
-		if (stateD == GLFW_PRESS) offset -= camRight * camMovementScalar;
+		if (stateD == GLFW_PRESS) offset += camRight * camMovementScalar;
 		if (stateQ == GLFW_PRESS) offset += camUp * camMovementScalar;
 		if (stateE == GLFW_PRESS) offset -= camUp * camMovementScalar;
 

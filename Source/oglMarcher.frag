@@ -8,7 +8,7 @@ struct LinearCSGTreeNode {
 	vec2 _padding;
 	vec4 position;
 	vec4 dimensions;
-	mat4 rotation;
+	mat4 transform;
 	vec4 scale;
 	vec4 color;
 };
@@ -92,6 +92,10 @@ float sphere_sdf(vec3 point, float radius)
 	return length(point) - radius;
 }
 
+float minComponent3(vec3 v) {
+	return min(min(v.x, v.y), v.z);
+}
+
 float get_distance(vec3 point, out vec3 out_color) {
 	float stack[20];
 	int sp = 0; // pointer to next empty slot
@@ -104,15 +108,22 @@ float get_distance(vec3 point, out vec3 out_color) {
 		int op = nodes[i].op;
 		if (shape != NO_SHAPE) {
 			float d;
+
+			vec4 hpoint = vec4(point, 1.0);
+			hpoint = nodes[i].transform * hpoint;
+			hpoint = hpoint / nodes[i].scale;
+
 			if (shape == SHAPE_SPHERE) {
-				d = sphere_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x);
+				d = sphere_sdf(hpoint.xyz, nodes[i].dimensions.x);
 			} else if (shape == SHAPE_BOX) {
-				d = box_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz);
+				d = box_sdf(hpoint.xyz, nodes[i].dimensions.xyz);
 			} else if (shape == SHAPE_CYL) {
-				d = cylinder_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.x, nodes[i].dimensions.y);
+				d = cylinder_sdf(hpoint.xyz, nodes[i].dimensions.x, nodes[i].dimensions.y);
 			} else if (shape == SHAPE_PLANE) {
-				d = plane_sdf(point - nodes[i].position.xyz, nodes[i].dimensions.xyz, 1);
+				d = plane_sdf(hpoint.xyz, nodes[i].dimensions.xyz, 1);
 			}
+
+			d = d * minComponent3(nodes[i].scale.xyz);
 
 			stack[sp++] = d;
 
@@ -167,23 +178,21 @@ vec3 get_shadow_scalar(vec3 point, vec3 light_pos) {
     return vec3(1.0);
 }
 
-mat3 create_look_at_matrix(vec3 camera_pos, vec3 look_direction, vec3 up) {
-	vec3 forward = normalize(look_direction);
-	vec3 right = normalize(cross(forward, up));
-	vec3 camera_up = cross(right, forward);
+mat3 create_look_at_matrix(vec3 camera_pos, vec3 look_at, vec3 up) {
+	vec3 forward = normalize(look_at - camera_pos);
+	vec3 right = normalize(cross(up, forward));
+	vec3 camera_up = cross(forward, right);
+
 	return mat3(right, camera_up, forward);
 }
+
+const vec3 up = vec3(0.0, 1.0, 0.0);
+const float FOV = 1.0;
 
 void main()
 {
 	vec2 xy_clip = ((gl_FragCoord.xy * 2.0 - window_dimensions) / window_dimensions.y);
-	vec3 ray_direction = normalize(vec3(xy_clip, 1.0 / tan(radians(u_fov * 0.5))));
-
-	vec3 up = vec3(0.0, 1.0, 0.0);
-	mat3 viewMat = create_look_at_matrix(u_camera_position, normalize(vec3(u_look_at.xy, 1.0)), up);
-
-	ray_direction = viewMat * ray_direction;
-
+	vec3 ray_direction = create_look_at_matrix(u_camera_position, u_look_at, up) * normalize(vec3(xy_clip.xy, FOV));
 	vec3 ray_origin = u_camera_position;
 
 	float total_distance = 0.;
