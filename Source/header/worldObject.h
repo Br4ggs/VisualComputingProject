@@ -21,7 +21,7 @@ public:
 	glm::vec3 getPosition();
 	glm::vec3 getScale();
 	glm::mat4 getTransform();
-	glm::vec3 getCol();
+	glm::vec3 getColor();
 
 protected:
 	float posf[3] = { 0.0f, 0.0f, 0.0f };

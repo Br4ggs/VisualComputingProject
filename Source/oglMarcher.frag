@@ -188,7 +188,7 @@ void main()
 
 	float total_distance = 0.;
 
-	vec3 colour = vec3(0.0);
+	vec3 colour = u_background_color;
 	vec3 object_color;
 
 	for(int i = 0; i < MAX_ITERATIONS; ++i) {

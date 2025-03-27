@@ -25,7 +25,7 @@ glm::vec3 WorldObject::getPosition()
 	return glm::vec3(posf[0],posf[1],posf[2]);
 }
 
-glm::vec3 WorldObject::getCol()
+glm::vec3 WorldObject::getColor()
 {
 	return glm::vec3(color);
 }
