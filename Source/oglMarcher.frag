@@ -180,8 +180,9 @@ vec3 get_shadow_scalar(vec3 point, vec3 light_pos) {
 
 mat3 create_look_at_matrix(vec3 camera_pos, vec3 look_at, vec3 up) {
 	vec3 forward = normalize(look_at - camera_pos);
-	vec3 right = normalize(cross(forward, up));
-	vec3 camera_up = cross(right, forward);
+	vec3 right = normalize(cross(up, forward));
+	vec3 camera_up = cross(forward, right);
+
 	return mat3(right, camera_up, forward);
 }
 
