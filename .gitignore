@@ -424,3 +424,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 build/
+imgui.ini
