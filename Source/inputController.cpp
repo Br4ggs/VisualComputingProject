@@ -13,8 +13,6 @@ InputController::InputController(GLFWwindow* window, Scene* scene)
 void InputController::processInput()
 {
 	//TODO: deltatime
-	//TODO: zoom
-
 
 	int stateW = glfwGetKey(window, GLFW_KEY_W); //forward
 	int stateA = glfwGetKey(window, GLFW_KEY_A); //left
@@ -45,7 +43,7 @@ void InputController::processInput()
 		double deltaY = firstYpos - ypos;
 
 		glm::vec4 camHomog(firstCam.x, firstCam.y, firstCam.z, 1.0f);
-		glm::vec4 lookAtHomog(firstLookAt.x, firstLookAt.y, firstLookAt.z, 0.0f);
+		glm::vec4 lookAtHomog(firstLookAt.x, firstLookAt.y, firstLookAt.z, 1.0f);
 
 		glm::vec3 camForward = glm::normalize(firstLookAt - firstCam);
 		glm::vec3 camRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), camForward));
@@ -65,21 +63,31 @@ void InputController::processInput()
 	else if (stateM2 == GLFW_RELEASE)
 		firstMousePress = true;
 
+	//disallow position moving when we are currently rotating
+	if (stateM2 != GLFW_PRESS)
+	{
+		//moving the lookat and camera position
+		glm::vec3 offset(0.0f);
 
+		glm::vec3 cam = scene->getCamPos();
+		glm::vec3 lookAt = scene->getLookAt();
 
-	//moving the lookat and camera position
-	glm::vec3 offset(0.0f);
+		glm::vec3 camForward = glm::normalize(lookAt - cam);
+		glm::vec3 camRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), camForward));
+		glm::vec3 camUp = glm::cross(camForward, camRight);
 
-	if (stateW == GLFW_PRESS) offset.z += 0.01f;
-	if (stateA == GLFW_PRESS) offset.x += 0.01f;
-	if (stateS == GLFW_PRESS) offset.z -= 0.01f;
-	if (stateD == GLFW_PRESS) offset.x -= 0.01f;
-	if (stateQ == GLFW_PRESS) offset.y += 0.01f;
-	if (stateE == GLFW_PRESS) offset.y -= 0.01f;
+		if (stateW == GLFW_PRESS) offset += camForward * 0.01f;
+		if (stateA == GLFW_PRESS) offset += camRight * 0.01f;
+		if (stateS == GLFW_PRESS) offset -= camForward * 0.01f;
+		if (stateD == GLFW_PRESS) offset -= camRight * 0.01f;
+		if (stateQ == GLFW_PRESS) offset += camUp * 0.01f;
+		if (stateE == GLFW_PRESS) offset -= camUp * 0.01f;
 
-	scene->setCamPos(scene->getCamPos() + offset);
-	scene->setLookAt(scene->getLookAt() + offset);
+		scene->setCamPos(scene->getCamPos() + offset);
+		scene->setLookAt(scene->getLookAt() + offset);
+	}
 }
+
 
 void InputController::processScrollEvent(double xoffset, double yoffset)
 {
