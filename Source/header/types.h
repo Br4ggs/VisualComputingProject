@@ -13,7 +13,7 @@ typedef struct LinearCSGTreeNode {
 	float _padding[2];
 	glm::vec4 position;
 	glm::vec4 dimensions;
-	glm::mat4 rotation;
+	glm::mat4 transform;
 	glm::vec4 scale;
 	glm::vec4 color;
 } LinearCSGTreeNode;

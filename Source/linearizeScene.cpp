@@ -22,7 +22,7 @@ void linearizeDrawable(IDrawable* drawable, std::vector<LinearCSGTreeNode>& line
             node.position = glm::vec4(wObject->getPosition(), 1.0);
             node.dimensions = glm::vec4(1.0f);
             node.scale = glm::vec4(wObject->getScale(), 0.0);
-            node.rotation = wObject->getTransform();
+            node.transform = wObject->getTransform();
             node.color = glm::vec4(wObject->getColor(), 0.0);
             linearScene.push_back(node);
             break;

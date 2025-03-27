@@ -8,7 +8,7 @@ struct LinearCSGTreeNode {
 	vec2 _padding;
 	vec4 position;
 	vec4 dimensions;
-	mat4 rotation;
+	mat4 transform;
 	vec4 scale;
 	vec4 color;
 };
