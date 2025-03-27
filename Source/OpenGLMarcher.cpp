@@ -70,8 +70,6 @@ void OpenGLMarcher::drawUI(bool &dirty)
         epsilon = glm::max(minEpsilon, epsilon);
     }
 
-    ImGui::SliderFloat("smoothing factor", &smoothing_factor, 0.001f, 2.0f);
-
     ImGui::ColorEdit3("background color", colf);
 }
 
@@ -117,7 +115,7 @@ void OpenGLMarcher::render(int width, int height)
     glUniform3f(spec_color_location, specCol[0], specCol[1], specCol[2]);
 
     const GLint smoothing_factor_location = glGetUniformLocation(shaderProgramInt, "u_smoothing_factor");
-    glUniform1f(smoothing_factor_location, smoothing_factor);
+    glUniform1f(smoothing_factor_location, scene->smoothingFactor);
 
     const GLint max_distance_location = glGetUniformLocation(shaderProgramInt, "u_max_distance");
     glUniform1f(max_distance_location, maxDist);

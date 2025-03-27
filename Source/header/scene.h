@@ -32,6 +32,7 @@ public:
 	int fov = 60;
 	float specular_strength = 0.5;
 	float shininess = 64.0;
+	float smoothingFactor = 0.1;
 
 private:
 	float camPosf[3] = { 0.0f, 0.0f, -3.0f };

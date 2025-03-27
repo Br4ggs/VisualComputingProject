@@ -32,8 +32,6 @@ private:
 	unsigned int uboID;
 	unsigned int VAOID;
 
-	float smoothing_factor = 0.1;
-
 	float FOV = 1.0;
 	int maxSteps = 100;
 	float maxDist = 50;
