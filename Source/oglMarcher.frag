@@ -178,23 +178,20 @@ vec3 get_shadow_scalar(vec3 point, vec3 light_pos) {
     return vec3(1.0);
 }
 
-mat3 create_look_at_matrix(vec3 camera_pos, vec3 look_direction, vec3 up) {
-	vec3 forward = normalize(look_direction);
+mat3 create_look_at_matrix(vec3 camera_pos, vec3 look_at, vec3 up) {
+	vec3 forward = normalize(look_at - camera_pos);
 	vec3 right = normalize(cross(forward, up));
 	vec3 camera_up = cross(right, forward);
 	return mat3(right, camera_up, forward);
 }
 
+const vec3 up = vec3(0.0, 1.0, 0.0);
+const float FOV = 1.0;
+
 void main()
 {
 	vec2 xy_clip = ((gl_FragCoord.xy * 2.0 - window_dimensions) / window_dimensions.y);
-	vec3 ray_direction = normalize(vec3(xy_clip, 1.0 / tan(radians(u_fov * 0.5))));
-
-	vec3 up = vec3(0.0, 1.0, 0.0);
-	mat3 viewMat = create_look_at_matrix(u_camera_position, normalize(vec3(u_look_at.xy, 1.0)), up);
-
-	ray_direction = viewMat * ray_direction;
-
+	vec3 ray_direction = create_look_at_matrix(u_camera_position, u_look_at, up) * normalize(vec3(xy_clip.xy, FOV));
 	vec3 ray_origin = u_camera_position;
 
 	float total_distance = 0.;
