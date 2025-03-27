@@ -63,12 +63,14 @@ OpenGLMarcher::~OpenGLMarcher()
 
 void OpenGLMarcher::drawUI(bool &dirty)
 {
-    ImGui::SliderInt("max steps", &maxSteps, 10, 500);
+    ImGui::SliderInt("max steps", &maxSteps, 10, 1000);
     ImGui::SliderFloat("max distance", &maxDist, 1, 20);
 
-    if (ImGui::InputFloat("epsilon", &epsilon, 0.00001f, 0.0f, "%.8f")) {
+    if (ImGui::InputFloat("epsilon", &epsilon, 0.000001f, 0.0f, "%.8f")) {
         epsilon = glm::max(minEpsilon, epsilon);
     }
+
+    ImGui::SliderFloat("smoothing factor", &smoothing_factor, 0.001f, 2.0f);
 
     ImGui::ColorEdit3("background color", colf);
 }
@@ -113,6 +115,9 @@ void OpenGLMarcher::render(int width, int height)
     glm::vec3 specCol = scene->getSpecColor();
     const GLint spec_color_location = glGetUniformLocation(shaderProgramInt, "u_spec_color");
     glUniform3f(spec_color_location, specCol[0], specCol[1], specCol[2]);
+
+    const GLint smoothing_factor_location = glGetUniformLocation(shaderProgramInt, "u_smoothing_factor");
+    glUniform1f(smoothing_factor_location, smoothing_factor);
 
     const GLint max_distance_location = glGetUniformLocation(shaderProgramInt, "u_max_distance");
     glUniform1f(max_distance_location, maxDist);

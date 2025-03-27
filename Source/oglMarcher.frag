@@ -36,6 +36,8 @@ uniform float u_shininess;
 uniform float u_specular_strength;
 uniform int u_fov;
 
+uniform float u_smoothing_factor;
+
 out vec4 fragment_colour;
 
 int MAX_ITERATIONS = u_max_steps;
@@ -96,6 +98,12 @@ float minComponent3(vec3 v) {
 	return min(min(v.x, v.y), v.z);
 }
 
+// NOTE: from https://michael-crum.com/raymarching/
+float opSmoothUnion( float d1, float d2, float k ) {
+    float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0);
+    return mix( d2, d1, h ) - k*h*(1.0-h); 
+}
+
 float get_distance(vec3 point, out vec3 out_color) {
 	float stack[20];
 	int sp = 0; // pointer to next empty slot
@@ -134,9 +142,11 @@ float get_distance(vec3 point, out vec3 out_color) {
 
 		} else if (op != NO_OP) {
 			if (op == OP_UNI) {
-				stack[sp - 2] = min(stack[sp - 1], stack[sp - 2]);
+				stack[sp - 2] = opSmoothUnion(stack[sp - 1], stack[sp - 2], u_smoothing_factor);
 			} else if (op == OP_INT) {
 				stack[sp - 2] = max(stack[sp - 1], stack[sp - 2]);
+			} else if (op == OP_DIFF) {
+				stack[sp - 2] = max(stack[sp - 1], -stack[sp - 2]);
 			}
 			sp--;
 		}
