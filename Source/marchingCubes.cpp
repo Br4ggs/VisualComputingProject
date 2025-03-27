@@ -185,24 +185,31 @@ void MarchingCubes::drawUI(bool& dirty)
 
 void MarchingCubes::render() const
 {
+	//sidenote: we mirror the x-axis here to align the coorinate system used by glm (right-handed)
+	//with that of the raymarchers (left-handed)
+
 	shaderProg->use();
 
-	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(-1.0f, 1.0f, 1.0f));
+
 	glm::vec3 camPos = scene->getCamPos();
+	camPos.x *= -1;
+
 	glm::vec3 lookAt = scene->getLookAt();
+	lookAt.x *= -1;
+
 	glm::mat4 view = glm::lookAt(camPos, lookAt, glm::vec3(0, 1, 0));
 	glm::mat4 proj = glm::perspective(glm::radians(90.0f), (float)displayWidth / (float)displayHeight, 0.1f, 100.0f);
 
+	glm::vec3 lightPos = scene->getLightPos();
+	lightPos.x *= -1;
+
+	glm::vec3 lightColor = scene->getSpecColor();
 
 	//pass uniforms
 	shaderProg->passUniform4x4floatMatrix("model", model);
 	shaderProg->passUniform4x4floatMatrix("view", view);
 	shaderProg->passUniform4x4floatMatrix("projection", proj);
-
-	glm::vec3 lightPos = scene->getLightPos();
-	lightPos.x *= -1;
-	glm::vec3 lightColor = scene->getSpecColor();
-
 	shaderProg->passUniform3floatVector("lightPos", lightPos);
 	shaderProg->passUniform3floatVector("viewPos", camPos);
 	shaderProg->passUniform3floatVector("lightColor", lightColor);
