@@ -47,10 +47,10 @@ private:
     int gridSize = 30;
     float gridSpacing = 0.1f;
 
-    std::vector<std::vector<std::vector<GridPoint> > > grid;
+    //3d vector of gridpoints
+    std::vector<std::vector<std::vector<GridPoint>>> grid;
 
     std::vector<Vertex> vertices;
-
 
     void marchingCubes();
 
