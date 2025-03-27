@@ -36,7 +36,7 @@ private:
 	int maxSteps = 100;
 	float maxDist = 50;
 	float epsilon = 0.001;
-  float minEpsilon = 0.00001f;
+	float minEpsilon = 0.00001f;
 	float colf[3] = { 0.5f, 0.8f, 0.9f };
 };
 
