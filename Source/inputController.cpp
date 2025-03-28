@@ -24,7 +24,7 @@ void InputController::drawUI()
 	if (ImGui::Button("Reset camera orientation"))
 	{
 		scene->setLookAt(glm::vec3(0.0f));
-		scene->setCamPos(glm::vec3(0.0f, 0.0f, -3.0f));
+		scene->setCamPos(glm::vec3(-2.0f, 2.0f, -2.0f));
 	}
 
 	//set scroll multiplier
