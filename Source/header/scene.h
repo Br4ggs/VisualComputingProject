@@ -34,10 +34,10 @@ public:
 	float shininess = 10.0f;
 
 private:
-	float camPosf[3] = { 0.0f, 0.0f, -3.0f };
+	float camPosf[3] = { -2.0f, 2.0f, -2.0f };
 	float lookAtf[3] = { 0.0f, 0.0f, 0.0f };
 
-	float lightPosf[3] = { 30.0f, 40.0f, 30.0f };
+	float lightPosf[3] = { 30.0f, 40.0f, -30.0f };
 	float ambientColorf[3] = { 0.3f, 0.3f, 0.3f };
 	float specColorf[3] = { 0.5f, 0.5f, 0.5f };
 

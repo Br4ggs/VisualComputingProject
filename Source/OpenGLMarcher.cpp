@@ -89,12 +89,10 @@ void OpenGLMarcher::drawUI(bool &dirty)
     ImGui::InputDouble("fog creep", &fogCreep);
 }
 
-void OpenGLMarcher::linearize(bool &dirty)
+void OpenGLMarcher::linearize()
 {
     linearScene.clear();
     linearizeScene(scene, linearScene);
-
-    dirty = false;
 }
 
 void OpenGLMarcher::render(int width, int height)

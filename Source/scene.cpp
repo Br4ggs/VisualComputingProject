@@ -16,7 +16,10 @@
 #include <algorithm>
 
 Scene::Scene()
-{}
+{
+    SDFBox* box = new SDFBox(glm::vec3(1.0f));
+    addObject(box);
+}
 
 Scene::~Scene()
 {

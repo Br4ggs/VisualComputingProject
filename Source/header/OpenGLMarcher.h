@@ -17,7 +17,7 @@ public:
 
 	void drawUI(bool& dirty);
 	void render(int width, int height);
-	void linearize(bool& dirty);
+	void linearize();
 
 private:
 	std::vector<LinearCSGTreeNode> linearScene;

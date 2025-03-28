@@ -104,7 +104,7 @@ void drawUI()
     }
     if (selectedRenderBackend == 2 && dirty)
     {
-        oglMarcher->linearize(dirty);
+        oglMarcher->linearize();
     }
 
     if (selectedRenderBackend == 0 && ImGui::Button("Render"))
@@ -189,6 +189,7 @@ int main()
     oglMarcher = new OpenGLMarcher(1000,800, scene, &OpenGLMarcherShader);
     input = new InputController(window, scene);
 
+    oglMarcher->linearize();
 
     glEnable(GL_DEPTH_TEST);
 
