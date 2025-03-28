@@ -40,9 +40,7 @@ enum CSGShape {
 
 using CSGType = std::variant<CSGShape, CSGOperation>;
 
-namespace RenderType {
-
-enum Type {
+enum class RenderStrategyType {
 	SPHERE_MARCHING_CPU = 0,
 	CUBE_MARCHING_CPU = 1,
 	SPHERE_MARCHING_GPU = 2,
@@ -50,33 +48,17 @@ enum Type {
 	COUNT /* HACK: amount of types */
 };
 
-static const char* names[] = {
-	"Sphere Marching (CPU)",
-	"Cube Marching (CPU)",
-	"Sphere Marching (GPU)",
-};
-
-inline const char* getName(Type type) {
-
-	if (type >= 0 && type <= COUNT) {
-		return names[type];
+constexpr const char* toString(RenderStrategyType type) {
+	switch (type) {
+	case RenderStrategyType::SPHERE_MARCHING_CPU:
+		return "Sphere Marching (CPU)";
+	case RenderStrategyType::CUBE_MARCHING_CPU:
+		return "Cube Marching (CPU)";
+	case RenderStrategyType::SPHERE_MARCHING_GPU:
+		return "Sphere Marching (GPU)";
+	default:
+		throw std::logic_error("Invalid render strategy");
 	}
-
-	throw std::invalid_argument(&"That render type does not exist: " [ type]);
-}
-
-inline const Type getType(int type) {
-	// should return the correct Type based on the index
-	if (type >= 0 && type < COUNT) {
-		return static_cast<Type>(type);
-	}
-	throw std::invalid_argument(&"That render type does not exist: " [ type]);
-}
-
-inline void allNames(const char *** dst) {
-	*dst = names;
-}
-
 }
 
 #endif
