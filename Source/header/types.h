@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <stdexcept>
 #include <variant>
+#include <glad/glad.h>
 
 // NOTE: should be the same as the shader definition
 typedef struct LinearCSGTreeNode {
@@ -48,7 +49,7 @@ enum class RenderStrategyType {
 	COUNT /* HACK: amount of types */
 };
 
-constexpr const char* toString(RenderStrategyType type) {
+constexpr const char* strategyToString(RenderStrategyType type) {
 	switch (type) {
 	case RenderStrategyType::SPHERE_MARCHING_CPU:
 		return "Sphere Marching (CPU)";

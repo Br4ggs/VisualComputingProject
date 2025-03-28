@@ -1,9 +1,8 @@
 #ifndef SHADER_PROG_H
 #define SHADER_PROG_H
 
-#include <filesystem>
-#include <glad/glad.h>
 #include <glm/glm.hpp>
+#include "types.h"
 
 //Wrapper class for opengl shader programs
 //Usage:
@@ -33,9 +32,9 @@ public:
 	unsigned int getRawShaderProgram();
 
 private:
-	GLuint vertexShader = 0;
-	GLuint fragmentShader = 0;
-	GLuint shaderProgram = 0;
+	unsigned int vertexShader = 0;
+	unsigned int fragmentShader = 0;
+	unsigned int shaderProgram = 0;
 };
 
 #endif

@@ -19,9 +19,6 @@ int ShaderProgram::attachVertexShader(const char* sourceFile)
 	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 	const char* source = contents.c_str();
 
-	std::cout << "Found shader:" << std::endl;
-	std::cout << source << std::endl;
-
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &source, NULL);
 
@@ -38,7 +35,7 @@ int ShaderProgram::attachVertexShader(const char* sourceFile)
 	}
 	else
 	{
-		std::cout << "Vertex shader compiled succesfully" << std::endl;
+		std::cout << "Vertex shader compiled succesfully:" << sourceFile << std::endl;
 		return 0;
 	}
 }
@@ -48,9 +45,6 @@ int ShaderProgram::attachFragmentShader(const char* sourceFile)
 	std::ifstream in(sourceFile);
 	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 	const char* source = contents.c_str();
-
-	std::cout << "Found shader:" << std::endl;
-	std::cout << source << std::endl;
 
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &source, NULL);
@@ -68,7 +62,7 @@ int ShaderProgram::attachFragmentShader(const char* sourceFile)
 	}
 	else
 	{
-		std::cout << "Fragment shader compiled succesfully" << std::endl;
+		std::cout << "Fragment shader compiled succesfully: " << sourceFile << std::endl;
 		return 0;
 	}
 }

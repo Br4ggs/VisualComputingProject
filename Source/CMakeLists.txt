@@ -25,6 +25,7 @@ add_executable(VisualComputingProject
     addPrimitiveModal.cpp
     inputController.cpp
     IRenderStrategy.cpp
+    OpenGLStrategy.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/glad.c
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui.cpp
     ${PROJECT_SOURCE_DIR}/Libraries/src/imgui_demo.cpp

@@ -2,7 +2,7 @@
 #include "imgui.h"
 #include "linearizeScene.h"
 #include "types.h"
-#include <iostream>
+#include <OpenGL/gltypes.h>
 
 constexpr int N_VERTICES = 4;
 constexpr int N_ELEMENTS  = N_VERTICES * 3;

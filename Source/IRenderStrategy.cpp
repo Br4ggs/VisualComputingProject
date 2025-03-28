@@ -4,5 +4,5 @@
 IRenderStrategy::IRenderStrategy(RenderStrategyType type)
 :type(type)
 {
-    std::cout << "constructed render strategy\n";
+    std::cout << "constructed irender strategy\n";
 }

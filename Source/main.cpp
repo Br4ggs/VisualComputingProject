@@ -1,12 +1,13 @@
 #include "header/main.h"
 #include <iostream>
-#include <glad/glad.h>
+#include "types.h"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 //imgui related includes
+#include "OpenGLStrategy.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -160,21 +161,22 @@ int main()
 
     glViewport(0, 0, 1000, 800);
 
+
     ShaderProgram shaderProgMarcher;
-    shaderProgMarcher.attachVertexShader("vertexScreenQuad.glsl");
-    shaderProgMarcher.attachFragmentShader("fragmentScreenQuad.glsl");
+    shaderProgMarcher.attachVertexShader("./build/vertexScreenQuad.glsl");
+    shaderProgMarcher.attachFragmentShader("./build/fragmentScreenQuad.glsl");
     shaderProgMarcher.compile();
 
     screen = new TexturedScreenQuad(&shaderProgMarcher);
 
     ShaderProgram shaderProgMarchingCubes;
-    shaderProgMarchingCubes.attachVertexShader("vertexMarchingCubes.glsl");
-    shaderProgMarchingCubes.attachFragmentShader("fragmentMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachVertexShader("./build/vertexMarchingCubes.glsl");
+    shaderProgMarchingCubes.attachFragmentShader("./build/fragmentMarchingCubes.glsl");
     shaderProgMarchingCubes.compile();
 
     ShaderProgram OpenGLMarcherShader;
-    OpenGLMarcherShader.attachVertexShader("oglMarcher.vert");
-    OpenGLMarcherShader.attachFragmentShader("oglMarcher.frag");
+    OpenGLMarcherShader.attachVertexShader("./build/oglMarcher.vert");
+    OpenGLMarcherShader.attachFragmentShader("./build/oglMarcher.frag");
     OpenGLMarcherShader.compile();
 
     //set clearscreen color to a nice navy blue
@@ -183,6 +185,10 @@ int main()
     glfwSwapBuffers(window);
 
     scene = new Scene();
+
+    OpenGLStrategy *openglRenderStrategy = new OpenGLStrategy(
+        RenderStrategyType::SPHERE_MARCHING_GPU
+    );
 
     marcher = new RayMarcher(1000, 800);
     marchingCubes = new MarchingCubes(1000, 800, scene, &shaderProgMarchingCubes);
