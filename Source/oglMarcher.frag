@@ -36,8 +36,6 @@ uniform float u_shininess;
 uniform float u_specular_strength;
 uniform int u_fov;
 
-uniform float u_smoothing_factor;
-
 out vec4 fragment_colour;
 
 int MAX_ITERATIONS = u_max_steps;

@@ -19,7 +19,7 @@ public:
 	float getSmoothingFactor();
 
 private:
-	float smoothing_factor;
+	float smoothing_factor = 0.5f;
 	IDrawable* operant1;
 	IDrawable* operant2;
 };

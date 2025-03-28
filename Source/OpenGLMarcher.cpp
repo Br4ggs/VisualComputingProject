@@ -114,9 +114,6 @@ void OpenGLMarcher::render(int width, int height)
     const GLint spec_color_location = glGetUniformLocation(shaderProgramInt, "u_spec_color");
     glUniform3f(spec_color_location, specCol[0], specCol[1], specCol[2]);
 
-    const GLint smoothing_factor_location = glGetUniformLocation(shaderProgramInt, "u_smoothing_factor");
-    glUniform1f(smoothing_factor_location, scene->smoothingFactor);
-
     const GLint max_distance_location = glGetUniformLocation(shaderProgramInt, "u_max_distance");
     glUniform1f(max_distance_location, maxDist);
 

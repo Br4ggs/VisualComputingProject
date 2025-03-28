@@ -79,8 +79,6 @@ void drawUI()
             ImGui::EndCombo();
         }
 
-        ImGui::SliderFloat("smoothing factor", &scene->smoothingFactor, 0.1, 3.0);
-
         //render settings
         switch (selectedRenderBackend)
         {
