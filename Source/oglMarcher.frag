@@ -6,7 +6,7 @@ struct LinearCSGTreeNode {
 	int op;
 	int shape;
 	vec2 _padding;
-	vec4 position;
+	vec4 metadata1;
 	vec4 dimensions;
 	mat4 transform;
 	vec4 scale;
@@ -52,7 +52,8 @@ const int OP_UNI = 0;
 const int OP_INT = 1;
 const int OP_DIFF = 2;
 const int OP_MOD = 3;
-const int NO_OP = 4;
+const int OP_SMUN = 4;
+const int NO_OP = 5;
 
 const int SHAPE_SPHERE = 0;
 const int SHAPE_BOX = 1;
@@ -96,6 +97,12 @@ float minComponent3(vec3 v) {
 	return min(min(v.x, v.y), v.z);
 }
 
+// NOTE: from https://michael-crum.com/raymarching/
+float opSmoothUnion( float d1, float d2, float k ) {
+	float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0);
+	return mix( d2, d1, h ) - k*h*(1.0-h);
+}
+
 float get_distance(vec3 point, out vec3 out_color) {
 	float stack[20];
 	int sp = 0; // pointer to next empty slot
@@ -137,6 +144,10 @@ float get_distance(vec3 point, out vec3 out_color) {
 				stack[sp - 2] = min(stack[sp - 1], stack[sp - 2]);
 			} else if (op == OP_INT) {
 				stack[sp - 2] = max(stack[sp - 1], stack[sp - 2]);
+			} else if (op == OP_DIFF) {
+				stack[sp - 2] = max(-stack[sp - 1], stack[sp - 2]);
+			} else if (op == OP_SMUN) {
+				stack[sp - 2] = opSmoothUnion(stack[sp - 1], stack[sp - 2], nodes[i].metadata1.x);
 			}
 			sp--;
 		}
@@ -182,7 +193,6 @@ mat3 create_look_at_matrix(vec3 camera_pos, vec3 look_at, vec3 up) {
 	vec3 forward = normalize(look_at - camera_pos);
 	vec3 right = normalize(cross(up, forward));
 	vec3 camera_up = cross(forward, right);
-
 	return mat3(right, camera_up, forward);
 }
 

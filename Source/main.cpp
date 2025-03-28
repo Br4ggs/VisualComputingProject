@@ -53,6 +53,7 @@ void drawUI()
 
     if (ImGui::CollapsingHeader("Rendering"))
     {
+
         //rendering backend dropdown
         const char* renderTypes[] = { "sphere tracing (cpu)", "marching cubes", "sphere tracing gpu"};
         const char* renderPreview = renderTypes[selectedRenderBackend];

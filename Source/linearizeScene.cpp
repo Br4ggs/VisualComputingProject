@@ -1,4 +1,5 @@
 #include "linearizeScene.h"
+#include "opSmoothUnion.h"
 #include "worldObject.h"
 #include <iostream>
 #include <ostream>
@@ -19,7 +20,7 @@ void linearizeDrawable(IDrawable* drawable, std::vector<LinearCSGTreeNode>& line
             LinearCSGTreeNode node;
             node.op = CSGOperation::NO_OP;
             node.shape = shape;
-            node.position = glm::vec4(wObject->getPosition(), 1.0);
+            node.metadata1 = glm::vec4(wObject->getPosition(), 1.0);
             node.dimensions = glm::vec4(1.0f);
             node.scale = glm::vec4(wObject->getScale(), 0.0);
             node.transform = wObject->getTransform();
@@ -38,17 +39,20 @@ void linearizeDrawable(IDrawable* drawable, std::vector<LinearCSGTreeNode>& line
             linearizeDrawable(child, linearScene);
         }
         CSGOperation op = std::get<CSGOperation>(type);
+        LinearCSGTreeNode node;
         switch(op) {
+        case OP_SMUN:
+            node.metadata1 = glm::vec4(static_cast<OpSmoothUnion*>(drawable)->getSmoothingFactor() ,1.0,1.0,1.0);
         case OP_UNI:
         case OP_INT:
         case OP_DIFF:
         case OP_MOD:
-            LinearCSGTreeNode node;
             node.op = op;
             node.shape = CSGShape::NO_SHAPE;
             linearScene.push_back(node);
             break;
         case NO_OP:
+        default:
             throw std::logic_error("op implementation should always have a valid operation");
             break;
         }
@@ -84,7 +88,8 @@ const char* getCSGOperationName(int op) {
 		case OP_UNI: return "Union";
 		case OP_INT: return "Intersection";
 		case OP_DIFF: return "Difference";
-		case OP_MOD: return "Modification";
+		case OP_MOD: return "Modulus";
+		case OP_SMUN: return "Smooth Union";
 		case NO_OP: return "No Operation";
 		default: return "Unknown";
 	}
@@ -107,9 +112,9 @@ void printLinearCSGTreeNode(const LinearCSGTreeNode& node) {
         " (" << node.op << ")" << std::endl;
 	std::cout << "  Shape: " << getCSGShapeName(node.shape) <<
         " (" << node.shape << ")" << std::endl;
-	std::cout << "  Position: (" << node.position.x << ", " <<
-        node.position.y << ", " << node.position.z << ", " <<
-        node.position.w << ")" << std::endl;
+	std::cout << "  Position: (" << node.metadata1.x << ", " <<
+        node.metadata1.y << ", " << node.metadata1.z << ", " <<
+        node.metadata1.w << ")" << std::endl;
 	std::cout << "  Dimensions: (" << node.dimensions.x << ", " <<
         node.dimensions.y << ", " << node.dimensions.z << ", " <<
         node.dimensions.w << ")" << std::endl;

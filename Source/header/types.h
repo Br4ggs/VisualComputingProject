@@ -11,12 +11,13 @@ typedef struct LinearCSGTreeNode {
 	int32_t op;
 	int32_t shape;
 	float _padding[2];
-	glm::vec4 position;
+	glm::vec4 metadata1;  /* see notes below */
 	glm::vec4 dimensions;
 	glm::mat4 transform;
 	glm::vec4 scale;
 	glm::vec4 color;
 } LinearCSGTreeNode;
+/*NOTE: metadata1[0] has smoothing factor for smooth min */
 
 // NOTE: should be the same as the shader constants
 enum CSGOperation {
@@ -24,7 +25,8 @@ enum CSGOperation {
 	OP_INT = 1,
 	OP_DIFF = 2,
 	OP_MOD = 3,
-	NO_OP = 4,
+	OP_SMUN = 4,
+	NO_OP = 5,
 };
 
 // NOTE: should be the same as the shader constants

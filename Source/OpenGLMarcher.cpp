@@ -63,10 +63,10 @@ OpenGLMarcher::~OpenGLMarcher()
 
 void OpenGLMarcher::drawUI(bool &dirty)
 {
-    ImGui::SliderInt("max steps", &maxSteps, 10, 500);
+    ImGui::SliderInt("max steps", &maxSteps, 10, 1000);
     ImGui::SliderFloat("max distance", &maxDist, 1, 20);
 
-    if (ImGui::InputFloat("epsilon", &epsilon, 0.00001f, 0.0f, "%.8f")) {
+    if (ImGui::InputFloat("epsilon", &epsilon, 0.000001f, 0.0f, "%.8f")) {
         epsilon = glm::max(minEpsilon, epsilon);
     }
 

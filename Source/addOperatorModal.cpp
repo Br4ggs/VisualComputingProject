@@ -3,6 +3,7 @@
 #include "header/opIntersect.h"
 #include "header/opDifference.h"
 #include "header/opModulo.h"
+#include "header/opSmoothUnion.h"
 
 #include "imgui.h"
 
@@ -12,12 +13,15 @@ void AddOperatorModal::drawUI(Scene& scene, bool& dirty)
 
     if (ImGui::BeginPopupModal("Add operator", NULL, ImGuiWindowFlags_None))
     {
-        const char* opTypes[] = { "union", "intersect", "difference", "modulo" };
+        // TODO: magic constants should be in types.h, tightly coupled
+        const char* opTypes[] = { "union", "intersect", "difference", "modulo", "smooth union"};
         const char* opPreview = opTypes[selectedOperator];
 
         if (ImGui::BeginCombo("operator", opPreview))
         {
-            for (int n = 0; n < 4; n++)
+            // TODO: hard coded limit, coupled with other magic constants
+            // should use central spot for changing this
+            for (int n = 0; n < 5; n++)
             {
                 const bool selected = (selectedOperator == n);
                 if (ImGui::Selectable(opTypes[n], selectedOperator))
@@ -120,5 +124,7 @@ IDrawable* AddOperatorModal::createOperator(int op, IDrawable* op1, IDrawable* o
         return new OpDifference(op1, op2);
     case 3: //modulo
         return new OpModulo(op1);
+    case 4:
+        return new OpSmoothUnion(op1, op2);
     }
 }

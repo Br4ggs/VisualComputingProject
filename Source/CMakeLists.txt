@@ -16,6 +16,7 @@ add_executable(VisualComputingProject
     sdfCylinder.cpp
     sdfPlane.cpp
     opUnion.cpp
+    opSmoothUnion.cpp
     opIntersect.cpp
     opDifference.cpp
     opModulo.cpp

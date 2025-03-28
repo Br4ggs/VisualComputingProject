@@ -59,10 +59,7 @@ std::vector<IDrawable*> OpUnion::detachChildren()
 
 std::pair<float, glm::vec3> OpUnion::sdf(glm::vec3 point) const
 {
-	//input guards
-
 	std::pair<float, glm::vec3> obj1 = operant1->sdf(point);
 	std::pair<float, glm::vec3> obj2 = operant2->sdf(point);
-
 	return (obj1.first < obj2.first) ? obj1 : obj2;
 }
