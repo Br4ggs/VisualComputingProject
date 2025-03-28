@@ -16,7 +16,10 @@
 #include <algorithm>
 
 Scene::Scene()
-{}
+{
+    SDFBox* box = new SDFBox(glm::vec3(1.0f));
+    addObject(box);
+}
 
 Scene::~Scene()
 {
@@ -52,7 +55,7 @@ void Scene::drawUI(bool& dirty)
         if (ImGui::ColorEdit3("Specular color", specColorf)) dirty = true;
 
         ImGui::ColorEdit3("Ambient color", ambientColorf);
-        ImGui::SliderFloat("Specular strength", &specular_strength, 0.1, 0.9);
+        ImGui::SliderFloat("Specular strength", &specularStrength, 0.1, 0.9);
         ImGui::SliderFloat("Shininess", &shininess, 2.0, 128.0);
     }
 

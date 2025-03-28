@@ -27,6 +27,7 @@ public:
 	void passUniform3floatVector(char* name, glm::vec3 vector) const;
 	void passUniformInt(char* name, int value) const;
 	void passUniformFloat(char* name, float value) const;
+	void passUniformDouble(char* name, double value) const;
 
 	void destroy();
 

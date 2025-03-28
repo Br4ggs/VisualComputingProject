@@ -68,22 +68,31 @@ OpenGLMarcher::~OpenGLMarcher()
 
 void OpenGLMarcher::drawUI(bool &dirty)
 {
-    ImGui::SliderInt("max steps", &maxSteps, 10, 1000);
-    ImGui::SliderFloat("max distance", &maxDist, 1, 20);
+    if (ImGui::InputInt("max steps", &maxSteps))
+    {
+        if (maxSteps < 1)
+            maxSteps = 1;
+    }
+
+    if (ImGui::InputFloat("max distance", &maxDist))
+    {
+        if (maxDist < 1)
+            maxDist = 1.0f;
+    }
 
     if (ImGui::InputFloat("epsilon", &epsilon, 0.000001f, 0.0f, "%.8f")) {
         epsilon = glm::max(minEpsilon, epsilon);
     }
 
     ImGui::ColorEdit3("background color", colf);
+
+    ImGui::InputDouble("fog creep", &fogCreep);
 }
 
-void OpenGLMarcher::linearize(bool &dirty)
+void OpenGLMarcher::linearize()
 {
     linearScene.clear();
     linearizeScene(scene, linearScene);
-
-    dirty = false;
 }
 
 void OpenGLMarcher::render(int width, int height)
@@ -126,9 +135,11 @@ void OpenGLMarcher::render(int width, int height)
     glm::vec3 ambientColor = scene->getAmbientColor();
     shaderProgram->passUniform3floatVector("u_ambient_color", ambientColor);
 
-    shaderProgram->passUniformFloat("u_specular_strength", scene->specular_strength);
+    shaderProgram->passUniformFloat("u_specular_strength", scene->specularStrength);
 
     shaderProgram->passUniformFloat("u_shininess", scene->shininess);
+
+    shaderProgram->passUniformFloat("u_fog_creep", (float)fogCreep);
 
     //write linearized scene tree to buffer
     size_t dataSize = sizeof(LinearCSGTreeNode) * maxNodes;
