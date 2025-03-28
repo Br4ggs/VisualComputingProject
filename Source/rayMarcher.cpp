@@ -38,7 +38,7 @@ void RayMarcher::drawUI()
 
 void RayMarcher::render(Scene* scene)
 {
-    currentScene = scene;
+    this->scene = scene;
     glm::vec2 resolution(width, height);
     for (int i = 0; i < height; i++)
     {
@@ -49,13 +49,13 @@ void RayMarcher::render(Scene* scene)
             glm::vec2 uv = (2.0f * fragCoord - resolution) / resolution.y;
 
             //direction vectors
-            glm::vec3 rayOrigin = currentScene->getCamPos();
-            glm::vec3 lookat = currentScene->getLookAt();
+            glm::vec3 rayOrigin = scene->getCamPos();
+            glm::vec3 lookat = scene->getLookAt();
             glm::vec3 rayDirection = getCamera(rayOrigin, lookat) * glm::normalize(glm::vec3(uv.x, uv.y, FOV));
 
             //do rendering
             glm::vec3 background = backgroundColor;
-            glm::vec3 color(0, 0, 0);
+            glm::vec3 color = glm::vec3(0.0f);
 
             //first component is the distance, second component is the material (color)
             std::pair<float, glm::vec3> object = rayMarch(rayOrigin, rayDirection);
@@ -109,8 +109,9 @@ glm::mat3 RayMarcher::getCamera(glm::vec3 rayOrigin, glm::vec3 lookAt) const
 
 glm::vec3 RayMarcher::getLight(glm::vec3 point, glm::vec3 rayDirection, glm::vec3 color) const
 {
-    glm::vec3 lightPos = currentScene->getLightPos();
-    glm::vec3 specColor = currentScene->getSpecColor();
+    glm::vec3 lightPos = scene->getLightPos();
+    glm::vec3 ambientColor = scene->getAmbientColor();
+    glm::vec3 specColor = scene->getSpecColor();
 
     glm::vec3 L = glm::normalize(lightPos - point);
     glm::vec3 N = getNormal(point);
@@ -118,9 +119,9 @@ glm::vec3 RayMarcher::getLight(glm::vec3 point, glm::vec3 rayDirection, glm::vec
     glm::vec3 R = glm::reflect(-L, N);
 
     //standard phong light model
-    glm::vec3 specular = specColor * pow(glm::clamp(glm::dot(R, V), 0.0f, 1.0f), 10.0f);
+    glm::vec3 ambient = color * ambientColor;
     glm::vec3 diffuse = color * glm::clamp(glm::dot(L, N), 0.0f, 1.0f);
-    glm::vec3 ambient = color * 0.05f;
+    glm::vec3 specular = specColor * pow(glm::clamp(glm::dot(R, V), 0.0f, 1.0f), scene->shininess) * scene->specularStrength;
 
     //shadows
     float d = rayMarch(point + N * 0.02f, glm::normalize(lightPos)).first;
@@ -134,10 +135,10 @@ glm::vec3 RayMarcher::getNormal(glm::vec3 point) const
 {
     glm::vec2 e(epsilon, 0.0);
 
-    float comp1 = currentScene->map(point - glm::vec3(e.x, e.y, e.y)).first;
-    float comp2 = currentScene->map(point - glm::vec3(e.y, e.x, e.y)).first;
-    float comp3 = currentScene->map(point - glm::vec3(e.y, e.y, e.x)).first;
-    glm::vec3 n = glm::vec3(currentScene->map(point).first) - glm::vec3(comp1, comp2, comp3);
+    float comp1 = scene->map(point - glm::vec3(e.x, e.y, e.y)).first;
+    float comp2 = scene->map(point - glm::vec3(e.y, e.x, e.y)).first;
+    float comp3 = scene->map(point - glm::vec3(e.y, e.y, e.x)).first;
+    glm::vec3 n = glm::vec3(scene->map(point).first) - glm::vec3(comp1, comp2, comp3);
     return glm::normalize(n);
 }
 
@@ -149,7 +150,7 @@ std::pair<float, glm::vec3> RayMarcher::rayMarch(glm::vec3 rayOrigin, glm::vec3 
     for (int i = 0; i < maxSteps; i++)
     {
         glm::vec3 p = rayOrigin +  rayDirection * object.first;
-        hit = currentScene->map(p);
+        hit = scene->map(p);
         object.first += hit.first;
         object.second = hit.second;
 

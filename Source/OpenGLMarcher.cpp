@@ -126,7 +126,7 @@ void OpenGLMarcher::render(int width, int height)
     glm::vec3 ambientColor = scene->getAmbientColor();
     shaderProgram->passUniform3floatVector("u_ambient_color", ambientColor);
 
-    shaderProgram->passUniformFloat("u_specular_strength", scene->specular_strength);
+    shaderProgram->passUniformFloat("u_specular_strength", scene->specularStrength);
 
     shaderProgram->passUniformFloat("u_shininess", scene->shininess);
 

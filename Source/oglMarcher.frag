@@ -208,7 +208,7 @@ void main()
 	float total_distance = 0.;
 
 	vec3 colour = u_background_color;
-	vec3 object_color;
+	vec3 object_color = vec3(0.0);
 
 	for(int i = 0; i < MAX_ITERATIONS; ++i) {
 		vec3 current_position = ray_origin + ray_direction * total_distance;
@@ -223,20 +223,14 @@ void main()
 		}
 
 		if (distance < THRESHOLD) {
-			vec3 light_dir = normalize(u_light_position - current_position);
-			vec3 view_dir = normalize(-ray_direction);
-			vec3 halfway_dir = normalize(light_dir + view_dir);
-			vec3 normal = get_normal(current_position);
+			vec3 L = normalize(u_light_position - current_position);
+			vec3 N = get_normal(current_position);
+			vec3 V = -ray_direction;
+			vec3 R = reflect(-L, N);
 
-			float diff = max(dot(normal, light_dir), 0.0);
-			float spec = 0.0;
-			if (diff > 0.0) {
-				spec = pow(max(dot(normal, halfway_dir), 0.0), shininess);
-			}
-
-			vec3 ambient = ambient_color * object_color;
-			vec3 diffuse = diff * light_color * object_color;
-			vec3 specular = specular_strength * spec * light_color;
+			vec3 ambient = object_color * ambient_color;
+			vec3 diffuse = object_color * clamp(dot(L, N), 0.0, 1.0);
+			vec3 specular = light_color * pow(clamp(dot(R, V), 0.0, 1.0), shininess) * specular_strength;
 
 			colour = ambient + diffuse + specular;
 
