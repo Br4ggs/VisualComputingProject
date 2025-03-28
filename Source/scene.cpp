@@ -126,6 +126,11 @@ glm::vec3 Scene::getLightPos() const
     return glm::vec3(lightPosf[0], lightPosf[1], lightPosf[2]);
 }
 
+glm::vec3 Scene::getAmbientColor() const
+{
+    return glm::vec3(ambientColorf[0], ambientColorf[1], ambientColorf[2]);
+}
+
 glm::vec3 Scene::getSpecColor() const
 {
     return glm::vec3(specColorf[0], specColorf[1], specColorf[2]);
