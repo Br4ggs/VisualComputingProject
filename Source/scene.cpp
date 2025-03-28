@@ -83,10 +83,10 @@ void Scene::render()
             }
             ImGui::EndCombo();
         }
-        activeStrategy->drawUI(dirty);
+        activeStrategy->drawUI(dirty); // render strategy specific settings
     }
 
-    this->drawUI(dirty);
+    this->drawUI(dirty); // general settings all renderers support
 
     if (dirty) activeStrategy->dirtyUpdate(this, window);
 

@@ -113,7 +113,6 @@ void OpenGLStrategy::setup()
     shaderProgram.attachVertexShader("./build/oglMarcher.vert");
     shaderProgram.attachFragmentShader("./build/oglMarcher.frag");
     shaderProgram.compile();
-    shaderProgram.use();
 
     unsigned int buffer_id;
     glGenBuffers(1, &buffer_id);
