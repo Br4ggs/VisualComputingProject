@@ -36,6 +36,8 @@ uniform float u_shininess;
 uniform float u_specular_strength;
 uniform int u_fov;
 
+uniform float u_fog_creep; 
+
 out vec4 fragment_colour;
 
 int MAX_ITERATIONS = u_max_steps;
@@ -233,6 +235,10 @@ void main()
 			vec3 specular = light_color * pow(clamp(dot(R, V), 0.0, 1.0), shininess) * specular_strength;
 
 			colour = ambient + diffuse + specular;
+
+			//add fog to mitigate ugly aliasing effects
+			vec3 bg = u_background_color - max(0.95f * -ray_direction.y, 0.0f);
+			colour = mix(colour, bg, 1.0 - exp(u_fog_creep * total_distance * total_distance));
 
 			break;
 		}

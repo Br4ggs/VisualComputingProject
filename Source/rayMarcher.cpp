@@ -28,6 +28,10 @@ void RayMarcher::drawUI()
             maxDist = 1.0f;
     }
 
+    if (ImGui::InputFloat("epsilon", &epsilon, 0.000001f, 0.0f, "%.8f")) {
+        epsilon = glm::max(minEpsilon, epsilon);
+    }
+
     if (ImGui::ColorEdit3("background color", colf))
     {
         backgroundColor = glm::vec3(colf[0], colf[1], colf[2]);
@@ -68,7 +72,8 @@ void RayMarcher::render(Scene* scene)
                 color += getLight(p, rayDirection, material);
 
                 //add fog to mitigate ugly aliasing effects
-                color = glm::mix(color, background, 1.0 - exp(fogCreep * object.first * object.first));
+                glm::vec3 bg = background - glm::max(0.95f * -rayDirection.y, 0.0f);
+                color = glm::mix(color, bg, 1.0 - exp((float)fogCreep * object.first * object.first));
             }
             else
             {

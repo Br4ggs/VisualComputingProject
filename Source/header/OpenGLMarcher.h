@@ -30,10 +30,11 @@ private:
 	unsigned int VAOID;
 
 	float FOV = 1.0;
-	int maxSteps = 100;
-	float maxDist = 50;
+	int maxSteps = 256;
+	float maxDist = 500;
+	double fogCreep = -0.0008;
 	float epsilon = 0.001;
-	float minEpsilon = 0.00001f;
+	float minEpsilon = 0.00001f; //?
 	float colf[3] = { 0.5f, 0.8f, 0.9f };
 };
 

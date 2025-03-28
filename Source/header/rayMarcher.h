@@ -26,6 +26,7 @@ private:
 	float maxDist = 500;
 	double fogCreep = -0.0008;
 	float epsilon = 0.001;
+	float minEpsilon = 0.00001f; //?
 	float colf[3] = { 0.5f, 0.8f, 0.9f };
 
 	glm::vec3 backgroundColor = glm::vec3(colf[0], colf[1], colf[2]);
