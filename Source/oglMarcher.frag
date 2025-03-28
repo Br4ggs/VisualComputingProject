@@ -216,7 +216,9 @@ void main()
 		total_distance += distance;
 
 		if (total_distance > MAX_DISTANCE) {
-			colour = u_background_color;
+
+			//render background
+			colour = u_background_color - max(0.95f * -ray_direction.y, 0.0f);
 			break;
 		}
 

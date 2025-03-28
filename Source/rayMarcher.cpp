@@ -73,7 +73,7 @@ void RayMarcher::render(Scene* scene)
             else
             {
                 //render background
-                color += background - glm::max(0.95f * rayDirection.y, 0.0f);
+                color += background - glm::max(0.95f * -rayDirection.y, 0.0f);
             }
 
             //perform gamma correction
