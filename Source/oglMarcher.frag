@@ -242,5 +242,8 @@ void main()
 		}
 	}
 
+	//gamma correction
+	colour = pow(colour, vec3(0.4545));
+
 	fragment_colour = vec4(colour, 1.0);
 }
