@@ -9,7 +9,7 @@
 class OpenGLStrategy : public IRenderStrategy
 {
 public:
-	OpenGLStrategy(RenderStrategyType type);
+	OpenGLStrategy(RenderStrategy::Type type);
 	~OpenGLStrategy();
 
 	void render(Scene *scene, GLFWwindow* window);
@@ -21,6 +21,7 @@ public:
 private:
 	std::vector<LinearCSGTreeNode> linearScene{};
 	ShaderProgram shaderProgram;
+	GLint shaderProgramInt;
 
 	unsigned int width;
 	unsigned int height;
@@ -31,7 +32,7 @@ private:
 	int maxSteps = 100;
 	float maxDist = 50;
 	float epsilon = 0.001;
-	float minEpsilon = 0.00001f;
+	float minEpsilon = 0.000001f;
 	float colf[3] = { 0.5f, 0.8f, 0.9f };
 
 };

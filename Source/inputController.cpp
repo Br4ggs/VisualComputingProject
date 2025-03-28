@@ -1,10 +1,9 @@
+#include "glm/ext/matrix_transform.hpp"
+#include "types.h"
+#include "scene.h"
 #include "header/inputController.h"
-
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "imgui.h"
 
-#include <iostream>
 
 InputController::InputController(GLFWwindow* window, Scene* scene)
 	:window(window),

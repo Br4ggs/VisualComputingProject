@@ -1,10 +1,5 @@
 #include "header/scene.h"
 
-#include "header/sdfSphere.h"
-#include "header/sdfBox.h"
-#include "header/opUnion.h"
-#include "header/opIntersect.h"
-#include "header/opDifference.h"
 #include "header/addOperatorModal.h"
 #include "header/addPrimitiveModal.h"
 
@@ -12,11 +7,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <limits>
-#include <iostream>
 #include <algorithm>
 
-Scene::Scene()
-{}
+Scene::Scene(GLFWwindow *window)
+:window(window)
+{
+    inputController = new InputController(window, this);
+    glfwSetWindowUserPointer(window, inputController);
+    glfwSetScrollCallback(window, InputController::scrollCallbackWrapper);
+}
 
 Scene::~Scene()
 {
@@ -25,6 +24,73 @@ Scene::~Scene()
         delete objects[i];
     }
 }
+
+void Scene::addRenderStrategy(std::unique_ptr<IRenderStrategy> strategy)
+{
+    if (activeStrategy == nullptr) { /* set the first strategy as active */
+        activeStrategy = strategy.get();
+    }
+    strategies.push_back(std::move(strategy));
+}
+
+void Scene::setActiveStrategy(RenderStrategy::Type type)
+{
+    for (const auto &strategy : strategies) {
+        if (strategy->getType() == type) {
+            activeStrategy = strategy.get();
+        }
+    }
+
+    throw std::logic_error("strategy is not found, abort");
+}
+
+void Scene::render()
+{
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(400, 680));
+
+    bool dirty = false;
+
+    ImGui::Begin("Settings");
+    if (ImGui::CollapsingHeader("Controls"))
+    {
+        inputController->drawUI();
+    }
+
+    if (ImGui::CollapsingHeader("Rendering"))
+    {
+
+
+        if (ImGui::BeginCombo("rendering backend", "deeznuts"))
+        {
+            // TODO: switch backend here
+            ImGui::EndCombo();
+        }
+
+        // TODO: draw ui from render strategy here
+
+    }
+
+    // TODO: call draw ui from scene here
+
+    //call to Scene ui
+    this->drawUI(dirty);
+
+    // TODO: handle dirty scene for the chosen render strategy here
+
+    ImGui::End();
+
+    inputController->processInput();
+
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+
+    glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    activeStrategy->render(this, window);
+}
+
 
 void Scene::drawUI(bool& dirty)
 {

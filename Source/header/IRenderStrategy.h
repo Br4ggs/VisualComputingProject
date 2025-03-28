@@ -3,12 +3,11 @@
 
 #include "types.h"
 #include "GLFW/glfw3.h"
-#include "scene.h"
 
 class IRenderStrategy 
 {
 public:
-	IRenderStrategy(RenderStrategyType type);
+	IRenderStrategy(RenderStrategy::Type type);
 	virtual ~IRenderStrategy() = default;
 
 	virtual void render(Scene *scene, GLFWwindow* window) = 0;
@@ -17,10 +16,11 @@ public:
 	virtual void drawUI(bool &dirty) = 0;
 	virtual void dirtyUpdate() = 0;
 
-	const char* getName() { return strategyToString(type); };
+	const char* getName() { return RenderStrategy::toString(type); };
+	const RenderStrategy::Type getType() { return type; };
 
 private:
-	RenderStrategyType type;
+	RenderStrategy::Type type;
 };
 
 #endif

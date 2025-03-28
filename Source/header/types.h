@@ -7,6 +7,9 @@
 #include <variant>
 #include <glad/glad.h>
 
+
+class Scene;
+
 // NOTE: should be the same as the shader definition
 typedef struct LinearCSGTreeNode {
 	int32_t op;
@@ -41,7 +44,8 @@ enum CSGShape {
 
 using CSGType = std::variant<CSGShape, CSGOperation>;
 
-enum class RenderStrategyType {
+namespace RenderStrategy {
+enum class Type {
 	SPHERE_MARCHING_CPU = 0,
 	CUBE_MARCHING_CPU = 1,
 	SPHERE_MARCHING_GPU = 2,
@@ -49,17 +53,18 @@ enum class RenderStrategyType {
 	COUNT /* HACK: amount of types */
 };
 
-constexpr const char* strategyToString(RenderStrategyType type) {
+constexpr const char* toString(Type type) {
 	switch (type) {
-	case RenderStrategyType::SPHERE_MARCHING_CPU:
+	case Type::SPHERE_MARCHING_CPU:
 		return "Sphere Marching (CPU)";
-	case RenderStrategyType::CUBE_MARCHING_CPU:
+	case Type::CUBE_MARCHING_CPU:
 		return "Cube Marching (CPU)";
-	case RenderStrategyType::SPHERE_MARCHING_GPU:
+	case Type::SPHERE_MARCHING_GPU:
 		return "Sphere Marching (GPU)";
 	default:
 		throw std::logic_error("Invalid render strategy");
 	}
 }
 
+}
 #endif

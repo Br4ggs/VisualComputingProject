@@ -1,8 +1,10 @@
 #ifndef INPUTCONTROLLER_H
 #define INPUTCONTROLLER_H
 
-#include "scene.h"
 #include "GLFW/glfw3.h"
+#include "glm/ext/vector_float3.hpp"
+
+class Scene;
 
 class InputController
 {
@@ -12,6 +14,13 @@ public:
 	void drawUI();
 	void processInput();
 	void processScrollEvent(double xoffset, double yoffset);
+
+	static void scrollCallbackWrapper(GLFWwindow *window, double xoffset, double yoffset) {
+		InputController* input = static_cast<InputController*>(glfwGetWindowUserPointer(window));
+		if (input) {
+			input->processScrollEvent(xoffset, yoffset);
+		}
+	}
 
 private:
 	GLFWwindow* window;
