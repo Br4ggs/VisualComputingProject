@@ -49,6 +49,8 @@ private:
 
 	std::vector<std::unique_ptr<IRenderStrategy>> strategies{};
 	IRenderStrategy *activeStrategy = nullptr;
+	std::vector<const char*> strategyNamesList{};
+	unsigned int activeStrategyId;
 
 	float camPosf[3] = { 0.0f, 0.0f, -3.0f };
 	float lookAtf[3] = { 0.0f, 0.0f, 0.0f };

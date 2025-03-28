@@ -14,7 +14,7 @@ public:
 	virtual void switchedStrategy() = 0;
 	virtual void setup() = 0;
 	virtual void drawUI(bool &dirty) = 0;
-	virtual void dirtyUpdate() = 0;
+	virtual void dirtyUpdate(Scene *scene, GLFWwindow *window) = 0;
 
 	const char* getName() { return RenderStrategy::toString(type); };
 	const RenderStrategy::Type getType() { return type; };

@@ -37,11 +37,13 @@ OpenGLStrategy::~OpenGLStrategy()
 
 void OpenGLStrategy::render(Scene *scene, GLFWwindow* window)
 {
+
     glBindVertexArray(VAOID);
+
     shaderProgram.use();
+
     // TODO: nodes is hardcoded now, this needs to come from the linearization
     int maxNodes = 128;
-
     assert(linearScene.size() <= maxNodes);
 
     //uniform transfer
@@ -82,7 +84,9 @@ void OpenGLStrategy::render(Scene *scene, GLFWwindow* window)
 
     shaderProgram.passUniformFloat("loop_length", linearScene.size());
 
-    glm::vec2 dimensions(width, height);
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    glm::vec2 dimensions{width, height};
     shaderProgram.passUniform2floatVector("window_dimensions", dimensions);
 
     //binding
@@ -91,14 +95,12 @@ void OpenGLStrategy::render(Scene *scene, GLFWwindow* window)
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, uboID);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
 }
 
 void OpenGLStrategy::switchedStrategy()
 {
     glBindVertexArray(VAOID);
     shaderProgram.use();
-    dirtyUpdate();
 }
 
 void OpenGLStrategy::setup()
@@ -148,7 +150,8 @@ void OpenGLStrategy::drawUI(bool &dirty)
     ImGui::ColorEdit3("background color", colf);
 }
 
-void OpenGLStrategy::dirtyUpdate()
+void OpenGLStrategy::dirtyUpdate(Scene *scene, GLFWwindow *window)
 {
-    // TODO: linearize here
+    linearScene.clear();
+    linearizeScene(scene, linearScene);
 }

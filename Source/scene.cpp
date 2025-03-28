@@ -6,8 +6,10 @@
 #include "imgui.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <iostream>
 #include <limits>
 #include <algorithm>
+#include <ostream>
 
 Scene::Scene(GLFWwindow *window)
 :window(window)
@@ -29,16 +31,21 @@ void Scene::addRenderStrategy(std::unique_ptr<IRenderStrategy> strategy)
 {
     if (activeStrategy == nullptr) { /* set the first strategy as active */
         activeStrategy = strategy.get();
+        activeStrategyId = 0;
     }
+    strategyNamesList.push_back(strategy->getName());
     strategies.push_back(std::move(strategy));
 }
 
 void Scene::setActiveStrategy(RenderStrategy::Type type)
 {
+    unsigned int i = 0;
     for (const auto &strategy : strategies) {
         if (strategy->getType() == type) {
             activeStrategy = strategy.get();
+            activeStrategyId = i;
         }
+        ++i;
     }
 
     throw std::logic_error("strategy is not found, abort");
@@ -52,6 +59,7 @@ void Scene::render()
     bool dirty = false;
 
     ImGui::Begin("Settings");
+
     if (ImGui::CollapsingHeader("Controls"))
     {
         inputController->drawUI();
@@ -59,24 +67,28 @@ void Scene::render()
 
     if (ImGui::CollapsingHeader("Rendering"))
     {
-
-
-        if (ImGui::BeginCombo("rendering backend", "deeznuts"))
+        if (ImGui::BeginCombo("rendering backend", strategyNamesList[activeStrategyId]))
         {
-            // TODO: switch backend here
+            for (int n = 0; n < strategies.size(); n++) {
+                const bool selected = (activeStrategyId == n);
+                if (ImGui::Selectable(strategyNamesList[n], selected)) {
+                    std::cout << "Strategy " << strategyNamesList[n] << " was selected." << std::endl;
+                    activeStrategyId = n;
+                    activeStrategy = strategies[n].get();
+                    activeStrategy->switchedStrategy();
+                }
+                if (selected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
             ImGui::EndCombo();
         }
-
-        // TODO: draw ui from render strategy here
-
+        activeStrategy->drawUI(dirty);
     }
 
-    // TODO: call draw ui from scene here
-
-    //call to Scene ui
     this->drawUI(dirty);
 
-    // TODO: handle dirty scene for the chosen render strategy here
+    if (dirty) activeStrategy->dirtyUpdate(this, window);
 
     ImGui::End();
 

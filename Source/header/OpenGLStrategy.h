@@ -16,15 +16,13 @@ public:
 	void switchedStrategy();
 	void setup();
 	void drawUI(bool &dirty);
-	void dirtyUpdate();
+	void dirtyUpdate(Scene *scene, GLFWwindow *window);
 
 private:
 	std::vector<LinearCSGTreeNode> linearScene{};
 	ShaderProgram shaderProgram;
 	GLint shaderProgramInt;
 
-	unsigned int width;
-	unsigned int height;
 	unsigned int uboID;
 	unsigned int VAOID;
 
