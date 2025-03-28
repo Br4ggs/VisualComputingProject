@@ -21,8 +21,13 @@ public:
 	int attachFragmentShader(const char* sourceFile);
 	int compile();
 	void use() const;
+
 	void passUniform4x4floatMatrix(char* name, glm::mat4 matrix) const;
+	void passUniform2floatVector(char* name, glm::vec2 vector) const;
 	void passUniform3floatVector(char* name, glm::vec3 vector) const;
+	void passUniformInt(char* name, int value) const;
+	void passUniformFloat(char* name, float value) const;
+
 	void destroy();
 
 	unsigned int getRawShaderProgram();

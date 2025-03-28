@@ -20,9 +20,6 @@ public:
 	void linearize(bool& dirty);
 
 private:
-
-	Scene* currentScene;
-
 	std::vector<LinearCSGTreeNode> linearScene;
 
 	unsigned int width;

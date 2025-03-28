@@ -21,13 +21,13 @@ public:
 	void setLookAt(glm::vec3 pos);
 
 	glm::vec3 getLightPos() const;
+	glm::vec3 getAmbientColor() const;
 	glm::vec3 getSpecColor() const;
 
 	std::vector<IDrawable*> getObjects();
 	void addObject(IDrawable* obj);
 	void removeObject(IDrawable* obj);
 
-	float ambientColorf[3] = { 0.3f, 0.3f, 0.3f };
 
 	int fov = 60;
 	float specular_strength = 0.5;
@@ -38,6 +38,7 @@ private:
 	float lookAtf[3] = { 0.0f, 0.0f, 0.0f };
 
 	float lightPosf[3] = { 30.0f, 40.0f, 30.0f };
+	float ambientColorf[3] = { 0.3f, 0.3f, 0.3f };
 	float specColorf[3] = { 0.5f, 0.5f, 0.5f };
 
 	glm::vec3 specularColor = glm::vec3(0.5f);

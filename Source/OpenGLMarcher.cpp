@@ -23,12 +23,17 @@ constexpr Vertex vertices[N_VERTICES] =
 
 constexpr GLuint elements[N_VERTICES * 3] = { 0, 1, 2, 2, 3, 0 };
 
-OpenGLMarcher:: OpenGLMarcher(unsigned int width,
-                              unsigned int height,
-                              Scene *scene,
-                              ShaderProgram *shaderProgram)
-:width(width), height(height), shaderProgram(shaderProgram), scene(scene)
+OpenGLMarcher::OpenGLMarcher(unsigned int width,
+                             unsigned int height,
+                             Scene *scene,
+                             ShaderProgram *shaderProgram)
+    :width(width),
+     height(height),
+     shaderProgram(shaderProgram),
+     scene(scene)
 {
+    glGenBuffers(1, &uboID);
+
     glGenVertexArrays(1, &VAOID);
     glBindVertexArray(VAOID);
 
@@ -96,56 +101,46 @@ void OpenGLMarcher::render(int width, int height)
 
     //uniform transfer
     glm::vec3 cam_pos = scene->getCamPos();
-    const GLint cam_pos_location = glGetUniformLocation(shaderProgramInt, "u_camera_position");
-    glUniform3f(cam_pos_location, cam_pos[0], cam_pos[1], cam_pos[2]);
+    shaderProgram->passUniform3floatVector("u_camera_position", cam_pos);
 
     glm::vec3 light_pos = scene->getLightPos();
-    const GLint light_pos_location = glGetUniformLocation(shaderProgramInt, "u_light_position");
-    glUniform3f(light_pos_location, light_pos[0], light_pos[1], light_pos[2]);
+    shaderProgram->passUniform3floatVector("u_light_position", light_pos);
 
     glm::vec3 look_at = scene->getLookAt();
-    const GLint look_at_location = glGetUniformLocation(shaderProgramInt, "u_look_at");
-    glUniform3f(look_at_location, look_at[0], look_at[1], look_at[2]);
+    shaderProgram->passUniform3floatVector("u_look_at", look_at);
 
-    const GLint max_steps_location = glGetUniformLocation(shaderProgramInt, "u_max_steps");
-    glUniform1i(max_steps_location, maxSteps);
+    shaderProgram->passUniformInt("u_max_steps", maxSteps);
 
     glm::vec3 specCol = scene->getSpecColor();
-    const GLint spec_color_location = glGetUniformLocation(shaderProgramInt, "u_spec_color");
-    glUniform3f(spec_color_location, specCol[0], specCol[1], specCol[2]);
+    shaderProgram->passUniform3floatVector("u_spec_color", specCol);
 
-    const GLint max_distance_location = glGetUniformLocation(shaderProgramInt, "u_max_distance");
-    glUniform1f(max_distance_location, maxDist);
+    shaderProgram->passUniformFloat("u_max_distance", maxDist);
 
-    const GLint background_color_location = glGetUniformLocation(shaderProgramInt, "u_background_color");
-    glUniform3f(background_color_location, colf[0], colf[1], colf[2]);
+    glm::vec3 background_color(colf[0], colf[1], colf[2]);
+    shaderProgram->passUniform3floatVector("u_background_color", background_color);
 
-    const GLint epsilon_location = glGetUniformLocation(shaderProgramInt, "u_epsilon");
-    glUniform1f(epsilon_location, epsilon);
+    shaderProgram->passUniformFloat("u_epsilon", epsilon);
 
-    const GLint fovLoc = glGetUniformLocation(shaderProgramInt, "u_fov");
-    glUniform1i(fovLoc, scene->fov);
+    shaderProgram->passUniformInt("u_fov", scene->fov);
 
-    const GLint ambientColLoc = glGetUniformLocation(shaderProgramInt, "u_ambient_color");
-    glUniform3f(ambientColLoc, scene->ambientColorf[0],scene->ambientColorf[1],scene->ambientColorf[2]);
+    glm::vec3 ambientColor = scene->getAmbientColor();
+    shaderProgram->passUniform3floatVector("u_ambient_color", ambientColor);
 
-    const GLint specStrLoc = glGetUniformLocation(shaderProgramInt, "u_specular_strength");
-    glUniform1f(specStrLoc, scene->specular_strength);
+    shaderProgram->passUniformFloat("u_specular_strength", scene->specular_strength);
 
-    const GLint shinyLoc = glGetUniformLocation(shaderProgramInt, "u_shininess");
-    glUniform1f(shinyLoc, scene->shininess);
+    shaderProgram->passUniformFloat("u_shininess", scene->shininess);
 
+    //write linearized scene tree to buffer
     size_t dataSize = sizeof(LinearCSGTreeNode) * maxNodes;
-    glGenBuffers(1, &uboID);
     glBindBuffer(GL_UNIFORM_BUFFER, uboID);
     glBufferData(GL_UNIFORM_BUFFER, dataSize, linearScene.data(), GL_DYNAMIC_DRAW);
 
-    const GLint loop_length_location = glGetUniformLocation(shaderProgramInt, "loop_length");
-    glUniform1f(loop_length_location, linearScene.size());
+    shaderProgram->passUniformFloat("loop_length", linearScene.size());
 
-    const GLint window_dim_location = glGetUniformLocation(shaderProgramInt, "window_dimensions");
-    glUniform2f(window_dim_location, width, height);
+    glm::vec2 dimensions(width, height);
+    shaderProgram->passUniform2floatVector("window_dimensions", dimensions);
 
+    //binding
     GLuint blockIndex = glGetUniformBlockIndex(shaderProgramInt, "CSGBuffer");
     glUniformBlockBinding(shaderProgramInt, blockIndex, 0);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, uboID);
