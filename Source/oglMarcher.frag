@@ -146,7 +146,7 @@ float get_distance(vec3 point, out vec3 out_color) {
 			} else if (op == OP_INT) {
 				stack[sp - 2] = max(stack[sp - 1], stack[sp - 2]);
 			} else if (op == OP_DIFF) {
-				stack[sp - 2] = max(stack[sp - 1], -stack[sp - 2]);
+				stack[sp - 2] = max(-stack[sp - 1], stack[sp - 2]);
 			}
 			sp--;
 		}
