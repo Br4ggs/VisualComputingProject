@@ -9,14 +9,14 @@ public:
 	OpSmoothUnion(IDrawable* operant1, IDrawable* operant2);
 	~OpSmoothUnion() override;
 
-	CSGType getType() const { return CSGOperation::OP_SMUN; };
-
 	void drawUI(bool& dirty) override;
-	char* getName() const override;
 	std::vector<IDrawable*> getChildren() const override;
 	std::vector<IDrawable*> detachChildren() override;
 	std::pair<float, glm::vec3> sdf(glm::vec3 point) const override;
 	float getSmoothingFactor();
+
+protected:
+	CSGType type = CSGOperation::OP_SMUN;
 
 private:
 	float smoothing_factor = 0.5f;

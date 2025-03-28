@@ -1,6 +1,7 @@
 #include "linearizeScene.h"
 #include "opSmoothUnion.h"
 #include "worldObject.h"
+#include <iomanip>
 #include <iostream>
 #include <ostream>
 #include "types.h"
@@ -81,41 +82,61 @@ void linearizeScene(Scene *scene, std::vector<LinearCSGTreeNode>& linearScene)
     }
 
     std::cout << "...done linearizing\n";
-}
 
-const char* getCSGOperationName(int op) {
-	switch (op) {
-		case OP_UNI: return "Union";
-		case OP_INT: return "Intersection";
-		case OP_DIFF: return "Difference";
-		case OP_MOD: return "Modulus";
-		case OP_SMUN: return "Smooth Union";
-		case NO_OP: return "No Operation";
-		default: return "Unknown";
-	}
-}
-
-const char* getCSGShapeName(int shape) {
-	switch (shape) {
-		case SHAPE_SPHERE: return "Sphere";
-		case SHAPE_BOX: return "Box";
-		case SHAPE_CYL: return "Cylinder";
-		case SHAPE_PLANE: return "Plane";
-		case NO_SHAPE: return "No Shape";
-		default: return "Unknown";
-	}
+    for (auto &x : linearScene) 
+    {
+        printLinearCSGTreeNode(x);
+    }
 }
 
 void printLinearCSGTreeNode(const LinearCSGTreeNode& node) {
-	std::cout << "CSG Node:" << std::endl;
-	std::cout << "  Operation: " << getCSGOperationName(node.op) <<
-        " (" << node.op << ")" << std::endl;
-	std::cout << "  Shape: " << getCSGShapeName(node.shape) <<
-        " (" << node.shape << ")" << std::endl;
-	std::cout << "  Position: (" << node.metadata1.x << ", " <<
-        node.metadata1.y << ", " << node.metadata1.z << ", " <<
-        node.metadata1.w << ")" << std::endl;
-	std::cout << "  Dimensions: (" << node.dimensions.x << ", " <<
-        node.dimensions.y << ", " << node.dimensions.z << ", " <<
-        node.dimensions.w << ")" << std::endl;
+    // Print operation and shape
+    std::cout << "CSG Node Details:" << std::endl;
+
+    // Convert integer to operation/shape names using previous visitor
+    CSGType opType = static_cast<CSGOperation>(node.op);
+    CSGType shapeType = static_cast<CSGShape>(node.shape);
+
+    std::cout << "Operation: " << csgTypeToString(opType) << std::endl;
+    std::cout << "Shape:     " << csgTypeToString(shapeType) << std::endl;
+
+    // Print metadata
+    std::cout << "\nMetadata:" << std::endl;
+    std::cout << "  Metadata1: (" 
+        << node.metadata1.x << ", " 
+        << node.metadata1.y << ", " 
+        << node.metadata1.z << ", " 
+        << node.metadata1.w << ")" << std::endl;
+
+    // Print dimensions
+    std::cout << "  Dimensions: (" 
+        << node.dimensions.x << ", " 
+        << node.dimensions.y << ", " 
+        << node.dimensions.z << ", " 
+        << node.dimensions.w << ")" << std::endl;
+
+    // Print transform matrix (4x4)
+    std::cout << "\nTransform Matrix:" << std::endl;
+    for (int i = 0; i < 4; ++i) {
+        std::cout << "  [" 
+            << std::fixed << std::setprecision(4) 
+            << node.transform[i][0] << ", "
+            << node.transform[i][1] << ", "
+            << node.transform[i][2] << ", "
+            << node.transform[i][3] << "]" << std::endl;
+    }
+
+    // Print scale
+    std::cout << "\nScale: (" 
+        << node.scale.x << ", " 
+        << node.scale.y << ", " 
+        << node.scale.z << ", " 
+        << node.scale.w << ")" << std::endl;
+
+    // Print color
+    std::cout << "Color: (" 
+        << node.color.x << ", " 
+        << node.color.y << ", " 
+        << node.color.z << ", " 
+        << node.color.w << ")" << std::endl;
 }

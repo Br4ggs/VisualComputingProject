@@ -44,6 +44,7 @@ void Scene::setActiveStrategy(RenderStrategy::Type type)
         if (strategy->getType() == type) {
             activeStrategy = strategy.get();
             activeStrategyId = i;
+            break;
         }
         ++i;
     }

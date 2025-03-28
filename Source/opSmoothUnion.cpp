@@ -42,11 +42,6 @@ void OpSmoothUnion::drawUI(bool& dirty)
 	ImGui::PopID();
 }
 
-char* OpSmoothUnion::getName() const
-{
-	return "smooth union";
-}
-
 std::vector<IDrawable*> OpSmoothUnion::getChildren() const
 {
 	std::vector<IDrawable*> operants;

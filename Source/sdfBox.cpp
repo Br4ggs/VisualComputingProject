@@ -4,8 +4,6 @@
 
 #include "imgui.h"
 
-#include <iostream>
-
 SDFBox::SDFBox(glm::vec3 dimensions)
 	:WorldObject(),
 	 dimensions(dimensions)
@@ -22,11 +20,6 @@ void SDFBox::drawUI(bool& dirty)
 	}
 
 	WorldObject::drawUI(dirty);
-}
-
-char* SDFBox::getName() const
-{
-	return "box";
 }
 
 std::pair<float, glm::vec3> SDFBox::sdf(glm::vec3 point) const

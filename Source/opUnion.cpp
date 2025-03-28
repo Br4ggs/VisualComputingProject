@@ -33,11 +33,6 @@ void OpUnion::drawUI(bool& dirty)
 	ImGui::PopID();
 }
 
-char* OpUnion::getName() const
-{
-	return "union";
-}
-
 std::vector<IDrawable*> OpUnion::getChildren() const
 {
 	std::vector<IDrawable*> operants;

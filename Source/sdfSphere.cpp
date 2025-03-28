@@ -24,11 +24,6 @@ void SDFSphere::drawUI(bool& dirty)
 	WorldObject::drawUI(dirty);
 }
 
-char* SDFSphere::getName() const
-{
-	return "sphere";
-}
-
 std::pair<float, glm::vec3> SDFSphere::sdf(glm::vec3 point) const
 {
 	glm::vec4 pointHomog(point.x, point.y, point.z, 1.0f);

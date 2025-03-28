@@ -2,6 +2,7 @@
 
 #include "header/sdfSphere.h"
 #include "header/sdfBox.h";
+#include <iostream>
 #include "header/sdfCylinder.h"
 #include "header/sdfPlane.h"
 
@@ -9,60 +10,67 @@
 
 void AddPrimitiveModal::drawUI(Scene& scene, bool& dirty) const
 {
-	ImGui::SetNextWindowSize(ImVec2(250, 150));
+  ImGui::SetNextWindowSize(ImVec2(250, 150));
 
-	if (ImGui::BeginPopupModal("Add primitive", NULL, ImGuiWindowFlags_None))
-	{
-        const char* primTypes[] = { "sphere", "box", "cylinder", "plane" };
-        static int primSelected = 0;
-        const char* primPreview = primTypes[primSelected];
+  if (ImGui::BeginPopupModal("Add primitive", NULL, ImGuiWindowFlags_None))
+  {
+    CSGType selectedShape;
+    static int selectedId = 0;
+    const char* primPreview = shapeNames[selectedId];
 
-		if (ImGui::BeginCombo("primitive", primPreview))
-		{
-			for (int n = 0; n < 4; n++)
-			{
-				const bool selected = (primSelected == n);
-				if (ImGui::Selectable(primTypes[n], selected))
-					primSelected = n;
+    if (ImGui::BeginCombo("primitive", primPreview))
+    {
+      for (int n = 0; n < CSGShape::NO_SHAPE; n++)
+      {
+        const bool selected = (selectedId == n);
+        if (ImGui::Selectable(shapeNames[n], selected)) {
+          selectedShape = parseCSGType(shapeNames[n]).value();
+          selectedId = n;
+        }
 
-				if (selected)
-					ImGui::SetItemDefaultFocus();
-			}
+        if (selected) {
+          ImGui::SetItemDefaultFocus();
+        }
+      }
 
-			ImGui::EndCombo();
-		}
+      ImGui::EndCombo();
+    }
 
-		if (ImGui::Button("Add"))
-		{
-			dirty = true;
-			IDrawable* prim = createPrimitive(primSelected);
-			scene.addObject(prim);
-			ImGui::CloseCurrentPopup();
-		}
+    if (ImGui::Button("Add"))
+    {
+      dirty = true;
+      IDrawable* prim = createPrimitive(std::get<CSGShape>(selectedShape));
+      scene.addObject(prim);
+      ImGui::CloseCurrentPopup();
+    }
 
-		ImGui::SameLine();
+    ImGui::SameLine();
 
-		if (ImGui::Button("Close"))
-		{
-			ImGui::CloseCurrentPopup();
-		}
+    if (ImGui::Button("Close"))
+    {
+      ImGui::CloseCurrentPopup();
+    }
 
-		ImGui::EndPopup();
-	}
+    ImGui::EndPopup();
+  }
 }
 
-IDrawable* AddPrimitiveModal::createPrimitive(int prim) const
+IDrawable* AddPrimitiveModal::createPrimitive(CSGShape shape) const
 {
-	switch (prim)
-	{
-	case 0: //sphere
-		return new SDFSphere(1.0f);
-	case 1: //box
-		return new SDFBox(glm::vec3(1.0f, 1.0f, 1.0f));
-	case 2: //cylinder
-		return new SDFCylinder(1.0f, 1.0f);
-	case 3: //plane
-		return new SDFPlane(-0.5f);
-		//return new SDFCylinder(1.0f, 1.0f);
-	}
+
+  std::cout << shape;
+  switch (shape)
+  {
+  case SHAPE_SPHERE: //sphere
+    return new SDFSphere(1.0f);
+  case SHAPE_BOX: //box
+    return new SDFBox(glm::vec3(1.0f, 1.0f, 1.0f));
+  case SHAPE_CYL: //cylinder
+    return new SDFCylinder(1.0f, 1.0f);
+  case SHAPE_PLANE: //plane
+    return new SDFPlane(-0.5f);
+  case NO_SHAPE:
+    throw std::logic_error("not a real shape");
+    break;
+  }
 }

@@ -8,14 +8,14 @@ class OpModulo : public IDrawable
 public:
 	OpModulo(IDrawable* operant);
 	~OpModulo() override;
-
-	CSGType getType() const { return CSGOperation::OP_MOD; };
-
 	void drawUI(bool& dirty) override;
-	char* getName() const override;
 	std::vector<IDrawable*> getChildren() const override;
 	std::vector<IDrawable*> detachChildren() override;
 	std::pair<float, glm::vec3> sdf(glm::vec3 point) const override;
+
+
+protected:
+	CSGType type = CSGOperation::OP_MOD;
 
 private:
 	float sclf[3] = { 0.0f, 0.0f, 0.0f };

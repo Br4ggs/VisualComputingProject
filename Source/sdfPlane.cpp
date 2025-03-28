@@ -16,11 +16,6 @@ void SDFPlane::drawUI(bool& dirty)
 	WorldObject::drawUI(dirty);
 }
 
-char* SDFPlane::getName() const
-{
-	return "plane";
-}
-
 std::pair<float, glm::vec3> SDFPlane::sdf(glm::vec3 point) const
 {
 	glm::vec4 pointHomog(point.x, point.y, point.z, 1.0f);

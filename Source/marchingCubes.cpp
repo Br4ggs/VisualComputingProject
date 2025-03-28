@@ -3,7 +3,6 @@
 #include "imgui.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 
 constexpr int edgeTable[256] = {
 	0x0, 0x109, 0x203, 0x30a, 0x80c, 0x905, 0xa0f, 0xb06,

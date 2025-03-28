@@ -15,7 +15,6 @@
 #include "stb_image.h"
 #include "scene.h"
 
-
 int main()
 {
     if (!glfwInit())

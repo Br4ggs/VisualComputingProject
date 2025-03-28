@@ -23,11 +23,6 @@ void OpModulo::drawUI(bool& dirty)
 	}
 }
 
-char* OpModulo::getName() const
-{
-	return "modulo";
-}
-
 std::vector<IDrawable*> OpModulo::getChildren() const
 {
 	std::vector<IDrawable*> operants;

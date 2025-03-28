@@ -10,11 +10,11 @@ class SDFSphere : public WorldObject
 public:
 	SDFSphere(float radius);
 
-	CSGType getType() const { return CSGShape::SHAPE_SPHERE; };
-
 	void drawUI(bool& dirty) override;
-	char* getName() const override;
 	std::pair<float, glm::vec3> sdf(glm::vec3 point) const override;
+
+protected:
+	CSGType type = CSGShape::SHAPE_SPHERE;
 
 private:
 	float colf[3] = { 1.0f, 1.0f, 1.0f };

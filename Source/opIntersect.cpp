@@ -31,11 +31,6 @@ void OpIntersect::drawUI(bool& dirty)
 	ImGui::PopID();
 }
 
-char* OpIntersect::getName() const
-{
-	return "intersect";
-}
-
 std::vector<IDrawable*> OpIntersect::getChildren() const
 {
 	std::vector<IDrawable*> operants;

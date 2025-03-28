@@ -12,7 +12,7 @@ public:
 	void drawUI(Scene& scene, bool& dirty) const;
 
 private:
-	IDrawable* createPrimitive(int prim) const;
+	IDrawable* createPrimitive(CSGShape prim) const;
 };
 
 #endif

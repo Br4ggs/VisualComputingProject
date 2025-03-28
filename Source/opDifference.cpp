@@ -39,11 +39,6 @@ void OpDifference::drawUI(bool& dirty)
 	ImGui::PopID();
 }
 
-char* OpDifference::getName() const
-{
-	return "difference";
-}
-
 std::vector<IDrawable*> OpDifference::getChildren() const
 {
 	std::vector<IDrawable*> operants;

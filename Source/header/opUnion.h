@@ -9,13 +9,13 @@ public:
 	OpUnion(IDrawable* operant1, IDrawable* operant2);
 	~OpUnion() override;
 
-	CSGType getType() const { return CSGOperation::OP_UNI; };
-
 	void drawUI(bool& dirty) override;
-	char* getName() const override;
 	std::vector<IDrawable*> getChildren() const override;
 	std::vector<IDrawable*> detachChildren() override;
 	std::pair<float, glm::vec3> sdf(glm::vec3 point) const override;
+
+protected:
+	CSGType type = CSGOperation::OP_UNI;
 
 private:
 	IDrawable* operant1;

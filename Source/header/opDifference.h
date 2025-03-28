@@ -9,13 +9,13 @@ public:
 	OpDifference(IDrawable* operant1, IDrawable* operant2);
 	~OpDifference() override;
 
-	CSGType getType() const { return CSGOperation::OP_DIFF; };
-
 	void drawUI(bool& dirty) override;
-	char* getName() const override;
 	std::vector<IDrawable*> getChildren() const override;
 	std::vector<IDrawable*> detachChildren() override;
 	std::pair<float, glm::vec3> sdf(glm::vec3 point) const override;
+
+protected:
+	CSGType type = CSGOperation::OP_DIFF;
 
 private:
 	IDrawable* operant1;
