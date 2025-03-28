@@ -59,17 +59,7 @@ std::vector<IDrawable*> OpUnion::detachChildren()
 
 std::pair<float, glm::vec3> OpUnion::sdf(glm::vec3 point) const
 {
-	//input guards
-
 	std::pair<float, glm::vec3> obj1 = operant1->sdf(point);
 	std::pair<float, glm::vec3> obj2 = operant2->sdf(point);
-
-	constexpr float smoothingFactor = 0.5;
-
-	float h = glm::clamp(0.5 + 0.5 * (obj2.first - obj1.first) / smoothingFactor, 0.0, 1.0);
-	float mixed = glm::mix(obj2.first, obj1.first, h);
-
-	float distVal =  mixed - smoothingFactor * h * (1.0 - h);
-
-	return (obj1.first < obj2.first) ? std::pair(distVal, obj1.second) : std::pair(distVal, obj2.second);
+	return (obj1.first < obj2.first) ? obj1 : obj2;
 }

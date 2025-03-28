@@ -6,7 +6,7 @@ struct LinearCSGTreeNode {
 	int op;
 	int shape;
 	vec2 _padding;
-	vec4 position;
+	vec4 metadata1;
 	vec4 dimensions;
 	mat4 transform;
 	vec4 scale;
@@ -54,7 +54,8 @@ const int OP_UNI = 0;
 const int OP_INT = 1;
 const int OP_DIFF = 2;
 const int OP_MOD = 3;
-const int NO_OP = 4;
+const int OP_SMUN = 4;
+const int NO_OP = 5;
 
 const int SHAPE_SPHERE = 0;
 const int SHAPE_BOX = 1;
@@ -142,11 +143,13 @@ float get_distance(vec3 point, out vec3 out_color) {
 
 		} else if (op != NO_OP) {
 			if (op == OP_UNI) {
-				stack[sp - 2] = opSmoothUnion(stack[sp - 1], stack[sp - 2], u_smoothing_factor);
+				stack[sp - 2] = min(stack[sp - 1], stack[sp - 2]);
 			} else if (op == OP_INT) {
 				stack[sp - 2] = max(stack[sp - 1], stack[sp - 2]);
 			} else if (op == OP_DIFF) {
 				stack[sp - 2] = max(-stack[sp - 1], stack[sp - 2]);
+			} else if (op == OP_SMUN) {
+				stack[sp - 2] = opSmoothUnion(stack[sp - 1], stack[sp - 2], nodes[i].metadata1.x);
 			}
 			sp--;
 		}
