@@ -1,10 +1,10 @@
+#include "types.h"
 #include "header/addOperatorModal.h"
 #include "header/opUnion.h"
 #include "header/opIntersect.h"
 #include "header/opDifference.h"
 #include "header/opModulo.h"
 #include "header/opSmoothUnion.h"
-
 #include "imgui.h"
 
 void AddOperatorModal::drawUI(Scene& scene, bool& dirty)
@@ -13,22 +13,21 @@ void AddOperatorModal::drawUI(Scene& scene, bool& dirty)
 
     if (ImGui::BeginPopupModal("Add operator", NULL, ImGuiWindowFlags_None))
     {
-        // TODO: magic constants should be in types.h, tightly coupled
-        const char* opTypes[] = { "union", "intersect", "difference", "modulo", "smooth union"};
-        const char* opPreview = opTypes[selectedOperator];
+        const char* opPreview = operationNames[selectedOperator];
 
         if (ImGui::BeginCombo("operator", opPreview))
         {
-            // TODO: hard coded limit, coupled with other magic constants
-            // should use central spot for changing this
-            for (int n = 0; n < 5; n++)
+            for (int n = 0; n < static_cast<int>(CSGOperation::NO_OP); n++)
             {
                 const bool selected = (selectedOperator == n);
-                if (ImGui::Selectable(opTypes[n], selectedOperator))
+                if (ImGui::Selectable(operationNames[n], selectedOperator)) {
                     selectedOperator = n;
+                    selectedOperatorType = std::get<CSGOperation>(parseCSGType(operationNames[n]).value());
+                }
 
-                if (selected)
+                if (selected) {
                     ImGui::SetItemDefaultFocus();
+                }
             }
 
             ImGui::EndCombo();
@@ -53,7 +52,7 @@ void AddOperatorModal::drawUI(Scene& scene, bool& dirty)
             if (obj == operant1 || obj == operant2 || state == 2) continue;
 
             ImGui::PushID(i);
-            ImGui::BulletText(obj->getName());
+            ImGui::BulletText("%s", obj->getName());
             selectButton(obj);
             ImGui::PopID();
         }
@@ -61,7 +60,7 @@ void AddOperatorModal::drawUI(Scene& scene, bool& dirty)
         if (state == 2 && ImGui::Button("Add operator"))
         {
             dirty = true;
-            IDrawable* op = createOperator(selectedOperator, operant1, operant2);
+            IDrawable* op = createOperator(selectedOperatorType, operant1, operant2);
 
             scene.removeObject(operant1);
             if (selectedOperator != 3) //modulo only has one operant
@@ -112,19 +111,22 @@ void AddOperatorModal::selectButton(IDrawable* obj)
     }
 }
 
-IDrawable* AddOperatorModal::createOperator(int op, IDrawable* op1, IDrawable* op2) const
+IDrawable* AddOperatorModal::createOperator(CSGOperation op, IDrawable* op1, IDrawable* op2) const
 {
     switch (op)
     {
-    case 0: //union
+    case OP_UNI:
         return new OpUnion(op1, op2);
-    case 1: //intersect
+    case OP_INT:
         return new OpIntersect(op1, op2);
-    case 2: //difference
+    case OP_DIFF:
         return new OpDifference(op1, op2);
-    case 3: //modulo
+    case OP_MOD:
         return new OpModulo(op1);
-    case 4:
+    case OP_SMUN:
         return new OpSmoothUnion(op1, op2);
+    case NO_OP:
+    default:
+        std::logic_error("operator unknown when creating operator class instance");
     }
 }

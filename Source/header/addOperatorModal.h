@@ -13,10 +13,12 @@ public:
 
 private:
 	void selectButton(IDrawable* obj);
-	IDrawable* createOperator(int op, IDrawable* op1, IDrawable* op2) const;
+	IDrawable* createOperator(CSGOperation p, IDrawable* op1, IDrawable* op2) const;
 
 	int state = 0;
 	int selectedOperator = 0;
+	CSGOperation selectedOperatorType;
+
 	IDrawable* operant1 = nullptr;
 	IDrawable* operant2 = nullptr;
 };
