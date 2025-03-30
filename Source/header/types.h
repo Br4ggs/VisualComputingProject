@@ -2,6 +2,7 @@
 #define _TYPES_H
 
 #include <cstdint>
+#include <ostream>
 #include <glm/glm.hpp>
 #include <optional>
 #include <stdexcept>
@@ -114,6 +115,11 @@ constexpr const char* csgTypeToString(const CSGType& type) {
     return std::visit(CSGVisitor(), type);
 }
 
+inline std::ostream& operator<<(std::ostream& os, const CSGType& type)
+{
+    os << csgTypeToString(type);
+    return os;
+}
 
 namespace RenderStrategy {
 enum class Type {

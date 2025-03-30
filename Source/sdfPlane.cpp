@@ -1,8 +1,6 @@
 #include "header/sdfPlane.h"
 #include "header/vecUtils.h"
 
-#include "imgui.h"
-
 //TODO: fix weird rendering issue where a ball and a plane in a scene causes the
 //		ball to not be rendered properly?
 

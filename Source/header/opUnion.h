@@ -14,8 +14,7 @@ public:
 	std::vector<IDrawable*> detachChildren() override;
 	std::pair<float, glm::vec3> sdf(glm::vec3 point) const override;
 
-protected:
-	CSGType type = CSGOperation::OP_UNI;
+	const CSGType getType() const override { return CSGOperation::OP_UNI; };
 
 private:
 	IDrawable* operant1;

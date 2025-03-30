@@ -15,8 +15,7 @@ public:
 	std::pair<float, glm::vec3> sdf(glm::vec3 point) const override;
 	float getSmoothingFactor();
 
-protected:
-	CSGType type = CSGOperation::OP_SMUN;
+	const CSGType getType() const override { return CSGOperation::OP_SMUN; };
 
 private:
 	float smoothing_factor = 0.5f;
