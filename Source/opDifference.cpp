@@ -68,13 +68,10 @@ std::pair<float, glm::vec3> OpDifference::sdf(glm::vec3 point) const
 	std::pair<float, glm::vec3> obj1 = operant1->sdf(point);
 	std::pair<float, glm::vec3> obj2 = operant2->sdf(point);
 
-	if (obj1.first > -obj2.first)
-	{
+	obj2.first *= -1;
+
+	if (obj1.first > obj2.first)
 		return obj1;
-	}
 	else
-	{
-		obj2.first *= -1;
 		return obj2;
-	}
 }
