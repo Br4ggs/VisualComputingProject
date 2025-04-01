@@ -38,6 +38,9 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     input->processScrollEvent(xoffset, yoffset);
 }
 
+constexpr int windowWidth = 1920;
+constexpr int windowHeight = 1080;
+
 void drawUI()
 {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -111,7 +114,7 @@ void drawUI()
     {
         marcher->render(scene);
         unsigned char* dataptr = marcher->getRenderData();
-        screen->writeToTexture(1000, 800, dataptr);
+        screen->writeToTexture(windowWidth, windowHeight, dataptr);
     }
 
     ImGui::End();
@@ -130,7 +133,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     glfwWindowHint(GLFW_DEPTH_BITS, 24); // at least 24 bits
-    GLFWwindow* window = glfwCreateWindow(1000, 800, "VisualComputingProject", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "VisualComputingProject", nullptr, nullptr);
 
     if (window == NULL)
     {
@@ -184,9 +187,9 @@ int main()
 
     scene = new Scene();
 
-    marcher = new RayMarcher(1000, 800);
-    marchingCubes = new MarchingCubes(1000, 800, scene, &shaderProgMarchingCubes);
-    oglMarcher = new OpenGLMarcher(1000,800, scene, &OpenGLMarcherShader);
+    marcher = new RayMarcher(windowWidth, windowHeight);
+    marchingCubes = new MarchingCubes(windowWidth, windowHeight, scene, &shaderProgMarchingCubes);
+    oglMarcher = new OpenGLMarcher(windowWidth,windowHeight, scene, &OpenGLMarcherShader);
     input = new InputController(window, scene);
 
     oglMarcher->linearize();
