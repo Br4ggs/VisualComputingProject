@@ -174,7 +174,6 @@ MarchingCubes::MarchingCubes(int displayWidth, int displayHeight, Scene* scene, 
 
 void MarchingCubes::drawUI(bool& dirty)
 {
-	ImGui::Text("hoi!");
 	if (ImGui::InputInt("grid size", &gridSize))
 	{
 		dirty = true;
@@ -244,7 +243,6 @@ void MarchingCubes::regenerateMarchingCubes()
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void MarchingCubes::marchingCubes()
