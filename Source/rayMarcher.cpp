@@ -90,9 +90,9 @@ void RayMarcher::render(Scene* scene)
             unsigned int B = floor(color.z >= 1.0 ? 255 : color.z * 256.0);
 
             //set color
-            data[((i * 1000) + j) * 3]     = R;
-            data[((i * 1000) + j) * 3 + 1] = G;
-            data[((i * 1000) + j) * 3 + 2] = B;
+            data[((i * width) + j) * 3]     = R;
+            data[((i * width) + j) * 3 + 1] = G;
+            data[((i * width) + j) * 3 + 2] = B;
         }
     }
 }
