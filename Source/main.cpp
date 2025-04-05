@@ -20,6 +20,9 @@
 #include "header/OpenGLMarcher.h"
 #include "header/inputController.h"
 
+constexpr int windowWidth = 1920;
+constexpr int windowHeight = 1080;
+
 int selectedRenderBackend = 2;
 
 TexturedScreenQuad* screen = nullptr;
@@ -37,9 +40,6 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 
     input->processScrollEvent(xoffset, yoffset);
 }
-
-constexpr int windowWidth = 1920;
-constexpr int windowHeight = 1080;
 
 void drawUI()
 {
@@ -161,7 +161,7 @@ int main()
         return -1;
     }
 
-    glViewport(0, 0, 1000, 800);
+    glViewport(0, 0, windowWidth, windowHeight);
 
     ShaderProgram shaderProgMarcher;
     shaderProgMarcher.attachVertexShader("vertexScreenQuad.glsl");
