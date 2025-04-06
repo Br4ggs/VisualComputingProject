@@ -218,8 +218,7 @@ void main()
 		total_distance += distance;
 
 		if (total_distance > MAX_DISTANCE) {
-
-			//render background
+			// render background
 			colour = u_background_color - max(0.95f * -ray_direction.y, 0.0f);
 			break;
 		}
@@ -230,22 +229,40 @@ void main()
 			vec3 V = -ray_direction;
 			vec3 R = reflect(-L, N);
 
+			float shadow = 1.0;
+			vec3 shadow_origin = current_position + N * 0.01;
+			vec3 shadow_ray = normalize(u_light_position - shadow_origin);
+			float light_distance = length(u_light_position - shadow_origin);
+			float shadow_distance = 0.0;
+			vec3 dummy;
+
+			for (int j = 0; j < MAX_ITERATIONS; ++j) {
+				vec3 shadow_pos = shadow_origin + shadow_ray * shadow_distance;
+				float d = get_distance(shadow_pos, dummy);
+				shadow_distance += d;
+
+				if (shadow_distance > light_distance) {
+					break;
+				}
+				if (d < THRESHOLD) {
+					shadow = 0.0;
+					break;
+				}
+			}
+
 			vec3 ambient = object_color * ambient_color;
 			vec3 diffuse = object_color * clamp(dot(L, N), 0.0, 1.0);
 			vec3 specular = light_color * pow(clamp(dot(R, V), 0.0, 1.0), shininess) * specular_strength;
 
-			colour = ambient + diffuse + specular;
+			colour = ambient + shadow * (diffuse + specular);
 
-			//add fog to mitigate ugly aliasing effects
 			vec3 bg = u_background_color - max(0.95f * -ray_direction.y, 0.0f);
 			colour = mix(colour, bg, 1.0 - exp(u_fog_creep * total_distance * total_distance));
-
 			break;
 		}
 	}
 
-	//gamma correction
+	// gamma correction
 	colour = pow(colour, vec3(0.4545));
-
 	fragment_colour = vec4(colour, 1.0);
 }
